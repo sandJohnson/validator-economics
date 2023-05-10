@@ -1,0 +1,240 @@
+\ifglsentryexists{apr}{}%
+{%
+\gls@defglossaryentry{apr}%
+{%
+name={APR},%
+sort={APR},%
+type={acronym},%
+first={annual percentage rate\glsspace (APR)},%
+firstplural={annual percentage rates\glsspace (APRs)},%
+text={APR},%
+plural={APRs},%
+description={annual percentage rate},%
+descriptionplural={annual percentage rate\acrpluralsuffix },%
+symbol={\relax },%
+symbolplural={\relax },%
+user1={},%
+user2={},%
+user3={},%
+user4={},%
+user5={},%
+user6={},%
+long={annual percentage rate},%
+longplural={annual percentage rates},%
+short={APR},%
+shortplural={APRs},%
+counter={page},%
+parent={},%
+%
+}%
+}%
+\ifglsentryexists{dtmc}{}%
+{%
+\gls@defglossaryentry{dtmc}%
+{%
+name={DTMC},%
+sort={DTMC},%
+type={acronym},%
+first={Discrete Time Markov Chain\glsspace (DTMC)},%
+firstplural={Discrete Time Markov Chains\glsspace (DTMCs)},%
+text={DTMC},%
+plural={DTMCs},%
+description={Discrete Time Markov Chain},%
+descriptionplural={Discrete Time Markov Chain\acrpluralsuffix },%
+symbol={\relax },%
+symbolplural={\relax },%
+user1={},%
+user2={},%
+user3={},%
+user4={},%
+user5={},%
+user6={},%
+long={Discrete Time Markov Chain},%
+longplural={Discrete Time Markov Chains},%
+short={DTMC},%
+shortplural={DTMCs},%
+counter={page},%
+parent={},%
+%
+}%
+}%
+\ifglsentryexists{ef}{}%
+{%
+\gls@defglossaryentry{ef}%
+{%
+name={EF},%
+sort={EF},%
+type={acronym},%
+first={Ethereum Foundation\glsspace (EF)},%
+firstplural={Ethereum Foundations\glsspace (EFs)},%
+text={EF},%
+plural={EFs},%
+description={Ethereum Foundation},%
+descriptionplural={Ethereum Foundation\acrpluralsuffix },%
+symbol={\relax },%
+symbolplural={\relax },%
+user1={},%
+user2={},%
+user3={},%
+user4={},%
+user5={},%
+user6={},%
+long={Ethereum Foundation},%
+longplural={Ethereum Foundations},%
+short={EF},%
+shortplural={EFs},%
+counter={page},%
+parent={},%
+%
+}%
+}%
+\ifglsentryexists{hmm}{}%
+{%
+\gls@defglossaryentry{hmm}%
+{%
+name={HMM},%
+sort={HMM},%
+type={acronym},%
+first={Hidden Markov Model\glsspace (HMM)},%
+firstplural={Hidden Markov Models\glsspace (HMMs)},%
+text={HMM},%
+plural={HMMs},%
+description={Hidden Markov Model},%
+descriptionplural={Hidden Markov Model\acrpluralsuffix },%
+symbol={\relax },%
+symbolplural={\relax },%
+user1={},%
+user2={},%
+user3={},%
+user4={},%
+user5={},%
+user6={},%
+long={Hidden Markov Model},%
+longplural={Hidden Markov Models},%
+short={HMM},%
+shortplural={HMMs},%
+counter={page},%
+parent={},%
+%
+}%
+}%
+\ifglsentryexists{mev}{}%
+{%
+\gls@defglossaryentry{mev}%
+{%
+name={MEV},%
+sort={MEV},%
+type={acronym},%
+first={maximal extractable value\glsspace (MEV)},%
+firstplural={maximal extractable values\glsspace (MEVs)},%
+text={MEV},%
+plural={MEVs},%
+description={maximal extractable value},%
+descriptionplural={maximal extractable value\acrpluralsuffix },%
+symbol={\relax },%
+symbolplural={\relax },%
+user1={},%
+user2={},%
+user3={},%
+user4={},%
+user5={},%
+user6={},%
+long={maximal extractable value},%
+longplural={maximal extractable values},%
+short={MEV},%
+shortplural={MEVs},%
+counter={page},%
+parent={},%
+%
+}%
+}%
+\ifglsentryexists{isam}{}%
+{%
+\gls@defglossaryentry{isam}%
+{%
+name={ISAM},%
+sort={ISAM},%
+type={acronym},%
+first={Incentive Systems Analysis \& Modelling\glsspace (ISAM)},%
+firstplural={Incentive Systems Analysis \& Modellings\glsspace (ISAMs)},%
+text={ISAM},%
+plural={ISAMs},%
+description={Incentive Systems Analysis \& Modelling},%
+descriptionplural={Incentive Systems Analysis \& Modelling\acrpluralsuffix },%
+symbol={\relax },%
+symbolplural={\relax },%
+user1={},%
+user2={},%
+user3={},%
+user4={},%
+user5={},%
+user6={},%
+long={Incentive Systems Analysis \& Modelling},%
+longplural={Incentive Systems Analysis \& Modellings},%
+short={ISAM},%
+shortplural={ISAMs},%
+counter={page},%
+parent={},%
+%
+}%
+}%
+\ifglsentryexists{pmc}{}%
+{%
+\gls@defglossaryentry{pmc}%
+{%
+name={PMC},%
+sort={PMC},%
+type={acronym},%
+first={Probabilistic Model Checking\glsspace (PMC)},%
+firstplural={Probabilistic Model Checkings\glsspace (PMCs)},%
+text={PMC},%
+plural={PMCs},%
+description={Probabilistic Model Checking},%
+descriptionplural={Probabilistic Model Checking\acrpluralsuffix },%
+symbol={\relax },%
+symbolplural={\relax },%
+user1={},%
+user2={},%
+user3={},%
+user4={},%
+user5={},%
+user6={},%
+long={Probabilistic Model Checking},%
+longplural={Probabilistic Model Checkings},%
+short={PMC},%
+shortplural={PMCs},%
+counter={page},%
+parent={},%
+%
+}%
+}%
+\ifglsentryexists{rig}{}%
+{%
+\gls@defglossaryentry{rig}%
+{%
+name={RIG},%
+sort={RIG},%
+type={acronym},%
+first={Rigorous Incentives Group\glsspace (RIG)},%
+firstplural={Rigorous Incentives Groups\glsspace (RIGs)},%
+text={RIG},%
+plural={RIGs},%
+description={Rigorous Incentives Group},%
+descriptionplural={Rigorous Incentives Group\acrpluralsuffix },%
+symbol={\relax },%
+symbolplural={\relax },%
+user1={},%
+user2={},%
+user3={},%
+user4={},%
+user5={},%
+user6={},%
+long={Rigorous Incentives Group},%
+longplural={Rigorous Incentives Groups},%
+short={RIG},%
+shortplural={RIGs},%
+counter={page},%
+parent={},%
+%
+}%
+}%
