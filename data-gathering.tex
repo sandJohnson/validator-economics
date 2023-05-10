@@ -1,0 +1,65 @@
+\documentclass[UTF8]{article}
+\usepackage{geometry}                % See geometry.pdf to learn the layout options. There are lots.
+\geometry{a4paper}                   % ... or a4paper or a5paper or ... 
+
+%\geometry{landscape}                % Activate for for rotated page geometry
+\usepackage{graphicx}
+\usepackage{hyperref}
+\usepackage{amssymb}
+\usepackage{epstopdf}
+\usepackage{algorithm}
+\usepackage[noend]{algpseudocode}
+\usepackage{enumitem}
+\usepackage[acronym]{glossaries}
+\usepackage[hang,footnotesize,bf]{caption}
+\DeclareGraphicsRule{.tif}{png}{.png}{`convert #1 `dirname #1`/`basename #1 .tif`.png}
+
+
+% Copied from Stack Exchange for ToDo items
+% -----------------------------------------------------------
+\usepackage{xargs} 
+\usepackage[pdftex,dvipsnames]{xcolor}  % Coloured text etc.
+% 
+\usepackage[colorinlistoftodos,prependcaption,textsize=tiny]{todonotes}
+\newcommandx{\unsure}[2][1=]{\todo[linecolor=red,backgroundcolor=red!25,bordercolor=red,#1]{#2}}
+\newcommandx{\change}[2][1=]{\todo[linecolor=blue,backgroundcolor=blue!25,bordercolor=blue,#1]{#2}}
+\newcommandx{\info}[2][1=]{\todo[linecolor=OliveGreen,backgroundcolor=OliveGreen!25,bordercolor=OliveGreen,#1]{#2}}
+\newcommandx{\improvement}[2][1=]{\todo[linecolor=Plum,backgroundcolor=Plum!25,bordercolor=Plum,#1]{#2}}
+\newcommandx{\thiswillnotshow}[2][1=]{\todo[disable,#1]{#2}}
+
+
+\title{Validator Economics: Variable min validator deposit size\\
+\vspace{4pt}
+\large EF Academic Grant ID: xxx\\
+\vspace{16pt}
+DATA SOURCES \& GATHERING}
+\vspace{16pt}
+\author{Sandra Johnson\\
+ConsenSys Software R\&D}
+\date{\today}                                           % Activate to display a given date or no date
+
+\begin{document}
+\maketitle
+
+
+% Acronym definitions
+\newacronym{apr}{APR}{annual percentage rate}
+\newacronym{ef}{EF}{Ethereum Foundation}
+\newacronym{mev}{MEV}{maximal extractable value}
+\newacronym{rig}{RIG}{Rigorous Incentives Group}
+\newacronym{ssf}{SSF}{single slot finality}
+
+% ------------------------------------------------------------------------------
+\section{Overview}
+% ------------------------------------------------------------------------------
+This document details available information, data sources, and visualisations that will provide relevant data insights to gain a deeper understanding of current validator economics and any intuitions or assumptions used in formulating proposed solutions to capping the number of validators. The information gathering is targeted towards the proposal being evaluated, viz. a variable minimum validator balance, which is one of the proposals that Vitalik articulated in his blog post regarding \gls{ssf} 
+
+As the project progresses and additional data requirements are identified, this document will be updated accordingly.
+
+Many people have generously contributed time and data, and made helpful suggestions, which has been incredibly helpful in compiling the resources listed in this document. They include, but are not limited to Barnabé Monnot and the \gls{rig} team, Justin Drake and Alex, Ben Edgington, Paul Harris and Josh Fernandez.
+
+
+
+\end{document}
+
+
