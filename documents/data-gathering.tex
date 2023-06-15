@@ -33,7 +33,7 @@
 \vspace{4pt}
 \large EF Academic Grant ID: FY23-1030\\
 \vspace{16pt}
-DATA SOURCES \& GATHERING}
+MILESTONE 1: IDENTIFICATION OF DATA SOURCES \& INSIGHTS}
 \vspace{16pt}
 \author{Sandra Johnson\\
 ConsenSys Software R\&D}
@@ -53,9 +53,17 @@ ConsenSys Software R\&D}
 % ------------------------------------------------------------------------------
 \section{Overview}
 % ------------------------------------------------------------------------------
-This document is joint work with Kerrie Mengersen and Patrick O'Callaghan, and details available information, data sources, and proposed visualisations that will provide relevant data insights to gain a deeper understanding of current validator economics and any intuitions or assumptions used in formulating proposed solutions to capping the number of validators. 
+This document is the deliverable for Milestone 1 of EF Academic Grant ID: FY23-1030, and is joint work with Kerrie Mengersen and Patrick O'Callaghan. It details available information, data sources, and proposed visualisations that will provide relevant data insights to gain a deeper understanding of current validator economics and any intuitions or assumptions used in formulating proposed solutions to capping the number of validators. This document 
 
-The information gathering is targeted towards the proposal being evaluated, viz. a variable minimum validator balance, which is one of the proposals that Vitalik articulated in his blog post regarding \gls{ssf} 
+The information gathering is targeted towards the proposal being evaluated, viz. a variable minimum validator balance, which is one of the proposals that Vitalik articulated in his blog post regarding \gls{ssf}.  As Vitalik summarises in his blogpost ``Determining the validator economics'' means ``answering the question of who stays and who goes if demand for becoming a validator exceeds the system's capacity to process validators'' and he adds that this question ``involves the hardest tradeoffs that are not-just-technical and merits engagement from the community.''
+
+In other words, the floating minimum balance proposal is one of the ways put forward by Vitalik to manage a cap on the total number of validators. In this proposal, the validator with the lowest balance will be kicked out when the total number of validators is greater than the cap. 
+
+Vitalik highlighted a potential vulnerability that could be introduced with this proposal, viz. the emergence of a new type of griefing attack \cite{Buterin2018c} where validators split their stake in order to push smaller validators out. 
+
+The consequence of such a successful griefing attack is that the wealthier validators increase their reward, \textit{R}, because the total deposit amount, \textit{D}, decreases. (Current formula to calculate the validator reward: $R = \frac{k}{\sqrt{D}}$).
+
+Vitalik further suggests that this attack could possibly be mitigated by ``adding a fee per validator slot, and target it so that under a Zipfian distribution this is never worth it. However, this would still leave open a potential vulnerability if the distribution becomes very non-Zipfian''. 
 
 As the project progresses and additional data requirements are identified, this document will be updated accordingly.
 
@@ -71,6 +79,71 @@ Many people have generously contributed time and data, and made helpful suggesti
 \item The beacon chain \textbf{deposit contract address} is: 0x00000000219ab540356cBB839Cbe05303d7705Fa 
 \item The beacon chain \textbf{genesis block number} is 11182202
 \end{itemize}
+
+
+% ---------------------------------------------------------
+ \subsection{Total ETH Supply}
+ % ---------------------------------------------------------
+\label{sec:ethsupply} 
+        The total supply of ETH used to be fairly simple to work out, but it is now more complicated for two main reasons:  implementation of EIP-1559 and the Merge.
+Currently we are ``(a) burning ETH via the base fee and (b) the issuance is variable depending on the number of validators.'' (Ben Edgington 2023). 
+\begin{itemize}
+	\item Ultrasound is considered a credible source for total ETH supply projections. \\\textit{\href{https://ultrasound.money/}{Ultra sound money}} visualises various aspects of Ether supply since the Merge, gas, supply projections, the burn, total value secured - TVS and monetary premium. See figures~\ref{fig:ethsupply}~-~\ref{fig:monetary}, on pages~\pageref{fig:ethsupply}~-~\pageref{fig:monetary}.  
+
+\begin{itemize}
+	\item Ultrasound supplied two datasets for our analysis - the first had total supply at a more accurate and finer grained level, but shorter time period and the second dataset had data points roughly every 1,000 epochs covering from soon after Beacon chain genesis. The latter dataset is from Glassnode and would not be as accurate as the initial data provided by Alex Tesfamichael from Ultrasound.
+\end{itemize}
+	\item \textit{\href{https://etherscan.io/chart/ethersupplygrowth}{Etherscan}} is a good source of historic data for the growth in Ether supply since 2015. There are several pages of detailed information and the \textit{Charts \& Statistics} webpage has several visualisations, often with the ability to select different time ranges and a link to download the raw data as csv files, providing that Etherscan is acknowledged when these datasets are used.\\
+	Figures~\ref{fig:ethscan}~to~\ref{fig:ethgrowth} on pages~\pageref{fig:ethscan}~to~\pageref{fig:ethgrowth} show the visualisations that are currently available.
+\end{itemize}
+
+% -----------------------------------------------------------------
+\subsection{Validators, Stakers and Staking pools}
+% -----------------------------------------------------------------
+\label{sec:stakers}
+There are several helpful documents explaining in detail the different options available for staking:
+\begin{itemize}
+\item \href{https://ethereum.org/en/staking/solo/}{Solo staking}
+\item \href{https://ethereum.org/en/staking/saas/}{Staking as a Service (Saas)}
+\item \href{https://ethereum.org/en/staking/pools/}{Pooled staking}
+\end{itemize}
+
+According to the \href{https://launchpad.ethereum.org/en/}{Staking Launchpad} on June 2023:
+\begin{itemize}
+\item Total ETH staked: 19,357,605 ETH
+\item Total validators: 606,947
+\item Current \gls{apr}: 4.74\%
+\end{itemize}
+
+\subsubsection*{LIDO}
+% ----------------------------
+LIDO is a popular liquid staking pool. 
+At the time of writing, 7 June 2023, the total amount of ETH staked with \href{https://lido.fi/ethereum}{LIDO}  is 7,127,430 ETH. 
+
+Several graphs have been generated in Dune Analytics. See Figures~\ref{fig:dunelido1}~to~\ref{fig:dunelido5} on pages~\pageref{fig:dunelido1}~to~\pageref{fig:dunelido5}.
+
+
+\subsubsection*{Rocket Pool}
+% -----------------------------------
+A \href{https://rocketpool.net/}{Rocket Pool} node only needs to stake 16 ETH, and this stake is then coupled with 16 ETH from the staking pool to create a validator, known as a ``minipool''.  Staking in the Rocket Pool can be a stake of a little as 0.01 ETH, which is then issued as an rETH token representing the amount deposited into the pool. A node operator would obtain staked ETH from the pool to form a validator.
+
+Currently, 8 June 2023, Rocket Pool has staked 722,176 ETH and has 2,842 node operators.
+
+If we can identify the number of distinct rETH token holders, we would be able to determine the number of stakers staking ETH in Rocket Pool. 
+Examples of the graphs and information available from the Dune dashboard are shown in figures~\ref{fig:dunerocket1}~-~\ref{fig:rocketdrworm12} on pages~\pageref{fig:dunerocket1}~-~\pageref{fig:rocketdrworm12}.
+
+\subsubsection*{Data from an archive node}
+% --------------------------------------------------------
+Accessing a teku-besu archive node, \texttt{teku-besu-ohio-mainnet-archive-01},  we were able to use several API endpints to extract some rich data for validators.\\
+	 We selected several API endpoints from those listed in GitHub: \href{https://ethereum.github.io/beacon-APIs/?urls.primaryName=dev}{Eth Beacon Node API}\\
+	 Some visualisations of validator information from the archive node are in figures~\ref{fig:dailyvalidator1}~-~\ref{fig:cumulativevalidatorsregression}, pages~\pageref{fig:dailyvalidator1}~-~\pageref{fig:cumulativevalidatorsregression}.
+	 
+\subsubsection*{Rated network explorer}
+% --------------------------------------------------------	 
+Rated provides \href{https://docs.rated.network}{documentation} for context and detail of the metrics and visualisations presented on its website.
+	 The home page displays Beacon Chain validator ratings for the Ethereum beacon chain, figure~\ref{fig:ratedentity1}, page~\pageref{fig:ratedentity1}, but one can also select the G\"oerli test network to display ratings for those validators.
+Figure~\ref{fig:ratednw1}, page~\pageref{fig:ratednw1} depicts four metrics to reflect network health and four reference rates of return for the entire active validator set.
+
 
 % ----------------------------------------------------------
 \subsection{Client and staking pool diversity}
@@ -93,21 +166,8 @@ Many people have generously contributed time and data, and made helpful suggesti
 However, it is important to note that it is challenging to measure peer types in the network, and therefore the figures are at best approximations based on the information at hand. 
 
 \end{itemize}	
-% ---------------------------------------------------------
- \subsection{Total ETH Supply}
- % ---------------------------------------------------------
-\label{sec:ethsupply} 
-        The total supply of ETH used to be fairly simple to work out, but it is now more complicated for two main reasons:  implementation of EIP-1559 and the Merge.
-Currently we are ``(a) burning ETH via the base fee and (b) the issuance is variable depending on the number of validators.'' (Ben Edgington 2023). 
-\begin{itemize}
-	\item Ultrasound is considered a credible source for total ETH supply projections. \\\textit{\href{https://ultrasound.money/}{Ultra sound money}} visualises various aspects of Ether supply since the Merge, gas, supply projections, the burn, total value secured - TVS and monetary premium. See figures~\ref{fig:ethsupply}~-~\ref{fig:monetary}, on pages~\pageref{fig:ethsupply}~-~\pageref{fig:monetary}.  
 
-\begin{itemize}
-	\item Ultrasound supplied two datasets for our analysis - the first had total supply at a more accurate and finer grained level, but shorter time period and the second dataset had data points roughly every 1,000 epochs covering from soon after Beacon chain genesis. The latter dataset is from Glassnode and would not be as accurate as the initial data provided by Alex Tesfamichael from Ultrasound.
-\end{itemize}
-	\item \textit{\href{https://etherscan.io/chart/ethersupplygrowth}{Etherscan}} is a good source of historic data for the growth in Ether supply since 2015. There are several pages of detailed information and the \textit{Charts \& Statistics} webpage has several visualisations, often with the ability to select different time ranges and a link to download the raw data as csv files, providing that Etherscan is acknowledged when these datasets are used.\\
-	Figures~\ref{fig:ethscan}~to~\ref{fig:ethgrowth} on pages~\pageref{fig:ethscan}~to~\pageref{fig:ethgrowth} show the visualisations that are currently available.
-\end{itemize}
+
 % ---------------------------------------------------------	
 \subsection{Multiple datasets}
 % ---------------------------------------------------------
@@ -119,34 +179,39 @@ There are several resources that contain lists and visualisations of a variety o
 		\item On the home page, there is a \textbf{progress line} at the top of the page showing the \textit{number of slots left in the current epoch}. (Figure~\ref{fig:bhomepg}, page~\pageref{fig:bhomepg})
 		\item Immediately below the progress line, there is a \textbf{summary line} showing the \textit{current epoch number}, the \textit{last finalised epoch}, the \textit{current slot number}, the \textit{number of active and pending validators}, the \textit{total staked ETH} and the \textit{average validator balance}. (Figure~\ref{fig:bhomepg})
 		\item Below this summary there is a \textbf{graph} of the \textit{number of active validators} and \textit{staked ETH} for the last week (Figure~\ref{fig:bhomepg})
-		\item Then there are two side by side tables. The \textbf{left table} has information about the most recent epochs: \textit{epoch number, time, whether it is final, the eligible ETH, the number of percentage of votes}. The \textbf{right table} has information about the most recent blocks: \textit{epoch number, slot number, blockfigu number, status of the block (proposed or missed), time} and the \textit{proposer id}. These two tables are shown in Figure~\ref{fig:bhomepg2}, page~\pageref{fig:bhomepg2}).\\
+		\item Then there are two side by side tables. The \textbf{left table} has information about the most recent epochs: \textit{epoch number, time, whether it is final, the eligible ETH, the number of percentage of votes}. The \textbf{right table} has information about the most recent blocks: \textit{epoch number, slot number, block number, status of the block (proposed or missed), time} and the \textit{proposer id}. These two tables are shown in Figure~\ref{fig:bhomepg2}, page~\pageref{fig:bhomepg2}).\\
 		\item Moreover, one can click on the epoch, slot and block numbers in the tables to obtain a detailed view of the epoch, slot or block number. 
 		\item There is also a link to the validator ID in the right table that provides a detailed view of that validator.
-		\item Figures~\ref{fig:bepochs}~-~\ref{fig:bmempool} on pages~\pageref{fig:bepochs}~-~\pageref{fig:bmempool} gives detailed blockchain data.
-		\item Figures~\ref{fig:bvalidators}~-~\ref{fig:bblschgs} on pages~\pageref{fig:bvalidators}~-~\pageref{fig:bblschgs} gives detailed validator data.
+		\item Figures~\ref{fig:bepochs}~-~\ref{fig:bmempool} on pages~\pageref{fig:bepochs}~-~\pageref{fig:bmempool} displays detailed blockchain data.
+		\item Figures~\ref{fig:bvalidators}~-~\ref{fig:bblschgs} on pages~\pageref{fig:bvalidators}~-~\pageref{fig:bblschgs} displays detailed validator data.
 		\item Beaconcha.in provide additional visualisations and tools. For example, the ability to generate graphs to show the correlation between two variables (Figure~\ref{fig:bcorrelations} on page~\pageref{fig:bcorrelations}.
 	\end{itemize}
 
-	\item \textit{\href{https://mevboost.pics/data.html}{Mevboost.pics - Open Data}} will eventually provide links to download several datasets: 
-		\begin{itemize}
+	\item \textit{\href{https://mevboost.pics}{Mevboost.pics}} 
+	\begin{itemize}
+		\item \textit{\href{https://mevboost.pics}{MEV-Boost General Dashboard}}\\
+		Examples of the contents displayed on the general dashboard can be seen in figures~\ref{fig:mevhome1}~-~\ref{fig:mevhome4} on pages~\pageref{fig:mevhome1}~-~\pageref{fig:mevhome4}.
+		\item \textit{\href{https://mevboost.pics}{MEV-Boost Builders Dashboard}}\\
+		Examples of the contents displayed on the builders dashboard can be seen in figures~\ref{fig:mevbuilder1}~-~\ref{fig:mevbuilder4} on pages~\pageref{fig:mevbuilder1}~-~\pageref{fig:mevbuilder4}.
+		\item \textit{\href{https://mevboost.pics}{MEV-Boost Relays Dashboard}}\\
+		Examples of the contents displayed on the relays dashboard can be seen in figures~\ref{fig:mevrelay1}~-~\ref{fig:mevrelay4} on pages~\pageref{fig:mevrelay1}~-~\pageref{fig:mevrelay4}.
+		\item \textit{\href{https://mevboost.pics}{MEV-Boost Validators Dashboard}}\\
+		Examples of the contents displayed on the validators dashboard can be seen in figures~\ref{fig:mevvalidator1}~-~\ref{fig:mevvalidator4} on pages~\pageref{fig:mevvalidator1}~-~\pageref{fig:mevvalidator4}.
+		\item \textit{\href{https://mevboost.pics/data.html}{Mevboost.pics - Open Data}} will eventually provide links to download several datasets: (Figure~\ref{fig:mevboostrawdata}, page~\pageref{fig:mevboostrawdata})
+		\begin{itemize} 
 			\item \textit{eth\_data} - Slots since Merge with additional MEV-Boost and validator info such as: date, slot, block number, relay, builder pubkey, proposer pubkey, mevboost value, builder, validator \textit{(Available now)}
-			\item \textit{pubkey\_mapping} - Validator public keys mapped to known entities such as Lido, Kraken ect. \textit{(Not available)}
+			\item \textit{pubkey\_mapping} - Validator public keys mapped to known entities such as Lido, Kraken ect. \textit{(Available now)}
 			\item \textit{tc\_txs} - Tornado Cash related transactions \textit{(Not available)}
 			\item \textit{staking\_txs} - Deposit transactions to the ETH2 Deposit contract \textit{(Not available)}
 			\item \textit{relays\_over\_time} - Number of successfully relayed blocks per day \textit{(Not available)}
 			\item \textit{builders\_over\_time} - Number of successfully built blocks per day \textit{(Not available)}
 		\end{itemize}
+	\end{itemize}
+
 \end{itemize}
-% ---------------------------------------------------------
-\subsection{Stakers and Staking pools}
-% ---------------------------------------------------------
-\label{sec:stakers}
-\begin{itemize}
-	\item \textbf{Data from an archive node} \\
-	We had access to a teku-besu archive node, \texttt{teku-besu-ohio-mainnet-archive-01},  against which we were able to run many API queries to provide some rich data.\\
-	 We ran API calls from those listed in GitHub: \href{https://ethereum.github.io/beacon-APIs/?urls.primaryName=dev}{Eth Beacon Node API}
-\end{itemize}
+
 \clearpage
+
 % ---------------------------------------------------------------
 \subsection{Existing visualisations}
 % --------------------------------------------------------------
@@ -290,6 +355,151 @@ There are several resources that contain lists and visualisations of a variety o
 \label{fig:monetary}
 \end{center}
 \end{figure}
+\clearpage
+
+
+% --------------------------------------
+\subsubsection*{Rated network explorer}
+% --------------------------------------
+\textbf{Entity Views} \\
+% ----------------------------------
+\begin{figure}[htbp]
+\begin{center}
+\includegraphics[width=\linewidth]{images/ratedentity1}
+\caption{Rated network explorer: beacon chain validator ratings for staking pools. Select from timeframes: 1 day, 7 days, 30 days, or all (since merge) , 1 June 2023}
+\label{fig:ratedentity1}
+\end{center}
+\end{figure}
+
+\begin{figure}[htbp]
+\begin{center}
+\includegraphics[width=\linewidth]{images/ratedentity2}
+\caption{Rated network explorer: beacon chain validator ratings for node operators. Select from timeframes: 1 day, 7 days, 30 days, or all (since merge) , 1 June 2023}
+\label{fig:ratedentity2}
+\end{center}
+\end{figure}
+
+\begin{figure}[htbp]
+\begin{center}
+\includegraphics[width=\linewidth]{images/ratedentity3}
+\caption{Rated network explorer: beacon chain validator ratings by deposit addresses. Select from timeframes: 1 day, 7 days, 30 days, or all (since merge) , 1 June 2023}
+\label{fig:ratedentity3}
+\end{center}
+\end{figure}
+
+\begin{figure}[htbp]
+\begin{center}
+\includegraphics[width=\linewidth]{images/ratedentity4a}\\
+\includegraphics[width=\linewidth]{images/ratedentity4b}\\
+\includegraphics[width=\linewidth]{images/ratedentity4c}
+\caption{Rated network explorer: view of a chosen validator (using id or public key). Select from timeframes: 1 day, 7 days, 30 days, or all (since merge) , 1 June 2023}
+\label{fig:ratedentity4}
+\end{center}
+\end{figure}
+\clearpage
+
+\textbf{Aggregate Views} 
+% ----------------------------------
+\begin{figure}[htbp]
+\begin{center}
+\includegraphics[width=\linewidth]{images/ratedtrend1}\\
+(a)
+\includegraphics[width=\linewidth]{images/ratedtrend2}\\
+(b)
+\caption{Rated network explorer: top 5 and bottom 5 identified operators (a) and the top and bottom 5 operators by deposit addresses (b). Timeframes: 1 day, 7 days, 30 days or all (since merge), 1 June 2023}
+\label{fig:ratedtrend1}
+\end{center}
+\end{figure}
+
+\begin{figure}[htbp]
+\begin{center}
+\includegraphics[width=\linewidth]{images/ratedtrend3}\\
+(a)
+\includegraphics[width=\linewidth]{images/ratedtrend4}\\
+(b)
+\caption{Rated network explorer: top 5 and bottom 5 validators (a).  Top 5 and bottom 5 of operators that facilitated some MEV (total or average) (b), For both visualisations, select a timeframe: 1 day, 7 days, 30 days or all (since merge),1 June 2023}
+\label{fig:ratedtrend4}
+\end{center}
+\end{figure}
+
+\begin{figure}[htbp]
+\begin{center}
+\includegraphics[width=\linewidth]{images/ratedtrend5}
+\caption{Rated network explorer: top 5 entities by times slashed and top 5 operators by number of slashes reported. Select timeframes of 30 days, or all days (since merge) , 1 June 2023}
+\label{fig:ratedtrend5}
+\end{center}
+\end{figure}
+
+\begin{figure}[htbp]
+\begin{center}
+\includegraphics[width=\linewidth]{images/ratednw1}\\
+(a)
+\includegraphics[width=\linewidth]{images/ratednw2}\\
+(b)
+\caption{Rated network explorer: high level metrics to reflect the health of the network  (a) and four reference rates of return for the entire active validator set. (b), For both visualisations, select a timeframe: 1 day, 7 days, 30 days or all (since merge),1 June 2023}
+\label{fig:ratednw1}
+\end{center}
+\end{figure}
+
+\begin{figure}[htbp]
+\begin{center}
+\includegraphics[width=\linewidth]{images/ratednw3}\\
+(a)
+\includegraphics[width=\linewidth]{images/ratednw4}\\
+(b)
+\caption{Rated network explorer: activation \& exits information: the number of validators activated and the proportion of activation capacity for selected timeframe, and similarly for validators exiting.  (a) and four reference rates of return for the entire active validator set. (b), For both visualisations, select a timeframe: 1 day, 7 days, 30 days or all (since merge),1 June 2023}
+\label{fig:ratednw4}
+\end{center}
+\end{figure}
+
+\clearpage
+\textbf{MEV Relay Landscape}\\
+% ---------------------------------------
+\begin{figure}[htbp]
+\begin{center}
+\includegraphics[width=\linewidth]{images/ratedrelay1}
+\caption{Rated network explorer: MEV relay summary statistics for 30 days, selected from timeframes: 1 day, 7 days, 30 days or all (since merge), 6 June 2023}
+\label{fig:ratedrelay1}
+\end{center}
+\end{figure}
+
+\begin{figure}[htbp]
+\begin{center}
+\includegraphics[width=\linewidth]{images/ratedrelay2}
+\caption{Rated network explorer: Comparison between MEV relays for blocks procured from relays that were included in the canonical chain for all days, selected from timeframes: 1 day, 7 days, 30 days or all (since merge), 6 June 2023}
+\label{fig:ratedrelay2}
+\end{center}
+\end{figure}
+
+\begin{figure}[htbp]
+\begin{center}
+\includegraphics[width=\linewidth]{images/ratedrelay3}
+\caption{Rated network explorer: MEV-boost relay market share selecting all days from timeframes: 1 day, 7 days, 30 days or all (since merge), 6 June 2023}
+\label{fig:ratedrelay3}
+\end{center}
+\end{figure}
+
+\clearpage
+\textbf{MEV Builder Landscape}
+% ---------------------------------------
+\begin{figure}[htbp]
+\begin{center}
+\includegraphics[width=\linewidth]{images/ratedbuilder}
+\caption{Rated network explorer: MEV relay summary statistics for 30 days, selected from timeframes: 1 day, 7 days, 30 days or all (since merge), 6 June 2023}
+\label{fig:ratedbuilder}
+\end{center}
+\end{figure}
+
+\textbf{Diversified Staked ETH Index (dsETH) from Index Coop}
+% ---------------------------------------
+\begin{figure}[htbp]
+\begin{center}
+\includegraphics[width=0.9\linewidth]{images/ratedcoop}
+\caption{Rated network explorer: Key metrics of staked ETH index and time series for all available days, selected from timeframes: 1 day, 7 days, 30 days or all (since merge), 6 June 2023}
+\label{fig:ratedcoop}
+\end{center}
+\end{figure}
+
 
 \clearpage
 % --------------------------------------
@@ -306,7 +516,8 @@ Moreover, there are several summary graphs and visualisations that have been cre
 \label{fig:ethscan}
 \end{center}
 \end{figure}
-\clearpage
+
+
 \textbf{Detailed blockchain data}\\
 % ------------------------------------------
 \begin{figure}[htbp]
@@ -407,6 +618,151 @@ Moreover, there are several summary graphs and visualisations that have been cre
 \end{figure}
 
 \clearpage
+% --------------------------------------
+\subsubsection*{Dune Analytics}
+% --------------------------------------
+\textbf{LIDO}
+% -------------
+\begin{figure}[htbp]
+\begin{center}
+\includegraphics[width=\linewidth]{images/dunelido1}\\
+\includegraphics[width=\linewidth]{images/dunelido2}
+\caption{Dune Analytics Lido post Merge protocol APR dashboard by @LidoAnalytical  (7 June 2023)}
+\label{fig:dunelido1}
+\end{center}
+\end{figure}
+
+\begin{figure}[htbp]
+\begin{center}
+\includegraphics[width=\linewidth]{images/dunelido3}
+\caption{Dune Analytics Lido Execution Layer rewards by @LidoAnalytical  (7 June 2023)}
+\label{fig:dunelido3}
+\end{center}
+\end{figure}
+
+\begin{figure}[htbp]
+\begin{center}
+\includegraphics[width=\linewidth]{images/dunelido4}\\
+\includegraphics[width=\linewidth]{images/dunelido5}
+\caption{Dune Analytics Lido MEV builders statistics by @LidoAnalytical  (7 June 2023)}
+\label{fig:dunelido5}
+\end{center}
+\end{figure}
+\noindent
+\clearpage
+\noindent
+
+\textbf{Rocket Pool}
+% -------------
+\begin{figure}[htbp]
+\begin{center}
+\includegraphics[width=\linewidth]{images/dunerocket1}\\
+\includegraphics[width=\linewidth]{images/dunerocket2}
+\caption{Dune Analytics Rocket Pool overview by @KIV  (7 June 2023)}
+\label{fig:dunerocket1}
+\end{center}
+\end{figure}
+
+\begin{figure}[htbp]
+\begin{center}
+\includegraphics[width=\linewidth]{images/dunerocket3}
+\caption{Dune Analytics Rocket Pool node operator deposits by @KIV  (7 June 2023)}
+\label{fig:dunerocket3}
+\end{center}
+\end{figure}
+
+\begin{figure}[htbp]
+\begin{center}
+\includegraphics[width=\linewidth]{images/rocketdrworm1}
+\caption{Dune Analytics Rocket Pool overview by @drworm  (7 June 2023)}
+\label{fig:rocketdrworm1}
+\end{center}
+\end{figure}
+
+\begin{figure}[htbp]
+\begin{center}
+\includegraphics[width=\linewidth]{images/rocketdrworm2}
+\caption{Dune Analytics Rocket Pool various statistics by @drworm  (7 June 2023)}
+\label{fig:rocketdrworm2}
+\end{center}
+\end{figure}
+
+\begin{figure}[htbp]
+\begin{center}
+\includegraphics[width=\linewidth]{images/rocketdrworm3}
+\caption{Dune Analytics Rocket Pool ETH deposited \& rETH minted by @drworm  (7 June 2023)}
+\label{fig:rocketdrworm3}
+\end{center}
+\end{figure}
+
+
+\begin{figure}[htbp]
+\begin{center}
+\includegraphics[width=\linewidth]{images/rocketdrworm4}
+\caption{Dune Analytics Rocket Pool liquid staking derivatives peg price performance by @worm  (7 June 2023)}
+\label{fig:rocketdrworm4}
+\end{center}
+\end{figure}
+
+\begin{figure}[htbp]
+\begin{center}
+\includegraphics[width=\linewidth]{images/rocketdrworm5}
+\caption{Dune Analytics Rocket Pool rETH liquidity by @drworm  (7 June 2023)}
+\label{fig:rocketdrworm5}
+\end{center}
+\end{figure}
+
+\begin{figure}[htbp]
+\begin{center}
+\includegraphics[width=\linewidth]{images/rocketdrworm6}
+\caption{Dune Analytics Rocket Pool rETH DEX statistics by @drworm  (7 June 2023)}
+\label{fig:rocketdrworm6}
+\end{center}
+\end{figure}
+
+\begin{figure}[htbp]
+\begin{center}
+\includegraphics[width=\linewidth]{images/rocketdrworm7}
+\caption{Dune Analytics Rocket Pool rETH DEX graphs by @drworm  (7 June 2023)}
+\label{fig:rocketdrworm7}
+\end{center}
+\end{figure}
+
+\begin{figure}[htbp]
+\begin{center}
+\includegraphics[width=\linewidth]{images/rocketdrworm8}
+\caption{Dune Analytics Rocket Pool node operators by @drworm  (7 June 2023)}
+\label{fig:rocketdrworm8}
+\end{center}
+\end{figure}
+
+\begin{figure}[htbp]
+\begin{center}
+\includegraphics[width=\linewidth]{images/rocketdrworm9}
+\caption{Dune Analytics Rocket Pool oDAO-Reported RPL Price/RPL Staked by @drworm  (7 June 2023)}
+\label{fig:rocketdrworm9}
+\end{center}
+\end{figure}
+
+\begin{figure}[htbp]
+\begin{center}
+\includegraphics[width=\linewidth]{images/rocketdrworm10}\\
+\includegraphics[width=\linewidth]{images/rocketdrworm11}
+\caption{Dune Analytics Rocket Pool Minipools by @drworm  (7 June 2023)}
+\label{fig:rocketdrworm10}
+\end{center}
+\end{figure}
+
+\begin{figure}[htbp]
+\begin{center}
+\includegraphics[width=\linewidth]{images/rocketdrworm12}
+\caption{Dune Analytics Rocket Pool Rocket Pool Minipools by @drworm  (7 June 2023)}
+\label{fig:rocketdrworm12}
+\end{center}
+\end{figure}
+
+\clearpage
+
 % --------------------------------------
 \subsubsection*{Beaconcha.in}
 % --------------------------------------
@@ -749,6 +1105,228 @@ The website provides the ability to search using a variety of fields, including 
 \end{center}
 \end{figure}
 
+\clearpage
+% --------------------------------------
+\subsubsection*{Mevboost.pics}
+% --------------------------------------
+\textbf{General Dashboard} \\
+% ----------------------------------
+\begin{figure}[htbp]
+\begin{center}
+\includegraphics[width=0.9\linewidth]{images/mevhome1}
+\caption{General Dashboard - summary statistics. Mevboost.pics.(29 May 2023)}
+\label{fig:mevhome1}
+\end{center}
+\end{figure}
 
+\begin{figure}[htbp]
+\begin{center}
+\includegraphics[width=0.9\linewidth]{images/mevhome2}
+\caption{General Dashboard - slot share, daily gas and MEV revenue with the option of choosing different time periods. Mevboost.pics.(29 May 2023)}
+\label{fig:mevhome2}
+\end{center}
+\end{figure}
+
+\begin{figure}[htbp]
+\begin{center}
+\includegraphics[width=0.9\linewidth]{images/mevhome3}
+\caption{General Dashboard -  Average MEV-Boost payments per block - choose between 14 days, 60 days, 6 months or since the merge. Mevboost.pics.(29 May 2023)}
+\label{fig:mevhome3}
+\end{center}
+\end{figure}
+
+\begin{figure}[htbp]
+\begin{center}
+\includegraphics[width=0.9\linewidth]{images/mevhome4}
+\caption{General Dashboard - MEV-Boost block flow. Select to display all builders, only builders active in the past 7 days, excluding small builders, or choose  a builder from the available list. Mevboost.pics.(29 May 2023)}
+\label{fig:mevhome4}
+\end{center}
+\end{figure}
+\clearpage
+
+\textbf{Relays Dashboard}
+% ----------------------------------
+\begin{figure}[htbp]
+\begin{center}
+\includegraphics[width=0.85\linewidth]{images/mevrelay1}
+\caption{Relay Dashboard - MEV-Boost relay market (last 14 days) and total cumulative slot share (select from time ranges: 7 days, 1 month, since merge). Mevboost.pics.(29 May 2023)}
+\label{fig:mevrelay1}
+\end{center}
+\end{figure}
+
+\begin{figure}[htbp]
+\begin{center}
+\includegraphics[width=0.9\linewidth]{images/mevrelay2}
+\caption{Relay Dashboard - Slots per hour (last 7 days) and bids received (last 48 hours). Mevboost.pics.(29 May 2023)}
+\label{fig:mevrelay2}
+\end{center}
+\end{figure}
+
+\begin{figure}[htbp]
+\begin{center}
+\includegraphics[width=0.9\linewidth]{images/mevrelay3}
+\caption{Relay Dashboard - MEV-Boost payments (select from last 48 hours, 7 days, 30 days or 6 months) and average MEV-Boost proposer payment per block (either for the last 6 months or since the merge). Mevboost.pics.(29 May 2023)}
+\label{fig:mevrelay3}
+\end{center}
+\end{figure}
+
+\begin{figure}[htbp]
+\begin{center}
+\includegraphics[width=0.9\linewidth]{images/mevrelay4}
+\caption{Blocks per relay. Press play to see the visualisation of the blocks per relayer change over time. Mevboost.pics.(29 May 2023)}
+\label{fig:mevrelay4}
+\end{center}
+\end{figure}
+
+\clearpage
+\textbf{Builders Dashboard} 
+% ----------------------------------
+\begin{figure}[htbp]
+\begin{center}
+\includegraphics[width=0.85\linewidth]{images/mevbuilder1}
+\caption{Builders Dashboard - MEV-Boost builder market for the last 14 days  and total cumulative slot share (select from time ranges: 7 days, 1 month, since merge). Mevboost.pics.(29 May 2023)}
+\label{fig:mevbuilder1}
+\end{center}
+\end{figure}
+
+\begin{figure}[htbp]
+\begin{center}
+\includegraphics[width=0.9\linewidth]{images/mevbuilder2}
+\caption{Builders Dashboard - Slots per hour (last 7 days) and bids submitted  for the last 24 hours (select all builders, or one from the list provided). Mevboost.pics.(29 May 2023)}
+\label{fig:mevbuilder2}
+\end{center}
+\end{figure}
+
+\begin{figure}[htbp]
+\begin{center}
+\includegraphics[width=0.9\linewidth]{images/mevbuilder3}
+\caption{Builders Dashboard - MEV-Boost payments (select from 48 hours, 7 days, 30 days, or 6 months) and timing of the successful bids (select from all relays, or from the list provided). Mevboost.pics.(29 May 2023)}
+\label{fig:mevbuilder3}
+\end{center}
+\end{figure}
+
+\begin{figure}[htbp]
+\begin{center}
+\includegraphics[width=0.9\linewidth]{images/mevbuilder4}
+\caption{Builders Dashboard - Average MEV-Boost payments per block (select time range of last 6 months, or since merge) and builders overview of the last 14 days, ordered by the total number of blocks. Mevboost.pics.(29 May 2023)}
+\label{fig:mevbuilder4}
+\end{center}
+\end{figure}
+
+
+\clearpage
+\textbf{Validators Dashboard} \\
+% ----------------------------------
+\begin{figure}[htbp]
+\begin{center}
+\includegraphics[width=0.85\linewidth]{images/mevvalidator1}
+\caption{Validators Dashboard - MEV-Boost total validator market for the last 14 days  and total cumulative slot share (select from time ranges: 7 days, 1 month, since merge). Mevboost.pics.(29 May 2023)}
+\label{fig:mevvalidator1}
+\end{center}
+\end{figure}
+
+\begin{figure}[htbp]
+\begin{center}
+\includegraphics[width=0.9\linewidth]{images/mevvalidator2}
+\caption{Validators Dashboard - Slots per hour (last 7 days) and blocks per validator: press play to see the visualisation of the blocks per validator change over time.. Mevboost.pics.(29 May 2023)}
+\label{fig:mevvalidator2}
+\end{center}
+\end{figure}
+
+\begin{figure}[htbp]
+\begin{center}
+\includegraphics[width=0.9\linewidth]{images/mevvalidator3}
+\caption{Validators Dashboard - MEV-Boost payments (select from time ranges: 48 hours, 7 days, 30 days or 6 months) and cumulative total of Lido node operator slot share (select time range: 7 days, 1 month or since merge). Mevboost.pics.(29 May 2023)}
+\label{fig:mevvalidator3}
+\end{center}
+\end{figure}
+
+\begin{figure}[htbp]
+\begin{center}
+\includegraphics[width=0.9\linewidth]{images/mevvalidator4}
+\caption{Validators Dashboard - Validators overview with Staker/Validator, number of validators and number of blocks proposed by the staking entity since the merge. Mevboost.pics.(29 May 2023)}
+\label{fig:mevvalidator4}
+\end{center}
+\end{figure}
+
+\begin{figure}[htbp]
+\begin{center}
+\includegraphics[width=0.9\linewidth]{images/mevboostrawdata}
+\caption{Raw data can be downloaded from Mevboost.pics. Currently only the first dataset is available for download. (29 May 2023). The public key mapping dataset is now also available and will be updated daily (30 May 2023)}
+\label{fig:mevboostrawdata}
+\end{center}
+\end{figure}
+
+\clearpage
+% --------------------------------------
+\subsubsection*{teku-besu-ohio-mainnet-archive-01}
+% --------------------------------------
+
+We are able to retrieve some rich data from the archive node \texttt{teku-besu-ohio-mainnet-archive-01} using API endpoints. For example, the data of the validators retrieved according to their status (as seen in the call statement)  includes the \textit{validator index, balance, effective balance, slashed flag, activation eligibility epoch, activation epoch, exit epoch and withdraw-able epoch}
+\begin{itemize}
+\item \texttt{/eth/v1/beacon/states/finalized/validators?status=`active'} \\
+For each of the entries the sub-status is listed, i.e. `active\_ongoing', `active\_exiting', or `active\_slashed'. Alternatively a call can be made directly for one of these sub-statuses, e.g. \\
+ \texttt{/eth/v1/beacon/states/finalized/validators?status=`active\_ongoing'}
+\item \texttt{/eth/v1/beacon/states/finalized/validators?status=`pending'}\\
+The two sub-statuses are: `pending\_initialized' and `pending\_queued'. \\
+In a similar manner to the above sub-status call, we could run a query to extract only a specific sub-status:\\
+\texttt{/eth/v1/beacon/states/finalized/validators?status=`pending\_initialized'}
+\item \texttt{/eth/v1/beacon/states/finalized/validators?status=`exited'} \\
+Exited status also has two sub-statuses that can be called directly: exited\_unslashed and `exited\_slashed'
+\item \texttt{/eth/v1/beacon/states/finalized/validators?status=`withdrawal'} \\
+Withdrawal has two substatuses: `withdrawal\_possible' and `withdrawal\_done', which can be called directly.
+\end{itemize}
+\clearpage
+
+\textbf{Graphs of validator data}
+% -------------------------------------------
+ \begin{figure}[htbp]
+\begin{center}
+\includegraphics[width=\linewidth]{images/daily_validator_plot_230607}             % Note: Within images, no need to use \_ for _
+\caption{Number of validators added daily}
+\label{fig:dailyvalidator1}
+\end{center}
+\end{figure} 
+
+\begin{figure}[htbp]
+\begin{center}
+\includegraphics[width=\linewidth]{images/daily_validator_plot_no_genesis_no_smoothing_230607}             % Note: Within images, no need to use \_ for _
+\caption{Number of validators added daily, excluding genesis}
+\label{fig:dailyvalidator2}
+\end{center}
+\end{figure}
+
+\begin{figure}[htbp]
+\begin{center}
+\includegraphics[width=\linewidth]{images/daily_validator_plot_no_genesis_pt_no_smoothing_230607}             % Note: Within images, no need to use \_ for _
+\caption{Number of validators added daily, excluding genesis}
+\label{fig:dailyvalidator3}
+\end{center}
+\end{figure}
+
+\begin{figure}[htbp]
+\begin{center}
+\includegraphics[width=\linewidth]{images/cumulative_validator_plot_230607}
+\caption{Cumulative total of validators added \& activated}
+\label{fig:cumulativevalidators}
+\end{center}
+\end{figure}
+
+
+ \begin{figure}[htbp]
+\begin{center}
+\includegraphics[width=\linewidth]{images/cumulative_validator_plot_with_regression_line_230607}
+\caption{Cumulative total of validators added \& activated with regression line fitted}
+\label{fig:cumulativevalidatorsregression}
+\end{center}
+\end{figure}
+
+\clearpage
+
+\section{Bibliography}
+% -----------------------------
+\nocite{*}
+\bibliographystyle{eptcs}
+\bibliography{references}
 
 \end{document}
