@@ -53,7 +53,7 @@ ConsenSys Software R\&D}
 % ------------------------------------------------------------------------------
 \section{Overview}
 % ------------------------------------------------------------------------------
-This document is the deliverable for Milestone 1 of EF Academic Grant ID: FY23-1030, and is joint work with Kerrie Mengersen and Patrick O'Callaghan. It details available information, data sources, and proposed visualisations that will provide relevant data insights to gain a deeper understanding of current validator economics and any intuitions or assumptions used in formulating proposed solutions to capping the number of validators. This document 
+This document is the deliverable for Milestone 1 of EF Academic Grant ID: FY23-1030, and is joint work with Kerrie Mengersen and Patrick O'Callaghan. It details available information, data sources, and proposed visualisations that will provide relevant data insights to gain a deeper understanding of current validator economics and any intuitions or assumptions used in formulating proposed solutions to capping the number of validators. 1
 
 The information gathering is targeted towards the proposal being evaluated, viz. a variable minimum validator balance, which is one of the proposals that Vitalik articulated in his blog post regarding \gls{ssf}.  As Vitalik summarises in his blogpost ``Determining the validator economics'' means ``answering the question of who stays and who goes if demand for becoming a validator exceeds the system's capacity to process validators'' and he adds that this question ``involves the hardest tradeoffs that are not-just-technical and merits engagement from the community.''
 
@@ -80,7 +80,41 @@ Many people have generously contributed time and data, and made helpful suggesti
 \item The beacon chain \textbf{genesis block number} is 11182202
 \end{itemize}
 
+% ---------------------------------------------------------
+ \subsection{Key Parameters }
+ % ---------------------------------------------------------
+\begin{figure}[htbp]
+\begin{center}
+\includegraphics[width=0.9\linewidth]{images/configvalues}
+\caption{Configuration settings}
+\label{fig:config}
+\end{center}
+\end{figure}
 
+\begin{figure}[htbp]
+\begin{center}
+\includegraphics[width=0.4\linewidth]{images/constants}
+\caption{Miscellaneous key constant values}
+\label{fig:constants}
+\end{center}
+\end{figure}
+
+\begin{figure}[htbp]
+\begin{center}
+\includegraphics[width=0.9\linewidth]{images/committee}
+\caption{Parameters for committees and time}
+\label{fig:committee}
+\end{center}
+\end{figure}
+
+ \begin{figure}[htbp]
+\begin{center}
+\includegraphics[width=\linewidth]{images/rewards}
+\caption{Parameters for rewards and penalties, and operations}
+\label{fig:rewards}
+\end{center}
+\end{figure}
+\clearpage
 % ---------------------------------------------------------
  \subsection{Total ETH Supply}
  % ---------------------------------------------------------
