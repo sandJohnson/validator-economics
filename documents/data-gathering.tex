@@ -1,4 +1,5 @@
 \documentclass[UTF8]{article}
+%\usepackage{natbib}
 \usepackage{geometry}                % See geometry.pdf to learn the layout options. There are lots.
 \geometry{a4paper}                   % ... or a4paper or a5paper or ... 
 
@@ -53,7 +54,7 @@ ConsenSys Software R\&D}
 % ------------------------------------------------------------------------------
 \section{Overview}
 % ------------------------------------------------------------------------------
-This document is the deliverable for Milestone 1 of EF Academic Grant ID: FY23-1030, and is joint work with Kerrie Mengersen and Patrick O'Callaghan. It details available information, data sources, and proposed visualisations that will provide relevant data insights to gain a deeper understanding of current validator economics and any intuitions or assumptions used in formulating proposed solutions to capping the number of validators. 1
+This document is the deliverable for Milestone 1 of EF Academic Grant ID: FY23-1030, and is joint work with Kerrie Mengersen and Patrick O'Callaghan. It details available information, data sources, and proposed visualisations that will provide relevant data insights to gain a deeper understanding of current validator economics and any intuitions or assumptions used in formulating proposed solutions to capping the number of validators.
 
 The information gathering is targeted towards the proposal being evaluated, viz. a variable minimum validator balance, which is one of the proposals that Vitalik articulated in his blog post regarding \gls{ssf}.  As Vitalik summarises in his blogpost ``Determining the validator economics'' means ``answering the question of who stays and who goes if demand for becoming a validator exceeds the system's capacity to process validators'' and he adds that this question ``involves the hardest tradeoffs that are not-just-technical and merits engagement from the community.''
 
@@ -64,6 +65,15 @@ Vitalik highlighted a potential vulnerability that could be introduced with this
 The consequence of such a successful griefing attack is that the wealthier validators increase their reward, \textit{R}, because the total deposit amount, \textit{D}, decreases. (Current formula to calculate the validator reward: $R = \frac{k}{\sqrt{D}}$).
 
 Vitalik further suggests that this attack could possibly be mitigated by ``adding a fee per validator slot, and target it so that under a Zipfian distribution this is never worth it. However, this would still leave open a potential vulnerability if the distribution becomes very non-Zipfian''. 
+
+Recently a proposal has been put forward to increase the maximum effective balance of 32ETH. This proposal for stakers to consolidate their stake so that they run fewer validators overlaps with the validator capping proposal of having a variable minimum balance which this project aims to assess. It is therefore important to ensure that our research complements the work already undertaken to assess security risks and other aspects associated with increasing the maximum balance. The blog posts that propose and analyse the increased maximum effective balance are:
+\begin{itemize}
+\item \href{https://ethresear.ch/t/removing-unnecessary-stress-from-ethereums-p2p-network/15547}{Removing Unnecessary Stress from Ethereum’s P2P Network}, 10 May 2023.
+\item \href{https://ethresear.ch/t/increase-the-max-effective-balance-a-modest-proposal/15801/3}{Increase the MAX\_EFFECTIVE\_BALANCE – a modest proposal}, 6 June 2023.
+\item \href{https://notes.ethereum.org/nHqON5l7SACkL_nPwz8Vqw}{Security Considerations and Spec Changes for a MAX\_EFFECTIVE\_BALANCE Increase}, 12 June 2023.
+\item \href{https://hackmd.io/@0g8QuqEeQBe45CC8toURGw/HylpAVzIH2}{Upper bound on the probability of one majority dishonest committee in the context of MAX\_EFFECTIVE\_BALANCE increase}, 21 June 2023.
+\end{itemize}
+
 
 As the project progresses and additional data requirements are identified, this document will be updated accordingly.
 
@@ -114,6 +124,8 @@ Many people have generously contributed time and data, and made helpful suggesti
 \label{fig:rewards}
 \end{center}
 \end{figure}
+
+Rocket Pool has a simple explanation of the various validator rewards and a table which summarises the expected rewards when staking: \href{https://docs.rocketpool.net/guides/node/responsibilities.html}{A Node Operator's Responsibilities}.
 \clearpage
 % ---------------------------------------------------------
  \subsection{Total ETH Supply}
@@ -142,6 +154,9 @@ There are several helpful documents explaining in detail the different options a
 \item \href{https://ethereum.org/en/staking/pools/}{Pooled staking}
 \end{itemize}
 
+The Ethereum Foundation and EtherScan conducted a survey of stakers \cite{Smith2023}, according to the following categories: solo staking, staking pool service, mini node operator (Rocketpool), and those not yet staking. The responses were analysed and the key trends, take aways, and predictions reported. The large majority of the respondents were either solo stakers or mini pool operators.
+
+
 According to the \href{https://launchpad.ethereum.org/en/}{Staking Launchpad} on June 2023:
 \begin{itemize}
 \item Total ETH staked: 19,357,605 ETH
@@ -160,6 +175,8 @@ Several graphs have been generated in Dune Analytics. See Figures~\ref{fig:dunel
 \subsubsection*{Rocket Pool}
 % -----------------------------------
 A \href{https://rocketpool.net/}{Rocket Pool} node only needs to stake 16 ETH, and this stake is then coupled with 16 ETH from the staking pool to create a validator, known as a ``minipool''.  Staking in the Rocket Pool can be a stake of a little as 0.01 ETH, which is then issued as an rETH token representing the amount deposited into the pool. A node operator would obtain staked ETH from the pool to form a validator.
+
+There is documentation at the Rocket Pool website that clearly explains Ethereum staking and how it works when staking with Rocket Pool.
 
 Currently, 8 June 2023, Rocket Pool has staked 722,176 ETH and has 2,842 node operators.
 
@@ -542,10 +559,8 @@ There are several resources that contain lists and visualisations of a variety o
 % --------------------------------------
 There are several webpages with detailed information on transactions, blocks, accounts and tokens. In the screenshots below, figures~\ref{fig:txns}-~\ref{fig:erc20} on pages~\pageref{fig:txns}-~\pageref{fig:erc20}), are a few extracts from the detailed information on Etherscan and the data visualisations provided by them. Many of the dashboards allow the user to interact with the data being displayed by entering specific validators, blocks etc, that are of interest, or selecting one of the different time periods available. 
 
-Moreover, there are several summary graphs and visualisations that have been created and are displayed in the \textit{Charts \& Statistics} section of the website. These visualisations are shown in figures~\ref{fig:ethdaily}-~\ref{fig:ethgrowth} on pages~\pageref{fig:ethdaily}~-~\pageref{fig:ethgrowth}. There is some degree of interactivity in these charts and diagrams, which includes the ability to zoom in on a section of a graph in several instances.\\
-% ------------------------------------------------------------------
-% UPDATE THE LAST FIGURE REFERENCE!!!!
-% -----------------------------------------------------------------
+Moreover, there are several summary graphs and visualisations that have been created and are displayed in the \textit{Charts \& Statistics} section of the website. These visualisations are shown in figures~\ref{fig:ethdaily}-~\ref{fig:dailyverified} on pages~\pageref{fig:ethdaily}~-~\pageref{fig:dailyverified}. There is some degree of interactivity in these charts and diagrams, which includes the ability to zoom in on a section of a graph in several instances.\\
+
 \begin{figure}[htbp]
 \begin{center}
 \includegraphics[width=\linewidth]{images/etherscan}
