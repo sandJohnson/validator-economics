@@ -79,6 +79,40 @@ As the project progresses and additional data requirements are identified, this 
 
 Many people have generously contributed time and data, and made helpful suggestions, which has been incredibly helpful in compiling the resources listed in this document. They include, but are not limited to Barnabé Monnot and the \gls{rig} team, Justin Drake, Alexander Tesfamichael, Ben Edgington, Paul Harris and Josh Fernandez.
 
+\section{Data Insights}
+% ==================
+\label{sec:insights}
+To help us understand the validator landscape, it would be interesting to know, estimate or visualise the following:
+
+\begin{itemize}
+\item Validator yield
+\item Attestation violations
+\item Staked ETH as a percentage of ETH supply over time
+\item Assessing potential griefing/discouragement attacks
+\item Assess and project centralisation forces with respect to large stakers
+\end{itemize}
+% ---------------------------------------------------------------
+\subsection{Validator yield}
+% ---------------------------------------------------------------
+\label{yield}
+The motivation for quantifying yield is twofold: first to observe how this has changed over time and secondly to use this to inform an intuition of a yield at which there is no or very little incentive to stake in Ethereum.
+When we consider the yield of validators on their staked ETH, it is also worth bearing in mind the associated costs to run and manage a validator. 
+We reached out to several people for estimates regarding the initial outlay and ongoing costs. The responses are noted below: \\
+\noindent
+\textit{G. Nicholas D'Andrea}: \\
+The recurring costs are just internet/electricity. I would guess the electric to be about the same as another regular PC, maybe on the high end.
+from my experience (prices in USD), initial hardware costs are about \$2k for the validator node, and depending on your setup, you might want to invest in a high-end router (\$500-800). those, of course, would need replacing eventually.
+biggest expense is the ETH for each validator, followed by the labor to keep your node running and up-to-date. you could probably cut down on costs quite a bit if you did sufficient research to select the right hardware, configure everything by hand, etc.
+I just use one of the boxes that DappNode sells, and they make it easy. problem is that they distribute software updates via IPFS, which adds a lot of burden to your router. DappNode's use of IPFS, plus my congested urban wi-fi environment, have meant about \$1500 in networking equipment so that I can Zoom at the same time as running my validators
+\info [inline] {Rephrase Nick's response to make it anonymous}
+
+\noindent
+\textit{Ben Edgington}: \\
+I can give you some idea of my own costs, which I'd say are fairly representative. I'll use GBP and you can convert to whatever makes sense. For me, it's just hardware + power. The Internet use comes under my normal contract and I'm not paying any extra for it. I bought my first staking machine 3 years ago and I am about to replace it, so amortising costs over 3 years seems realistic. The first machine cost me about \textsterling600, and I also invested 100 in a UPS. The replacement will be about the same, but I don't plan to replace the UPS just now. So that's under \textsterling230 per year.
+As for power, I haven't measured usage, but I'd estimate around 20W, which is $\sim$0.5kWh/day, or $\sim$180kWh/year. It's currently around 34p per kWh here, so that's around \textsterling62 per year. Power costs have trebled over the last couple of years, but are still not huge.
+This is for a mid-range staking set-up: people might spend half as much or twice as much, but I'd say that range would cover the majority. The unknown is extra bandwidth costs - my connection is uncapped, but I gather that in other countries it is unusual for the connection to be uncapped, and people will be paying some extra cost for the bandwidth.
+\info [inline] {Rephrase Ben's response to make it anonymous}
+
 \section{Data Sources}
 % ==================
 \label{sec:sources}
@@ -619,7 +653,7 @@ Moreover, there are several summary graphs and visualisations that have been cre
 \includegraphics[width=0.48\linewidth]{images/ethscanepoch} \\
 (a)\hspace{160pt}        (b)\\
 \caption{Details of beacon chain epochs (a) and detailed information for one epoch (b). Etherscan (7 June 2023)}
-\label{fig:blocks}
+\label{fig:ethscanepoch1}
 \end{center}
 \end{figure}
 
@@ -629,7 +663,7 @@ Moreover, there are several summary graphs and visualisations that have been cre
 \includegraphics[width=0.8\linewidth]{images/ethscanblk2} \\
 \includegraphics[width=0.8\linewidth]{images/ethscanblk3} \\
 \caption{Detailed information of a block, e.g. block 16766859. Etherscan (7 June 2023)}
-\label{fig:blocks}
+\label{fig:ethscanblk1}
 \end{center}
 \end{figure}
 
@@ -782,13 +816,13 @@ Moreover, there are several summary graphs and visualisations that have been cre
 \end{center}
 \end{figure}
 
-\begin{figure}[htbp]
-\begin{center}
-\includegraphics[width=0.9\linewidth]{images/ethsync}
-\caption{Ethereum full node sync. Etherscan, 20 June 2023}
-\label{fig:ethsync}
-\end{center}
-\end{figure}
+%\begin{figure}[htbp]
+%\begin{center}
+%\includegraphics[width=0.9\linewidth]{images/ethsync}
+%\caption{Ethereum full node sync. Etherscan, 20 June 2023}
+%\label{fig:ethsync}
+%\end{center}
+%\end{figure}
 
 \begin{figure}[htbp]
 \begin{center}
@@ -1143,7 +1177,7 @@ Moreover, there are several summary graphs and visualisations that have been cre
 \includegraphics[width=\linewidth]{images/cembar2}\\
 \includegraphics[width=\linewidth]{images/cembar3}
 \caption{Dune Analytics of total and daily ETH burnt  by @cembar (6 June 2023)}
-\label{fig:dunelido1}
+\label{fig:cembar2}
 \end{center}
 \end{figure}
 
