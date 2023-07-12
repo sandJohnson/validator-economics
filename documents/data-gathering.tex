@@ -70,10 +70,11 @@ Vitalik further suggests that this attack could possibly be mitigated by ``addin
 
 Recently a proposal has been put forward to increase the maximum effective balance of 32ETH. This proposal aims to encourage stakers to consolidate their stake which means a reduction in the number of validators that they run, which can potentially greatly reduce network load. This proposal overlaps with the validator capping proposal of having a variable minimum balance, which this project aims to assess. It is therefore important to ensure that our research complements the work already undertaken to assess security risks and other aspects associated with increasing the maximum balance. The blog posts that propose and analyse the increased maximum effective balance are:
 \begin{itemize}
-\item \href{https://ethresear.ch/t/removing-unnecessary-stress-from-ethereums-p2p-network/15547}{Removing Unnecessary Stress from Ethereum’s P2P Network}, 10 May 2023.
-\item \href{https://ethresear.ch/t/increase-the-max-effective-balance-a-modest-proposal/15801/3}{Increase the MAX\_EFFECTIVE\_BALANCE – a modest proposal}, 6 June 2023.
-\item \href{https://notes.ethereum.org/nHqON5l7SACkL_nPwz8Vqw}{Security Considerations and Spec Changes for a MAX\_EFFECTIVE\_BALANCE Increase}, 12 June 2023.
-\item \href{https://hackmd.io/@0g8QuqEeQBe45CC8toURGw/HylpAVzIH2}{Upper bound on the probability of one majority dishonest committee in the context of MAX\_EFFECTIVE\_BALANCE increase}, 21 June 2023.
+\item \href{https://ethresear.ch/t/removing-unnecessary-stress-from-ethereums-p2p-network/15547}{Removing Unnecessary Stress from Ethereum’s P2P Network}, 10 May 2023 \cite{Asgaonkar2023}.
+\item \href{https://ethresear.ch/t/increase-the-max-effective-balance-a-modest-proposal/15801/3}{Increase the MAX\_EFFECTIVE\_BALANCE – a modest proposal}, 6 June 2023 \cite{Neuder2023a}.
+\item \href{https://notes.ethereum.org/nHqON5l7SACkL\_nPwz8Vqw}{Security Considerations and Spec Changes for a MAX\_EFFECTIVE\_BALANCE Increase}, 12 June 2023 \cite{Neuder2023b}.
+\item \href{https://hackmd.io/@0g8QuqEeQBe45CC8toURGw/HylpAVzIH2}{Upper bound on the probability of one majority dishonest committee in the context of MAX\_EFFECTIVE\_BALANCE increase}, 21 June 2023 \cite{Saltini2023}.
+\item There is currently an \gls{eip} in draft form to implement the proposal to increase the maximum effective balance. Here is the \href{https://github.com/ethereum/EIPs/pull/7251/commits/ec37fceec914af2a3fd298ef6f6cc13b5d41c533#diff-0e923b63b339f877c14b995b0c69d4962489dce485fb0e31ef49a4dd303e0b56}{pull request}. The initial draft by Mike Neuder is in his repo: \href{https://github.com/michaelneuder/EIPs/blob/max-eb-increase/EIPS/eip-increase-maxeb.md}{max effective balance increase proposal}.
 \end{itemize}
 
 
@@ -210,8 +211,6 @@ The Ethereum Foundation and EtherScan conducted a survey of stakers \cite{Smith2
 
 
 Justin Drake and Mike Neuder also had conversations with stakers with the biggest stakers that they talked to being Coinbase, a few different Lido operators and Kraken. They concluded that there are probably a few reasons to motivate bigger stakers to consolidate their validators if the maximum deposit size is increased from 32ETH to 2048ETH. Arguably this proposal is aimed largely at the bigger stakers rather than the smaller, solo stakers. The reasons they may want to consolidate are: to reduce operational cost, although it is likely not particularly high infrastructure costs, Mike thought perhaps in the region of a few \$100 per week, but key management would be the more challenging side of running many validators that can be consolidated into fewer validators if this proposal is implemented. 
-
-There is currently an \gls{eip} 
 
 According to the \href{https://launchpad.ethereum.org/en/}{Staking Launchpad} on June 2023:
 \begin{itemize}
