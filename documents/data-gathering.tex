@@ -4,6 +4,7 @@
 \geometry{a4paper}                   % ... or a4paper or a5paper or ... 
 
 %\geometry{landscape}                % Activate for for rotated page geometry
+\usepackage{breakurl}     
 \usepackage{graphicx}
 \usepackage{graphbox}
 \usepackage{hyperref}
@@ -47,6 +48,7 @@ ConsenSys Software R\&D}
 % Acronym definitions
 \newacronym{apr}{APR}{annual percentage rate}
 \newacronym{ef}{EF}{Ethereum Foundation}
+\newacronym{eip}{EIP}{Ethereum Improvement Proposal}
 \newacronym{mev}{MEV}{maximal extractable value}
 \newacronym{rig}{RIG}{Rigorous Incentives Group}
 \newacronym{ssf}{SSF}{single slot finality}
@@ -54,7 +56,7 @@ ConsenSys Software R\&D}
 % ------------------------------------------------------------------------------
 \section{Overview}
 % ------------------------------------------------------------------------------
-This document is the deliverable for Milestone 1 of EF Academic Grant ID: FY23-1030, and is joint work with Kerrie Mengersen and Patrick O'Callaghan. It details available information, data sources, existing and proposed visualisations that will provide relevant data insights to gain a deeper understanding of current validator economics and any intuitions or assumptions used in formulating proposed solutions to capping the number of validators.
+This document is the deliverable for Milestone 1 of EF Academic Grant ID: FY23-1030, and is joint work with Kerrie Mengersen and Patrick O'Callaghan. It details available information, data sources, existing and proposed visualisations that will provide relevant data insights to gain a deeper understanding of current validator economics and any intuitions or assumptions used in formulating proposed solutions for capping the number of validators.
 
 The information gathering is targeted towards the proposal being evaluated, viz. a variable minimum validator balance, which is one of the proposals that Vitalik articulated in his blog post regarding \gls{ssf}.  As Vitalik summarises in his blogpost ``Determining the validator economics'' means ``answering the question of who stays and who goes if demand for becoming a validator exceeds the system's capacity to process validators'' and he adds that this question ``involves the hardest tradeoffs that are not-just-technical and merits engagement from the community.''
 
@@ -95,7 +97,7 @@ To help us understand the validator landscape, it would be interesting to know, 
 \subsection{Validator yield}
 % ---------------------------------------------------------------
 \label{yield}
-The motivation for quantifying yield is twofold: first to observe how this has changed over time and secondly to use this to inform an intuition of a yield at which there is no or very little incentive to stake in Ethereum.
+The motivation for quantifying yield is twofold: first to observe how this has changed over time and secondly to use this to inform an intuition of a yield at which there is little or no incentive to stake in Ethereum.
 When we consider the yield of validators on their staked ETH, it is also worth bearing in mind the associated costs to run and manage a validator. 
 We reached out to several people for estimates regarding the initial outlay and ongoing costs. The responses are noted below: \\
 \noindent
@@ -112,6 +114,22 @@ I can give you some idea of my own costs, which I'd say are fairly representativ
 As for power, I haven't measured usage, but I'd estimate around 20W, which is $\sim$0.5kWh/day, or $\sim$180kWh/year. It's currently around 34p per kWh here, so that's around \textsterling62 per year. Power costs have trebled over the last couple of years, but are still not huge.
 This is for a mid-range staking set-up: people might spend half as much or twice as much, but I'd say that range would cover the majority. The unknown is extra bandwidth costs - my connection is uncapped, but I gather that in other countries it is unusual for the connection to be uncapped, and people will be paying some extra cost for the bandwidth.
 \info [inline] {Rephrase Ben's response to make it anonymous}
+
+\noindent
+\textit{Infura - Bogdan Suvar}\\
+Contacted Bogdan (devops) from Infura for cost estimates .... Sent Slack message \& awaiting reply.
+\info [inline] {Incorporate information provided by Bogdan}
+
+% ---------------------------------------------------------------
+\subsection{Validator slashing and penalties}
+% ---------------------------------------------------------------
+\label{slashing}
+The situations that lead to a validator being slashed are few and are severe violations of protocol rules that may constitute an attack on the system.
+The following behaviour can lead to a validator being slashed and are taken from the latest version of Ben Edgington's  \href{https://eth2book.info/capella/part2/incentives/slashing/}{\textit{Upgrading Ethereum}} book which incorporates the updates included in the Capella hard fork:
+\begin{itemize}
+\item 
+\end{itemize}
+
 
 \section{Data Sources}
 % ==================
@@ -190,6 +208,10 @@ There are several helpful documents explaining in detail the different options a
 
 The Ethereum Foundation and EtherScan conducted a survey of stakers \cite{Smith2023}, according to the following categories: solo staking, staking pool service, mini node operator (Rocketpool), and those not yet staking. The responses were analysed and the key trends, take aways, and predictions reported. The large majority of the respondents were either solo stakers or mini pool operators.
 
+
+Justin Drake and Mike Neuder also had conversations with stakers with the biggest stakers that they talked to being Coinbase, a few different Lido operators and Kraken. They concluded that there are probably a few reasons to motivate bigger stakers to consolidate their validators if the maximum deposit size is increased from 32ETH to 2048ETH. Arguably this proposal is aimed largely at the bigger stakers rather than the smaller, solo stakers. The reasons they may want to consolidate are: to reduce operational cost, although it is likely not particularly high infrastructure costs, Mike thought perhaps in the region of a few \$100 per week, but key management would be the more challenging side of running many validators that can be consolidated into fewer validators if this proposal is implemented. 
+
+There is currently an \gls{eip} 
 
 According to the \href{https://launchpad.ethereum.org/en/}{Staking Launchpad} on June 2023:
 \begin{itemize}
@@ -1627,7 +1649,6 @@ The website provides the ability to search using a variety of fields, including 
 \label{fig:mevbuilder4}
 \end{center}
 \end{figure}
-
 
 \clearpage
 \textbf{Validators Dashboard} \\
