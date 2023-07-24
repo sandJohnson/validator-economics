@@ -54,8 +54,10 @@ ConsenSys Software R\&D}
 \newacronym{lmd}{LMD}{Latest message driven}
 \newacronym{mev}{MEV}{maximal extractable value}
 \newacronym{mm}{MM}{MetaMask}
+\newacronym{pc}{PC}{personal computer}
 \newacronym{rig}{RIG}{Rigorous Incentives Group}
 \newacronym{ssf}{SSF}{single slot finality}
+\newacronym{ups}{UPS}{uninterruptable power supply}
 
 % ------------------------------------------------------------------------------
 \section{Overview}
@@ -72,7 +74,7 @@ The consequence of such a successful griefing attack is that the wealthier valid
 
 Vitalik further suggests that this attack could possibly be mitigated by ``adding a fee per validator slot, and target it so that under a Zipfian distribution this is never worth it. However, this would still leave open a potential vulnerability if the distribution becomes very non-Zipfian''. 
 
-Many people have generously contributed time and data, and made helpful suggestions, which has been incredibly helpful in compiling the resources listed in this document. They include, but are not limited to Barnab\'e Monnot and the \gls{rig} team, Justin Drake,  Ben Edgington, Josh Fernandez, Paul Harris, Mikhail Kalinin and Alexander Tesfamichael.
+Many people have generously contributed time and data, provided insights and made helpful suggestions, which has been incredibly helpful in compiling the resources listed in this document. They include, but are not limited to Barnab\'e Monnot and the \gls{rig} team, Justin Drake,  Ben Edgington, Josh Fernandez, Paul Harris, Mikhail Kalinin, Marta Poling and Alexander Tesfamichael.
 
 % -------------------------------------------------------------------------------------
 \section{EIP-7251: Increasing the MAX\_EFFECTIVE\_BALANCE}
@@ -85,17 +87,17 @@ Recently a proposal has been put forward to increase the maximum effective balan
 \item \href{https://notes.ethereum.org/nHqON5l7SACkL\_nPwz8Vqw}{Security Considerations and Spec Changes for a MAX\_EFFECTIVE\_BALANCE Increase}, 12 June 2023 \cite{Neuder2023b}.
 \item \href{https://hackmd.io/@0g8QuqEeQBe45CC8toURGw/HylpAVzIH2}{Upper bound on the probability of one majority dishonest committee in the context of MAX\_EFFECTIVE\_BALANCE increase}, 21 June 2023 \cite{Saltini2023}.
 \item There is currently an \gls{eip} in draft form to implement the proposal to increase the maximum effective balance. Here is the \href{https://github.com/ethereum/EIPs/pull/7251/commits/ec37fceec914af2a3fd298ef6f6cc13b5d41c533#diff-0e923b63b339f877c14b995b0c69d4962489dce485fb0e31ef49a4dd303e0b56}{pull request}. The initial draft by Mike Neuder is in his GitHub repo: \href{https://github.com/michaelneuder/EIPs/blob/max-eb-increase/EIPS/eip-increase-maxeb.md}{max effective balance increase proposal} \cite{Neuder2023c}.
-\item Mike Neuder has also added a very useful \href{https://notes.ethereum.org/@mikeneuder/eip-7251-faq}{FAQ post for EIP7251}.
-\item Christine Kim publishes regular summaries of the Ethereum All Core Developers calls. \href{https://www.galaxy.com/research/insights/ethereum-all-core-developers-consensus-call-111/}{Call 111} and \href{https://www.galaxy.com/research/insights/ethereum-all-core-developers-consensus-call-112/}{call 112} include the main discussion points for the proposal to increase the maximum effective balance for validators. A recording of the meetings are made available on YouTube. For call 111 the discussion around the increase in maximum effective balance starts around 59 mins (\href{https://youtu.be/ybgQuRcz9sg?t=3569}{recording}) and for call 112 the discussion around the increase in maximum effective balance starts around 46 mins (\href{https://youtu.be/zdqtl9x\_UjA?t=2775}{recording})
-\end{itemize}
+\item Mike Neuder added a very useful \href{https://notes.ethereum.org/@mikeneuder/eip-7251-faq}{FAQ post for EIP7251}.
+\item Christine Kim publishes regular summaries of the \textit{Ethereum All Core Developers (AllCoreDevs)} calls. \href{https://www.galaxy.com/research/insights/ethereum-all-core-developers-consensus-call-111/}{\textit{Call 111}} and \href{https://www.galaxy.com/research/insights/ethereum-all-core-developers-consensus-call-112/}{\textit{Call 112}} include the main discussion points for the proposal to increase the maximum effective balance for validators. Recordings of the meetings are available on YouTube. During \textit{Call 111} the discussion around the increase in maximum effective balance starts around 59 mins (\href{https://youtu.be/ybgQuRcz9sg?t=3569}{recording}) and for \textit{Call 112} the discussion starts around 46 mins (\href{https://youtu.be/zdqtl9x\_UjA?t=2775}{recording})
+\end{itemize}{
 
-With this proposal validators can choose to auto-compound their stake, instead of having any rewards above the 32 ETH effective balance automatically withdrawn into their account. Therefore validators do not have to wait until 32 ETH has been accumulated before another 32 ETH deposit can be made, but they can stake whatever they earn which will also increase their rewards since they are based on the effective balance of the validator. This is attractive to smaller, typically solo, stakers who have to wait for a very long time to get enough ETH for another 32 ETH stake, but it is perhaps even more attractive to larger stakers who regularly earn far greater rewards. On the other hand consolidation and compounding of validators run a risk of increased slashing penalties.
+With this proposal validators can choose to auto-compound their stake, instead of having any rewards above the 32 ETH effective balance automatically withdrawn into their account. Therefore validators do not have to wait until 32 ETH has been accumulated before another 32 ETH deposit can be made, but they can automatically compound their stake whatever they earn. The flow-on effect is that this would increase their rewards since rewards are based on the effective balance of the validator, making it attractive to smaller, typically solo, stakers, who have to wait for a very long time to earn enough ETH for another 32 ETH stake. It should also be attractive to larger stakers who regularly earn far greater rewards, and instead of waiting for a newly created validator to be activated in the long activation queue, that stake will immediately earn additional rewards. On the other hand consolidation and compounding of validators run a risk of increased slashing penalties.
 
 As part of this project it would therefore be prudent to analyse the overall design of this proposal, especially with respect to two key criteria: risk and benefit. In other words what are the risks for a range of stakers - from solo to large stakers, assuming some consolidate a portion or all of their stake, and what are the benefits for the various categories of stakers? Are the risks and benefits greater for some categories of stakers, and can we deduce the extent to which these potential differences affect various stakers and importantly the health of the ecosystem.
  
 Having a better understanding of the implications of this proposal on the health of the network, would also better inform the minimum variable deposit proposal.
 
-Note that a security analysis has already been undertaken by the \gls{ef}, but further in-depth analysis is desirable.
+Note that a security analysis has already been undertaken by the \gls{ef} (as mentioned above), but further in-depth analysis is desirable.
 
 \section{Data Insights}
 % ==================
@@ -121,24 +123,30 @@ The motivation for quantifying yield is twofold: first to observe how this has c
 When we consider the yield of validators on their staked ETH, it is also worth bearing in mind the associated costs to run and manage a validator. 
 We contacted some people for estimates regarding the initial outlay and ongoing costs. The responses are noted below: \\
 \noindent
-\textit{G. Nicholas D'Andrea}: \\
-The recurring costs are just internet/electricity. I would guess the electric to be about the same as another regular PC, maybe on the high end.
-from my experience (prices in USD), initial hardware costs are about \$2k for the validator node, and depending on your setup, you might want to invest in a high-end router (\$500-800). those, of course, would need replacing eventually.
-biggest expense is the ETH for each validator, followed by the labor to keep your node running and up-to-date. you could probably cut down on costs quite a bit if you did sufficient research to select the right hardware, configure everything by hand, etc.
-I just use one of the boxes that DappNode sells, and they make it easy. problem is that they distribute software updates via IPFS, which adds a lot of burden to your router. DappNode's use of IPFS, plus my congested urban wi-fi environment, have meant about \$1500 in networking equipment so that I can Zoom at the same time as running my validators
-\info [inline] {Rephrase Nick's response to make it anonymous - can potentially combine his and Ben's responses as solo stakers running more than one validator}
+\textit{Solo and small stakers} \\
+The overheads for running a validator node can be divided into two main categories: initial outlay and ongoing costs. The initial outlay includes purchasing the staking computer and associated  items such as routers, \gls{ups} and networking equipment. The ongoing costs are electricity, additional costs if additional bandwidth is required and not included in the existing internet package for home use, and labour in monitoring the node and keeping it up to date. Based on a small sample of solo stakers, the cost of purchasing a \gls{pc} to run a validator is approximately \$800 to \$2,000, with optional additional extras such as a high-end router approximately \$500 to \$600, a \gls{ups} around \$150 and networking equipment to facilitate high bandwidth around \$1,500. After 3 years it is probably advisable to replace the \gls{pc}, but not necessarily all the ancillaries. Ongoing costs such as additional electricity usage are minimal and could be as low as \$80 annually. 
 
-\noindent
-\textit{Ben Edgington}: \\
-I can give you some idea of my own costs, which I'd say are fairly representative. I'll use GBP and you can convert to whatever makes sense. For me, it's just hardware + power. The Internet use comes under my normal contract and I'm not paying any extra for it. I bought my first staking machine 3 years ago and I am about to replace it, so amortising costs over 3 years seems realistic. The first machine cost me about \textsterling600, and I also invested 100 in a UPS. The replacement will be about the same, but I don't plan to replace the UPS just now. So that's under \textsterling230 per year.
-As for power, I haven't measured usage, but I'd estimate around 20W, which is $\sim$0.5kWh/day, or $\sim$180kWh/year. It's currently around 34p per kWh here, so that's around \textsterling62 per year. Power costs have trebled over the last couple of years, but are still not huge.
-This is for a mid-range staking set-up: people might spend half as much or twice as much, but I'd say that range would cover the majority. The unknown is extra bandwidth costs - my connection is uncapped, but I gather that in other countries it is unusual for the connection to be uncapped, and people will be paying some extra cost for the bandwidth.
-\info [inline] {Rephrase Ben's response to make it anonymous}
+% ---- Nic's slack message:
+% ---------------------------------
+%\textit{G. Nicholas D'Andrea}: \\
+%The recurring costs are just internet/electricity. I would guess the electric to be about the same as another regular PC, maybe on the high end.
+%from my experience (prices in USD), initial hardware costs are about \$2k for the validator node, and depending on your setup, you might want to invest in a high-end router (\$500-800). those, of course, would need replacing eventually.
+%biggest expense is the ETH for each validator, followed by the labor to keep your node running and up-to-date. you could probably cut down on costs quite a bit if you did sufficient research to select the right hardware, configure everything by hand, etc.
+%I just use one of the boxes that DappNode sells, and they make it easy. problem is that they distribute software updates via IPFS, which adds a lot of burden to your router. DappNode's use of IPFS, plus my congested urban wi-fi environment, have meant about \$1500 in networking equipment so that I can Zoom at the same time as running my validators
+%\info [inline] {Rephrase Nick's response to make it anonymous - can potentially combine his and Ben's responses as solo stakers running more than one validator}
+
+% ---- Ben's slack message:
+% ---------------------------------
+%\textit{Ben Edgington}: \\
+%I can give you some idea of my own costs, which I'd say are fairly representative. I'll use GBP and you can convert to whatever makes sense. For me, it's just hardware + power. The Internet use comes under my normal contract and I'm not paying any extra for it. I bought my first staking machine 3 years ago and I am about to replace it, so amortising costs over 3 years seems realistic. The first machine cost me about \textsterling600, and I also invested 100 in a UPS. The replacement will be about the same, but I don't plan to replace the UPS just now. So that's under \textsterling230 per year.
+%As for power, I haven't measured usage, but I'd estimate around 20W, which is $\sim$0.5kWh/day, or $\sim$180kWh/year. It's currently around 34p per kWh here, so that's around \textsterling62 per year. Power costs have trebled over the last couple of years, but are still not huge.
+%This is for a mid-range staking set-up: people might spend half as much or twice as much, but I'd say that range would cover the majority. The unknown is extra bandwidth costs - my connection is uncapped, but I gather that in other countries it is unusual for the connection to be uncapped, and people will be paying some extra cost for the bandwidth.
+%\info [inline] {Rephrase Ben's response to make it anonymous}
 
 \noindent
 \textit{Infura - Bogdan Suvar}\\
 Contacted Bogdan (devops) from Infura for cost estimates. Had a meeting with Bogdan which was very insightful and he has put me in touch with Kuhan Tharmananthar and Juan Dominguez from Consensys staking, and Abad Mian and Marta Poling from \gls{mm} staking. Bogdan shared a Google sheet with me with estimates of staking entities and numbers of validators around July 2022. (Need to check this a bit more carefully).
-I am hoping to talk to them too in the near future. 
+I then met with both teams and had good discussions around staking at Consensys. \gls{mm} is targeting integration with fractional liquid staking pools and working closely with a fractional staking provider so that users can easily participate in staking via \gls{mm}.
 \info [inline] {Incorporate information provided by Bogdan}
 
 % ---------------------------------------------------------------
@@ -168,7 +176,7 @@ Apart from the slashing penalties, a slashed validator accrues attestation penal
 % ---------------------------------------------------------------
 \subsection{Staker wealth and distribution}
 % ---------------------------------------------------------------
-
+We can at best have an informed guess at the current staker wealth distribution. Some staking pools can be identified, but even then we may not be aware of all of the validator nodes and validators that they run.
 
 % ---------------------------------------------------------------
 \subsection{Compounding stake with rewards earned}
