@@ -105,23 +105,59 @@ Note that a security analysis has already been undertaken by the \gls{ef} (as me
 In order to analyse the variable minimum validator deposit proposal and the increase in the maximum effective balance proposal, it would be interesting to know, estimate or visualise the following:
 
 \begin{itemize}
+\item Committees - selection and rewards
+\item Validator rewards
 \item Validator yield
 \item Validator slashing and penalties
 \item Staker wealth and distribution
 \item Staker consolidation
-\item Compounding stake with rewards earned
 \item Staked ETH as a percentage of ETH supply over time
 \item Assessment of potential griefing/discouragement attacks
 \item Assessment and projection of centralisation forces with respect to large stakers (both for EIP7251 and for this project)
 \item Health of the Ethereum ecosystem
 \end{itemize}
 % ---------------------------------------------------------------
+\subsection{Committees}
+% ---------------------------------------------------------------
+\label{committee}
+
+% ---------------------------------------------------------------
+\subsection{Validator rewards}
+% ---------------------------------------------------------------
+\label{rewards}
+Validators earn rewards for three activities \cite{Edgington2023}:
+\begin{itemize}
+\item Attesting to their view of the beacon chain:
+	\begin{itemize}
+	\item voting for a source checkpoint
+	\item voting for a target checkpoing
+	\item voting for a chain head block
+	\end{itemize}
+\item Proposing a block	
+\item Signing off on blocks in the sync committee that support light clients
+\end{itemize}
+
+Validators that report a slashing violation, i.e. an event that triggers a validator to be slashed, receives a reward. 
+
+Each active validator will be selected to make one attestation per epoch, consisting of 3 votes: source, target and head votes. 
+In general, the largest part of a validator's rewards (84.4\% - timely source votes 21.9\%, timely target votes 40.6\% and timely head votes 21.9\%) come from making attestations, assuming they are included in a beacon chain block \cite{Edgington2023}. 
+
+All reward calculations are based on the `base reward per increment', where an increment is 1 unit of effective balance = 1 ETH.
+\begin{equation*}
+ b = Gwei \left( \frac{EFFECTIVE\_BALANCE\_INCREMENT * BASE\_REWARD\_FACTOR}{\sqrt {TOTAL \texttt{ } active \texttt{ } balance  \texttt{ } of  \texttt{ } current  \texttt{ } state}} \right)
+\end{equation*}
+
+In the long run, validators can expect to earn $32b \texttt{ } Gwei$ per epoch. Note that as the total active balance changes, \textit{b} changes  \cite{Edgington2023}. When we have auto-compounding of stake, it will also affect the expected rewards. However, consolidating validators is not expected to impact on \textit{b}, but the number of active validators will have the largest impact on expected earnings.
+
+When a validator submits a request to exit, they are expected to still perform their duties until they reach their exit epoch. The waiting time to exit depends on the exit queue which is currently (26 July 2023) empty. There is a limit on both entry and exits of validators, which is set at 10 per epoch. The validator activation queue has been very full since the implementation of withdrawal of stake, and that is currently around 80,000 with a wait time of approximate 33 days \cite{ea2023q}. 
+
+% ---------------------------------------------------------------
 \subsection{Validator yield}
 % ---------------------------------------------------------------
 \label{yield}
 The motivation for quantifying yield is twofold: first to observe how this has changed over time, and secondly to use this to inform an intuition of a yield at which there is little or no incentive to stake in Ethereum.
 When we consider the yield of validators on their staked ETH, it is also worth bearing in mind the associated costs to run and manage a validator. 
-We contacted some people for estimates regarding the initial outlay and ongoing costs. The responses are noted below: \\
+The survey conducted by the \gls{ef} and EthStaker concluded that the vast majority of solo stakers ((85\%) and mini pool operators (78\%) who completed the survey specially bought hardware for staking. We contacted some solo stakers for estimates regarding this initial outlay and to estimate ongoing costs. The responses are noted below: \\
 \noindent
 \textit{Solo and small stakers} \\
 The overheads for running a validator node can be divided into two main categories: initial outlay and ongoing costs. The initial outlay includes purchasing the staking computer and associated  items such as routers, \gls{ups} and networking equipment. The ongoing costs are electricity, additional costs if additional bandwidth is required and not included in the existing internet package for home use, and labour in monitoring the node and keeping it up to date. Based on a small sample of solo stakers, the cost of purchasing a \gls{pc} to run a validator is approximately \$800 to \$2,000, with optional additional extras such as a high-end router approximately \$500 to \$600, a \gls{ups} around \$150 and networking equipment to facilitate high bandwidth around \$1,500. After 3 years it is probably advisable to replace the \gls{pc}, but not necessarily all the ancillaries. Ongoing costs such as additional electricity usage are minimal and could be as low as \$80 annually. 
@@ -178,10 +214,6 @@ Apart from the slashing penalties, a slashed validator accrues attestation penal
 % ---------------------------------------------------------------
 We can at best have an informed guess at the current staker wealth distribution. Some staking pools can be identified, but even then we may not be aware of all of the validator nodes and validators that they run.
 
-% ---------------------------------------------------------------
-\subsection{Compounding stake with rewards earned}
-% ---------------------------------------------------------------
-
 
 % ---------------------------------------------------------------------------------------
 \subsection{Staked ETH as a percentage of ETH supply over time}
@@ -210,24 +242,25 @@ Ether alpha combines various aspects of the ecosystem to give an overall impress
 Historic and current trends for stake concentration are important to observe as these are warning signs that the chain is becoming more vulnerable to collusion. The consolidation of stake through EIP 7251 (currently in draft form) \cite{Neuder2023c} is unlikely to change the dynamics of stake concentration, since it is encouraging consolidation of validators already being operated by stakers. However, with more node operators and validators joining larger staking pools staked ETH will become more one-sided in favour of staking pools. 
 
 The Rated network also provides detailed metrics and visualisations to gauge the health of the network \cite{Rated2023a}. 
-
+\clearpage
 \section{Data Sources}
 % ==================
 \label{sec:sources}
 % ---------------------------------------------------------------
-\subsection{Key data points}
+\subsection{Key data points and parameters}
 % --------------------------------------------------------------
 \begin{itemize}
 \item The beacon chain \textbf{deposit contract address} is: 0x00000000219ab540356cBB839Cbe05303d7705Fa 
 \item The beacon chain \textbf{genesis block number} is 11182202
 \end{itemize}
 
+There is a rate limit of 10 per epoch for validator activations and exits. These limits need to be taken into account when validators are combined into larger validators. Moreover, there is another mechanism in place which bypasses the entry and exit rate limiting, viz. top-ups. Validators top their stake up when it drops below 32~ETH so that they maximise their rewards. 
 % ---------------------------------------------------------
  \subsection{Key Parameters }
  % ---------------------------------------------------------
 \begin{figure}[htbp]
 \begin{center}
-\includegraphics[width=0.9\linewidth]{images/configvalues}
+\includegraphics[width=0.7\linewidth]{images/configvalues}
 \caption{Configuration settings}
 \label{fig:config}
 \end{center}
@@ -235,7 +268,7 @@ The Rated network also provides detailed metrics and visualisations to gauge the
 
 \begin{figure}[htbp]
 \begin{center}
-\includegraphics[width=0.4\linewidth]{images/constants}
+\includegraphics[width=0.6\linewidth]{images/constants}
 \caption{Miscellaneous key constant values}
 \label{fig:constants}
 \end{center}
@@ -288,7 +321,6 @@ There are several helpful documents explaining in detail the different options a
 \end{itemize}
 
 The Ethereum Foundation and EtherScan conducted a survey of stakers \cite{Smith2023}, according to the following categories: solo staking, staking pool service, mini node operator (Rocketpool), and those not yet staking. The responses were analysed and the key trends, take aways, and predictions reported. The large majority of the respondents were either solo stakers or mini pool operators.
-
 
 Justin Drake and Mike Neuder also had conversations with stakers with the biggest stakers that they talked to being Coinbase, a few different Lido operators and Kraken. They concluded that there are probably a few reasons to motivate bigger stakers to consolidate their validators if the maximum deposit size is increased from 32ETH to 2048ETH. Arguably this proposal is aimed largely at the bigger stakers rather than the smaller, solo stakers. The reasons they may want to consolidate are: to reduce operational cost, although it is likely not particularly high infrastructure costs, Mike thought perhaps in the region of a few \$100 per week, but key management would be the more challenging side of running many validators that can be consolidated into fewer validators if this proposal is implemented. 
 
