@@ -47,8 +47,10 @@ ConsenSys Software R\&D}
 
 % Acronym definitions
 \newacronym{apr}{APR}{annual percentage rate}
+\newacronym{cl}{CL}{consensus layer}
 \newacronym{ef}{EF}{Ethereum Foundation}
 \newacronym{eip}{EIP}{Ethereum Improvement Proposal}
+\newacronym{el}{EL}{execution layer}
 \newacronym{ffg}{FFG}{Friendly finality gadget}
 \newacronym{ghost}{GHOST}{Greedy Heaviest-Observed Sub-Tree}
 \newacronym{lmd}{LMD}{Latest message driven}
@@ -74,7 +76,7 @@ The consequence of such a successful griefing attack is that the wealthier valid
 
 Vitalik further suggests that this attack could possibly be mitigated by ``adding a fee per validator slot, and target it so that under a Zipfian distribution this is never worth it. However, this would still leave open a potential vulnerability if the distribution becomes very non-Zipfian''. 
 
-Many people have generously contributed time and data, provided insights and made helpful suggestions, which has been incredibly helpful in compiling the resources listed in this document. They include, but are not limited to Barnab\'e Monnot and the \gls{rig} team, Justin Drake,  Ben Edgington, Josh Fernandez, Paul Harris, Mikhail Kalinin, Marta Poling and Alexander Tesfamichael.
+Many people have generously contributed time and data, provided insights and made helpful suggestions, which has been incredibly helpful in compiling the resources listed in this document. They include, but are not limited to Barnab\'e Monnot and the \gls{rig} team, Andrew Breslin, Juan Dominguez, Justin Drake,  Ben Edgington, Josh Fernandez, Paul Harris, Mikhail Kalinin, Abad Mian, Mike Neuder, Marta Poling, Roberto Saltini, Bogdan Suvar, Alexander Tesfamichael and Kuhan Tharmananthar.
 
 % -------------------------------------------------------------------------------------
 \section{EIP-7251: Increasing the MAX\_EFFECTIVE\_BALANCE}
@@ -91,7 +93,7 @@ Recently a proposal has been put forward to increase the maximum effective balan
 \item Christine Kim publishes regular summaries of the \textit{Ethereum All Core Developers (AllCoreDevs)} calls. \href{https://www.galaxy.com/research/insights/ethereum-all-core-developers-consensus-call-111/}{\textit{Call 111}} and \href{https://www.galaxy.com/research/insights/ethereum-all-core-developers-consensus-call-112/}{\textit{Call 112}} include the main discussion points for the proposal to increase the maximum effective balance for validators. Recordings of the meetings are available on YouTube. During \textit{Call 111} the discussion around the increase in maximum effective balance starts around 59 mins (\href{https://youtu.be/ybgQuRcz9sg?t=3569}{recording}) and for \textit{Call 112} the discussion starts around 46 mins (\href{https://youtu.be/zdqtl9x\_UjA?t=2775}{recording})
 \end{itemize}{
 
-With this proposal validators can choose to auto-compound their stake, instead of having any rewards above the 32 ETH effective balance automatically withdrawn into their account. Therefore validators do not have to wait until 32 ETH has been accumulated before another 32 ETH deposit can be made, but they can automatically compound their stake whatever they earn. The flow-on effect is that this would increase their rewards since rewards are based on the effective balance of the validator, making it attractive to smaller, typically solo, stakers, who have to wait for a very long time to earn enough ETH for another 32 ETH stake. It should also be attractive to larger stakers who regularly earn far greater rewards, and instead of waiting for a newly created validator to be activated in the long activation queue, that stake will immediately earn additional rewards. On the other hand consolidation and compounding of validators run a risk of increased slashing penalties.
+With this proposal validators can choose to auto-compound their stake, instead of having any rewards above the 32 ETH effective balance automatically withdrawn into their account. Therefore validators do not have to wait until 32 ETH has been accumulated before another 32 ETH deposit can be made, but they can automatically compound their stake with rewards earned. The flow-on effect is that this would increase their rewards since rewards are based on the effective balance of the validator, making it attractive to smaller, typically solo, stakers, who have to wait for a very long time to earn enough ETH for another 32 ETH stake. It should also be attractive to larger stakers who regularly earn far greater rewards, and instead of waiting for a newly created validator to be activated in the long activation queue, that stake will immediately earn additional rewards. On the other hand consolidation and compounding of validators run a risk of increased slashing penalties.
 
 As part of this project it would therefore be prudent to analyse the overall design of this proposal, especially with respect to two key criteria: risk and benefit. In other words what are the risks for a range of stakers - from solo to large stakers, assuming some consolidate a portion or all of their stake, and what are the benefits for the various categories of stakers? Are the risks and benefits greater for some categories of stakers, and can we deduce the extent to which these potential differences affect various stakers and importantly the health of the ecosystem.
  
@@ -120,36 +122,65 @@ In order to analyse the variable minimum validator deposit proposal and the incr
 \subsection{Committees}
 % ---------------------------------------------------------------
 \label{committee}
+There are two main types of committees  \cite{Edgington2023}:
+
+\begin{itemize}
+\item Beacon committees
+\item Sync committees
+\end{itemize}
+
+Beacon committees are allocated to each epoch by the protocol in such a way that each slot has the same number of committees. All active validators are distributed equally among these committees, and one committee member is assigned the duty of ``aggregating the signatures of all other validators in the committee that agree on an attestation'' \cite{efglossary}. These beacon committees are disbanded at the end of the epoch and a new randomly allocated set of committees is created for the next epoch. The protocol specifies a minimum size for a committee, as well as a maximum number of committees per slot  \cite{Edgington2023}.
+
+Each slot typically has several committees, sometimes referred to as `subcommittees' \cite{Neuder2023b}, and the same number of subcommittees is allocated to each slot in the epoch, and hence the total number of committees in a slot is a multiple of 32 \cite{Edgington2023}.
+
+In contrast to the short duration of the committees where each validator attests once per epoch, sync committees, consisting of 512 validators that are chosen at random, persist for 256 epochs (27.3 hours).  When a proposer includes the sync committee's output, they receive a reward that is proportional to the reward of the whole committee \cite{Edgington2023}.
+
+The rewards for attestations and sync committee are split $\frac{7}{8}$ and $\frac{1}{8}th$ between the validators performing these duties and the proposer that includes the evidence in blocks, respectively.
+
 
 % ---------------------------------------------------------------
 \subsection{Validator rewards}
 % ---------------------------------------------------------------
 \label{rewards}
-Validators earn rewards for three activities \cite{Edgington2023}:
+
+By participating in Ethereum’s consensus, honest validators earn rewards in two ways\cite{breslina}:
+\begin{itemize}
+\item \gls{cl} rewards, that comprise approximately 70\% of the total validator rewards, which are described in more detail below.
+\item \gls{el} rewards, that comprise approximately 30\% of total rewards, and are sourced from
+	\begin{itemize}
+	\item priority fees
+	\item \gls{mev}
+	\end{itemize}
+
+\end{itemize}
+
+Validators earn rewards on the beacon chain (\gls{cl}) for three key activities \cite{Edgington2023}:
 \begin{itemize}
 \item Attesting to their view of the beacon chain:
 	\begin{itemize}
 	\item voting for a source checkpoint
-	\item voting for a target checkpoing
+	\item voting for a target checkpoint
 	\item voting for a chain head block
 	\end{itemize}
 \item Proposing a block	
-\item Signing off on blocks in the sync committee that support light clients
+\item Sync committee members receive a reward for each slot that they sign off on the correct (from the proposer's point of view) head block.
 \end{itemize}
 
 Validators that report a slashing violation, i.e. an event that triggers a validator to be slashed, receives a reward. 
 
 Each active validator will be selected to make one attestation per epoch, consisting of 3 votes: source, target and head votes. 
-In general, the largest part of a validator's rewards (84.4\% - timely source votes 21.9\%, timely target votes 40.6\% and timely head votes 21.9\%) come from making attestations, assuming they are included in a beacon chain block \cite{Edgington2023}. 
+In general, the largest part of a validator's rewards (84.4\% = timely source votes 21.9\%, timely target votes 40.6\% and timely head votes 21.9\%) come from making attestations, assuming they are included in a beacon chain block \cite{Edgington2023}. 
 
 All reward calculations are based on the `base reward per increment', where an increment is 1 unit of effective balance = 1 ETH.
 \begin{equation*}
- b = Gwei \left( \frac{EFFECTIVE\_BALANCE\_INCREMENT * BASE\_REWARD\_FACTOR}{\sqrt {TOTAL \texttt{ } active \texttt{ } balance  \texttt{ } of  \texttt{ } current  \texttt{ } state}} \right)
+ b = Gwei \left( \frac{EFFECTIVE\_BALANCE\_INCREMENT * BASE\_REWARD\_FACTOR}{\sqrt {total \texttt{ } active \texttt{ } balance  \texttt{ } of  \texttt{ } current  \texttt{ } state}} \right)
 \end{equation*}
 
-In the long run, validators can expect to earn $32b \texttt{ } Gwei$ per epoch. Note that as the total active balance changes, \textit{b} changes  \cite{Edgington2023}. When we have auto-compounding of stake, it will also affect the expected rewards. However, consolidating validators is not expected to impact on \textit{b}, but the number of active validators will have the largest impact on expected earnings.
+In the long run, validators can expect to earn $32b \texttt{ } Gwei$ per epoch. Note that as the \textit{total active balance} changes, \textit{b} changes  \cite{Edgington2023}. When we have auto-compounding of stake, it will also affect the expected rewards. However, simply consolidating validators is not expected to impact on \textit{b}, since the total active balance will remain unchanged. However, as the number of active validators increase, and consequently the total active balance, the impact on expected earnings becomes greater.
 
-When a validator submits a request to exit, they are expected to still perform their duties until they reach their exit epoch. The waiting time to exit depends on the exit queue which is currently (26 July 2023) empty. There is a limit on both entry and exits of validators, which is set at 10 per epoch. The validator activation queue has been very full since the implementation of withdrawal of stake, and that is currently around 80,000 with a wait time of approximate 33 days \cite{ea2023q}. 
+When a validator submits a request to exit, they are expected to still perform their duties until they reach their exit epoch, which is usually approximately 2 epochs later. The waiting time to exit depends on the exit queue which is currently (26 July 2023) empty. 
+
+There is a limit on both entry and exits of validators, which is set at 10 per epoch. The validator activation queue has been very full since the implementation of withdrawal of stake, and that is currently around 80,000 with a wait time of approximate 33 days \cite{ea2023q}. 
 
 % ---------------------------------------------------------------
 \subsection{Validator yield}
@@ -180,15 +211,18 @@ The overheads for running a validator node can be divided into two main categori
 %\info [inline] {Rephrase Ben's response to make it anonymous}
 
 \noindent
-\textit{Infura - Bogdan Suvar}\\
-Contacted Bogdan (devops) from Infura for cost estimates. Had a meeting with Bogdan which was very insightful and he has put me in touch with Kuhan Tharmananthar and Juan Dominguez from Consensys staking, and Abad Mian and Marta Poling from \gls{mm} staking. Bogdan shared a Google sheet with me with estimates of staking entities and numbers of validators around July 2022. (Need to check this a bit more carefully).
-I then met with both teams and had good discussions around staking at Consensys. \gls{mm} is targeting integration with fractional liquid staking pools and working closely with a fractional staking provider so that users can easily participate in staking via \gls{mm}.
-\info [inline] {Incorporate information provided by Bogdan}
+\textit{Staking Pools}\\
+Meetings with Infura, Consensys staking and  \gls{mm} staking were very insightful and the range of infrastructure configurations was discussed as well as the types of staking. \gls{mm} staking is mainly targeting integration with fractional liquid staking pools and working closely with a fractional staking provider so that users can easily participate in staking via \gls{mm}.
+Estimates of costs to validators are more complex, depending on the staking pool and staking pool costs vary too. In general larger staking pools can keep per validator costs reasonably low due to economies of scale.
+%\info [inline] {Spreadsheet provided by Bogdan provides an overview of staking providers. Consensys staking runs nodes for Lido. }
+
+In conclusion, the overheads for small stakers are probably slightly higher than staking pools, when we work out the average cost per validator, i.e. spinning up and running a 32 ETH validator. 
 
 % ---------------------------------------------------------------
 \subsection{Validator slashing and penalties}
 % ---------------------------------------------------------------
 \label{slashing}
+\subsubsection*{Slashing}
 The situations that lead to a validator being slashed are few, but they are severe violations of protocol rules that may be considered as a potential solo or coordinated attack on the system. Regardless of the reason for the slashing event, they are all handled in the same way. There is an initial slashing penalty, which is currently set at 1 ETH (or $\frac{1}{32}$ of the stake) and this is followed 18 days after the slashing event by another penalty, known as the correlation penalty. The purpose of the latter is to penalise what may be a coordinated attack on the chain. Therefore the correlation penalty takes into account slashings 18 days before and after the slashing event. 
 
 A validator gets slashed when they are reported and evidence of the violation of the rules is included in a beacon block. For the valid reporting of a slashing event, the reporting validator receives a reward. The intention is that this will help incentivise the reporting of slashable events. Only one proposer slashing can be included in a report, whereas multiple attestation violations can be included in a report. When the slashing is included in a block, the proposer gets a reward which is a fraction of the effective balance of the validator being slashed (currently $\frac{1}{512}$). Up to 16 proposer slashings can be included in a block and up to 2 attester slashing reports.  Therefore, if several slashings have occurred, including these reports in a block can generate a generous reward for the proposer. 
@@ -206,32 +240,81 @@ The first two relate to Casper \gls{ffg} consensus, and the latter two are relat
 
 Ben Edgington points out that `slashable behaviours relate to ``equivocation'', which is when a validator contradicts something it previously advertised to the network'. Hence it is important for validators to ensure that they do not `accidentally' equivocate. This could theoretically happen as a result of bugs in client software, but the vast majority of slashings have been due to node operators running two different nodes using the same validator keys. The reason may have been to improve uptime, but the risk of slashing is too great compared to any potential benefit in uptime. There was also an incident where a validator exploited a vulnerability in a relay operator running mev-boost, an open source proposer-builder separation protocol. Flashbots posted a \href{https://collective.flashbots.net/t/post-mortem-april-3rd-2023-mev-boost-relay-incident-and-related-timing-issue/1540}{detailed post-mortem of the event}.
 
-Apart from the slashing penalties, a slashed validator accrues attestation penalties until such time as they exit, which is 8,192 epochs, i.e. 36 days, after being slashed. Moreover,  if there is an inactivity leak at the time, the penalties imposed on slashed validators will be higher. Slashed validators cannot earn any attestation rewards while waiting to exit. It seems rather odd, but a slashed validator can still be elected to be the proposer for the next block. However, their block will be deemed to be invalid. The only duty for which they could receive a small reward is if they are selected to be in the sync committee, but the probability of this happening is very small. 
+Apart from the slashing penalties, a slashed validator accrues attestation penalties until such time as they exit, which is not until $2^{13} epochs = 8,192 epochs \approx 36 days$ after being slashed. Moreover,  if there is an inactivity leak at the time, the penalties imposed on slashed validators will be higher. Slashed validators cannot earn any attestation rewards while waiting to exit. It seems rather odd, but a slashed validator can still be elected to be the proposer for the next block. However, their block will be deemed to be invalid. The only duty for which they could receive a small reward is if they are selected to be in the sync committee, but the probability of this happening is very small. 
 
+\subsubsection*{Penalties}
+Slashing is the most severe penalty a validator is subjected to and as explained they can accrue a several extra penalties while they wait to exit. However, there are several smaller, less serious `misdemeanours', or failure to perform their duties that can result in penalties for validators. The validator's stake is reduced by the penalty and is burnt, thereby reducing net issuance \cite{Edgington2023}. \\
+
+\textit{Attestation penalties}
+\begin{itemize}
+\item Missed source and target votes (i.e. missed Casper FFG votes), but no penalty for a missed head vote.
+\item Incorrect source vote, then target vote is missed.
+\item Incorrect source or target vote, then head vote is missed.
+\end{itemize}
+
+\textit{Sync committee penalties}\\
+\begin{itemize}
+\item Non-participation of a member incurs a penalty equivalent to the reward they would have received if it was correct
+\end{itemize}
 
 % ---------------------------------------------------------------
 \subsection{Staker wealth and distribution}
 % ---------------------------------------------------------------
-We can at best have an informed guess at the current staker wealth distribution. Some staking pools can be identified, but even then we may not be aware of all of the validator nodes and validators that they run.
+Validators can stake their ETH in four different ways \cite{breslina}:
+\begin{itemize}
+\item Solo staking 
+\item Staking as a service
+\item Pooled staking
+\item Centralised exchange staking
+\end{itemize}
+
+\begin{figure}[htbp]
+\begin{center}
+\includegraphics[width=0.7\linewidth]{images/solo-saas}
+\caption{Solo staking, staking as a service (credit: Andrew Breslin)}
+\label{fig:solo}
+\end{center}
+\end{figure}
+
+\begin{figure}[htbp]
+\begin{center}
+\includegraphics[width=0.7\linewidth]{images/pooled-custodial}
+\caption{Pooled staking, Custodial staking (credit:Andrew Breslin)}
+\label{fig:pooled}
+\end{center}
+\end{figure}
+
+We can at best have an informed guess about current staker wealth distribution. Some staking pools can be identified, but even then we may not be aware of all of the validator nodes and validators that they run. However, the largest staking pool, Lido, is transparent regarding its overall control of validators. Lido operates on a trusted setup, and Consensys staking runs several Lido operators. 
 
 
 % ---------------------------------------------------------------------------------------
 \subsection{Staked ETH as a percentage of ETH supply over time}
 % --------------------------------------------------------------------------------------
-
+Visualising the percentage of total ETH that is tied up in staking would be interesting to observe, especially as it has changed over time.
 
 % ---------------------------------------------------------------
 \subsection{Griefing/discouragement attacks}
 % ---------------------------------------------------------------
+According to Vitalik a griefing attack is when a validator acts maliciously inside a consensus mechanism to reduce other validators' revenue even at some cost to themselves to encourage the victims to drop out of the mechanism \cite{Buterin2018c.}
 
+The two main motivations for reducing the number of participants are most likely because fewer participants:
+\begin{itemize}
+\item mean greater rewards for those remaining in the mechanism
+\item helps to prepare an attack on the chain by reducing the cost of an attack
+\end{itemize}
+
+Some strategies have already been put in place to avoid discouragement attacks \cite{Edgington2023}:
+\begin{itemize}
+\item inverse square root scaling of validator rewards
+\item scaling of rewards with participation (viz. for each ``source, target, and head vote, the attester's reward is scaled by the proportion of the total stake that made the same vote'')
+\item zeroing attestation rewards during an inactivity leak
+\item rate limiting of validator exists, which means that an attacker needs to sustain an attack for longer and at greater cost in order to achieve the same outcome.
+\end{itemize}
 
 % ---------------------------------------------------------------
 \subsection{Centralisation forces}
 % ---------------------------------------------------------------
 Centralisation needs to be assessed within the context of this grant and the proposed increase in maximum effective balance, especially with respect to large stakers and staking pools.
-
-
-% ==================>>>  CONTINUE UPDATES HERE!!!!
 
 
 % ---------------------------------------------------------------
@@ -242,7 +325,7 @@ Ether alpha combines various aspects of the ecosystem to give an overall impress
 Historic and current trends for stake concentration are important to observe as these are warning signs that the chain is becoming more vulnerable to collusion. The consolidation of stake through EIP 7251 (currently in draft form) \cite{Neuder2023c} is unlikely to change the dynamics of stake concentration, since it is encouraging consolidation of validators already being operated by stakers. However, with more node operators and validators joining larger staking pools staked ETH will become more one-sided in favour of staking pools. 
 
 The Rated network also provides detailed metrics and visualisations to gauge the health of the network \cite{Rated2023a}. 
-\clearpage
+
 \section{Data Sources}
 % ==================
 \label{sec:sources}
