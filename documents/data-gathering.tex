@@ -47,18 +47,25 @@ ConsenSys Software R\&D}
 
 % Acronym definitions
 \newacronym{apr}{APR}{annual percentage rate}
+\newacronym{bls}{BLS}{Boneh–Lynn–Shacham}
+\newacronym{cbeth}{cbETH}{Coinbase wrapped staked ETH}
 \newacronym{cl}{CL}{consensus layer}
 \newacronym{ef}{EF}{Ethereum Foundation}
 \newacronym{eip}{EIP}{Ethereum Improvement Proposal}
 \newacronym{el}{EL}{execution layer}
 \newacronym{ffg}{FFG}{Friendly finality gadget}
+\newacronym{fxs}{FXS}{Frax share}
 \newacronym{ghost}{GHOST}{Greedy Heaviest-Observed Sub-Tree}
+\newacronym{ldo}{LDO}{Lido DAO}
 \newacronym{lmd}{LMD}{Latest message driven}
 \newacronym{mev}{MEV}{maximal extractable value}
 \newacronym{mm}{MM}{MetaMask}
 \newacronym{pc}{PC}{personal computer}
+\newacronym{pos}{PoS}{proof of stake}
 \newacronym{rig}{RIG}{Rigorous Incentives Group}
+\newacronym{rpl}{RPL}{Rocket Pool}
 \newacronym{ssf}{SSF}{single slot finality}
+\newacronym{steth}{stETH}{Lido staked Ether}
 \newacronym{ups}{UPS}{uninterruptable power supply}
 
 % ------------------------------------------------------------------------------
@@ -76,7 +83,7 @@ The consequence of such a successful griefing attack is that the wealthier valid
 
 Vitalik further suggests that this attack could possibly be mitigated by ``adding a fee per validator slot, and target it so that under a Zipfian distribution this is never worth it. However, this would still leave open a potential vulnerability if the distribution becomes very non-Zipfian''. 
 
-Many people have generously contributed time and data, provided insights and made helpful suggestions, which has been incredibly helpful in compiling the resources listed in this document. They include, but are not limited to Barnab\'e Monnot and the \gls{rig} team, Andrew Breslin, Juan Dominguez, Justin Drake,  Ben Edgington, Josh Fernandez, Paul Harris, Mikhail Kalinin, Abad Mian, Mike Neuder, Marta Poling, Roberto Saltini, Bogdan Suvar, Alexander Tesfamichael and Kuhan Tharmananthar.
+Many people have generously contributed time and data, provided insights and made helpful suggestions, which has been incredibly helpful in compiling the resources listed in this document. They include, but are not limited to Barnab\'e Monnot and the \gls{rig} team, Andrew Breslin, Juan Dominguez, Justin Drake,  Ben Edgington, Josh Fernandez, Paul Harris, Mikhail Kalinin, Abad Mian, Mike Neuder, Marta Poling, Roberto Saltini, Bogdan Suvar, Alexander Tesfamichael, Kuhan Tharmananthar and Rodrigo Vasquez.
 
 % -------------------------------------------------------------------------------------
 \section{EIP-7251: Increasing the MAX\_EFFECTIVE\_BALANCE}
@@ -129,13 +136,13 @@ There are two main types of committees  \cite{Edgington2023}:
 \item Sync committees
 \end{itemize}
 
-Beacon committees are allocated to each epoch by the protocol in such a way that each slot has the same number of committees. All active validators are distributed equally among these committees, and one committee member is assigned the duty of ``aggregating the signatures of all other validators in the committee that agree on an attestation'' \cite{efglossary}. These beacon committees are disbanded at the end of the epoch and a new randomly allocated set of committees is created for the next epoch. The protocol specifies a minimum size for a committee, as well as a maximum number of committees per slot  \cite{Edgington2023}.
+Beacon committees are allocated to each epoch by the protocol in such a way that each slot has the same number of committees. All active validators are distributed equally among these committees. Within each committee a subset of validators, called aggregators, is chosen probabilistically based on \gls{bls} signatures, to help improve scaling by aggregating the committee's messages. The beacon committees are disbanded at the end of the epoch and a new randomly allocated set of committees is created for the next epoch. The protocol specifies a minimum size for a committee, as well as a maximum number of committees per slot \cite{Edgington2023}.
 
-Each slot typically has several committees, sometimes referred to as `subcommittees' \cite{Neuder2023b}, and the same number of subcommittees is allocated to each slot in the epoch, and hence the total number of committees in a slot is a multiple of 32 \cite{Edgington2023}.
+Each slot typically has several committees, sometimes referred to as `subcommittees' \cite{Neuder2023b}, and the same number of subcommittees is allocated to each slot in the epoch, and hence the total number of committees in an epoch is a multiple of 32 \cite{Edgington2023}.
 
 In contrast to the short duration of the committees where each validator attests once per epoch, sync committees, consisting of 512 validators that are chosen at random, persist for 256 epochs (27.3 hours).  When a proposer includes the sync committee's output, they receive a reward that is proportional to the reward of the whole committee \cite{Edgington2023}.
 
-The rewards for attestations and sync committee are split $\frac{7}{8}$ and $\frac{1}{8}th$ between the validators performing these duties and the proposer that includes the evidence in blocks, respectively.
+The rewards for attestations and sync committee are split $\frac{7}{8}^{th}$ and $\frac{1}{8}^{th}$ between the validators performing these duties and the proposer that includes the evidence in blocks, respectively.
 
 
 % ---------------------------------------------------------------
@@ -169,7 +176,9 @@ Validators earn rewards on the beacon chain (\gls{cl}) for three key activities 
 Validators that report a slashing violation, i.e. an event that triggers a validator to be slashed, receives a reward. 
 
 Each active validator will be selected to make one attestation per epoch, consisting of 3 votes: source, target and head votes. 
-In general, the largest part of a validator's rewards (84.4\% = timely source votes 21.9\%, timely target votes 40.6\% and timely head votes 21.9\%) come from making attestations, assuming they are included in a beacon chain block \cite{Edgington2023}. 
+In general, the largest part of a validator's rewards, viz. \textit{(84.4\%)}: \\
+\textit{84.4\% = 21.9\% (timely source votes) + 40.6\% (timely target votes) +  21.9\% (timely head votes)}\\
+come from making attestations, assuming they are included in a beacon chain block \cite{Edgington2023}. 
 
 All reward calculations are based on the `base reward per increment', where an increment is 1 unit of effective balance = 1 ETH.
 \begin{equation*}
@@ -180,7 +189,18 @@ In the long run, validators can expect to earn $32b \texttt{ } Gwei$ per epoch. 
 
 When a validator submits a request to exit, they are expected to still perform their duties until they reach their exit epoch, which is usually approximately 2 epochs later. The waiting time to exit depends on the exit queue which is currently (26 July 2023) empty. 
 
-There is a limit on both entry and exits of validators, which is set at 10 per epoch. The validator activation queue has been very full since the implementation of withdrawal of stake, and that is currently around 80,000 with a wait time of approximate 33 days \cite{ea2023q}. 
+The churn limit is a limit on the entry and exits of validators, and its value depends on the number of active validators. The reason for having a limit on the rate of churn is provide stability in \gls{pos} Ethereum, and it is calculated as follows \cite{Edgington2023}:.
+\begin{equation*}
+\begin{aligned}
+max & \left( MIN\_PER\_EPOCH\_CHURN\_LIMIT, \frac{total \texttt{ } number  \texttt{ } of  \texttt{ } active  \texttt{ } validators}{CHURN\_LIMIT\_QUOTIENT} \right),\\
+where & \texttt{ }  MIN\_PER\_EPOCH\_CHURN\_LIMIT = 4, \\
+ &  \texttt{ } CHURN\_LIMIT\_QUOTIENT  \texttt{              }= 65536
+\end{aligned}
+\end{equation*}
+
+Currently this equates to around 10 per epoch, but as the validator set grows, so the churn limit increases \cite{liquid2023}.
+The validator activation queue has been very full since the implementation of withdrawal of stake, and the queue is currently around 80,000 with a wait time of approximate 33 days \cite{ea2023q}. 
+A temporary measure has been proposed to cap the churn limit at 12 to slow down the rate of growth of the validator set. \cite{dapplion}.
 
 % ---------------------------------------------------------------
 \subsection{Validator yield}
@@ -188,7 +208,7 @@ There is a limit on both entry and exits of validators, which is set at 10 per e
 \label{yield}
 The motivation for quantifying yield is twofold: first to observe how this has changed over time, and secondly to use this to inform an intuition of a yield at which there is little or no incentive to stake in Ethereum.
 When we consider the yield of validators on their staked ETH, it is also worth bearing in mind the associated costs to run and manage a validator. 
-The survey conducted by the \gls{ef} and EthStaker concluded that the vast majority of solo stakers ((85\%) and mini pool operators (78\%) who completed the survey specially bought hardware for staking. We contacted some solo stakers for estimates regarding this initial outlay and to estimate ongoing costs. The responses are noted below: \\
+The survey conducted by the \gls{ef} and EthStaker concluded that the vast majority of solo stakers ((85\%) and mini pool operators (78\%) who completed the survey specially bought hardware for staking \cite{Smith2023}. We contacted some solo stakers for estimates regarding this initial outlay and to estimate ongoing costs. The responses are noted below: \\
 \noindent
 \textit{Solo and small stakers} \\
 The overheads for running a validator node can be divided into two main categories: initial outlay and ongoing costs. The initial outlay includes purchasing the staking computer and associated  items such as routers, \gls{ups} and networking equipment. The ongoing costs are electricity, additional costs if additional bandwidth is required and not included in the existing internet package for home use, and labour in monitoring the node and keeping it up to date. Based on a small sample of solo stakers, the cost of purchasing a \gls{pc} to run a validator is approximately \$800 to \$2,000, with optional additional extras such as a high-end router approximately \$500 to \$600, a \gls{ups} around \$150 and networking equipment to facilitate high bandwidth around \$1,500. After 3 years it is probably advisable to replace the \gls{pc}, but not necessarily all the ancillaries. Ongoing costs such as additional electricity usage are minimal and could be as low as \$80 annually. 
@@ -227,7 +247,7 @@ The situations that lead to a validator being slashed are few, but they are seve
 
 A validator gets slashed when they are reported and evidence of the violation of the rules is included in a beacon block. For the valid reporting of a slashing event, the reporting validator receives a reward. The intention is that this will help incentivise the reporting of slashable events. Only one proposer slashing can be included in a report, whereas multiple attestation violations can be included in a report. When the slashing is included in a block, the proposer gets a reward which is a fraction of the effective balance of the validator being slashed (currently $\frac{1}{512}$). Up to 16 proposer slashings can be included in a block and up to 2 attester slashing reports.  Therefore, if several slashings have occurred, including these reports in a block can generate a generous reward for the proposer. 
 
-For more detailed information on slashing and calculations, please refer to the latest version of Ben Edgington's  \href{https://eth2book.info/capella/part2/incentives/slashing/}{\textit{Upgrading Ethereum}} book \cite{Edgington2023}  which incorporates the updates included in the Capella hard fork. In summary the events that lead to slashing are:
+For more detailed information on slashing and calculations, please refer to the latest version of Edgington's  \href{https://eth2book.info/capella/part2/incentives/slashing/}{\textit{Upgrading Ethereum}} book \cite{Edgington2023}  which incorporates the updates included in the Capella hard fork. In summary the events that lead to slashing are:
 
 \begin{enumerate}
 \item ``making two differing attestations for the same target checkpoint''
@@ -238,12 +258,12 @@ For more detailed information on slashing and calculations, please refer to the 
 
 The first two relate to Casper \gls{ffg} consensus, and the latter two are related to \gls{lmd} \gls{ghost} consensus.
 
-Ben Edgington points out that `slashable behaviours relate to ``equivocation'', which is when a validator contradicts something it previously advertised to the network'. Hence it is important for validators to ensure that they do not `accidentally' equivocate. This could theoretically happen as a result of bugs in client software, but the vast majority of slashings have been due to node operators running two different nodes using the same validator keys. The reason may have been to improve uptime, but the risk of slashing is too great compared to any potential benefit in uptime. There was also an incident where a validator exploited a vulnerability in a relay operator running mev-boost, an open source proposer-builder separation protocol. Flashbots posted a \href{https://collective.flashbots.net/t/post-mortem-april-3rd-2023-mev-boost-relay-incident-and-related-timing-issue/1540}{detailed post-mortem of the event}.
+Edgington points out that `slashable behaviours relate to ``equivocation'', which is when a validator contradicts something it previously advertised to the network'. Hence it is important for validators to ensure that they do not `accidentally' equivocate. This could theoretically happen as a result of bugs in client software, but the vast majority of slashings have been due to node operators running two different nodes using the same validator keys. The reason may have been to improve uptime, but the risk of slashing is too great compared to any potential benefit in uptime \cite{Edgington2023}. There was also an incident where a validator exploited a vulnerability in a relay operator running mev-boost, an open source proposer-builder separation protocol. Flashbots posted a \href{https://collective.flashbots.net/t/post-mortem-april-3rd-2023-mev-boost-relay-incident-and-related-timing-issue/1540}{detailed post-mortem of the event}.
 
-Apart from the slashing penalties, a slashed validator accrues attestation penalties until such time as they exit, which is not until $2^{13} epochs = 8,192 epochs \approx 36 days$ after being slashed. Moreover,  if there is an inactivity leak at the time, the penalties imposed on slashed validators will be higher. Slashed validators cannot earn any attestation rewards while waiting to exit. It seems rather odd, but a slashed validator can still be elected to be the proposer for the next block. However, their block will be deemed to be invalid. The only duty for which they could receive a small reward is if they are selected to be in the sync committee, but the probability of this happening is very small. 
+Apart from the slashing penalties, a slashed validator accrues attestation penalties until such time as they exit, which is not until $2^{13} \texttt{ }epochs = 8,192 \texttt{ }epochs \approx 36 \texttt{ } days$ after being slashed. Moreover,  if there is an inactivity leak at the time, the penalties imposed on slashed validators will be higher. Slashed validators cannot earn any attestation rewards while waiting to exit. It seems rather odd, but a slashed validator can still be elected to be the proposer for the next block. However, their block will be deemed to be invalid. The only duty for which they could receive a small reward is if they are selected to be in the sync committee, but the probability of this happening is very small. 
 
 \subsubsection*{Penalties}
-Slashing is the most severe penalty a validator is subjected to and as explained they can accrue a several extra penalties while they wait to exit. However, there are several smaller, less serious `misdemeanours', or failure to perform their duties that can result in penalties for validators. The validator's stake is reduced by the penalty and is burnt, thereby reducing net issuance \cite{Edgington2023}. \\
+Slashing is the most severe penalty a validator is subjected to and as explained they can accrue several extra penalties while they wait to exit. However, there are a number of smaller, less serious `misdemeanours', or failure to perform their duties that can result in penalties for validators. The validator's stake is reduced by the penalty and the ETH is burnt, thereby reducing net issuance \cite{Edgington2023}. \\
 
 \textit{Attestation penalties}
 \begin{itemize}
@@ -252,7 +272,7 @@ Slashing is the most severe penalty a validator is subjected to and as explained
 \item Incorrect source or target vote, then head vote is missed.
 \end{itemize}
 
-\textit{Sync committee penalties}\\
+\textit{Sync committee penalties}
 \begin{itemize}
 \item Non-participation of a member incurs a penalty equivalent to the reward they would have received if it was correct
 \end{itemize}
@@ -292,10 +312,12 @@ We can at best have an informed guess about current staker wealth distribution. 
 % --------------------------------------------------------------------------------------
 Visualising the percentage of total ETH that is tied up in staking would be interesting to observe, especially as it has changed over time.
 
+There are also crypto analytical companies such as \href{https://parsec.finance/}{Parsec} that report on liquid staking derivatives. The analytics provided by Parsec are captured in figures~\ref{fig:parsec1}~-~\ref{fig:parsec6} on pages~\pageref{fig:parsec1}~-~\pageref{fig:parsec6}.
+
 % ---------------------------------------------------------------
 \subsection{Griefing/discouragement attacks}
 % ---------------------------------------------------------------
-According to Vitalik a griefing attack is when a validator acts maliciously inside a consensus mechanism to reduce other validators' revenue even at some cost to themselves to encourage the victims to drop out of the mechanism \cite{Buterin2018c.}
+According to Buterin a griefing attack is when a validator acts maliciously inside a consensus mechanism to reduce other validators' revenue even at some cost to themselves to encourage the victims to drop out of the mechanism \cite{Buterin2018c}.
 
 The two main motivations for reducing the number of participants are most likely because fewer participants:
 \begin{itemize}
@@ -380,7 +402,7 @@ Rocket Pool has a simple explanation of the various validator rewards and a tabl
  % ---------------------------------------------------------
 \label{sec:ethsupply} 
         The total supply of ETH used to be fairly simple to work out, but it is now more complicated for two main reasons:  implementation of EIP-1559 and the Merge.
-Currently we are ``(a) burning ETH via the base fee and (b) the issuance is variable depending on the number of validators.'' (Ben Edgington 2023). 
+Currently we are ``(a) burning ETH via the base fee and (b) the issuance is variable depending on the number of validators.'' \cite{Edgington2023}. 
 \begin{itemize}
 	\item Ultrasound is considered a credible source for total ETH supply projections. \\\textit{\href{https://ultrasound.money/}{Ultra sound money}} visualises various aspects of Ether supply since the Merge, gas, supply projections, the burn, total value secured - TVS and monetary premium. See figures~\ref{fig:ethsupply}~-~\ref{fig:monetary}, on pages~\pageref{fig:ethsupply}~-~\pageref{fig:monetary}.  
 
@@ -510,9 +532,19 @@ There are several resources that contain lists and visualisations of a variety o
 			\item \textit{builders\_over\_time} - Number of successfully built blocks per day \textit{(Not available)}
 		\end{itemize}
 	\end{itemize}
+	
 	\item \textit{\href{https://app.metrika.co/ethereum/}{Metrika}} \\
 	The various dashboards available from Metrika are sponsored by the Ethereum Foundation. One can enter a withdrawal address in the search field on the homepage to retrieve withdrawal information for the time range selected, which is either 1 day, 1 week or 2 weeks. See figure~\ref{fig:metrika1} on page\pageref{fig:metrika1}. Following this there are several charts and tables covering the network, consensus, withdrawals and validators. Screen shots of the additional visualisations and tables are shown in figures~\ref{fig:metrika2}~-~\ref{fig:metrika6} on pages~\pageref{fig:metrika2}~-~\pageref{fig:metrika6}.
-
+	
+	\item \textit{\href{https://pro.nansen.ai/}{Nansen}}\\
+	Nansen provides some dashboards and visualisations that are freely available, but they also provide a paid service to customers for additional information, metrics and visualisations.
+	Two dashboards are of interest to this project:
+	\begin{itemize}
+		\item Dashboard displaying key metrics of the Shapella upgrade when withdrawals were activated (figure~\ref{fig:nansen1}~-~\ref{fig:nansen13} on pages~\pageref{fig:nansen1}~-~\pageref{fig:nansen13}) \cite{nansenshapella}
+		\item Eth2 dashboard  - overview of total ETH deposited, unique depositors, unique validators, proposer and attestor metrics (figure~ vv - zz on pages vv-zz) \cite{nanseneth2}
+	\end{itemize}
+	\item \textit{\href{https://beaconscan.com}{BeaconScan: The Official Etherscan Beacon Chain Ethereum 2.0 Explorer}}\\
+	The BeaconScan website is a product of EtherScan and provides multiple views of data on the beacon chain. Figures~\ref{fig:beaconscan1}~-~\ref{fig:beaconscan19} on pages~\pageref{fig:beaconscan1}~-~\pageref{fig:beaconscan19} demonstrate the type of information and visualisations that are freely available \cite{etherscan}.
 \end{itemize}
 
 \clearpage
@@ -1101,7 +1133,7 @@ Moreover, there are several summary graphs and visualisations that have been cre
 \end{center}
 \end{figure}
 
-
+\clearpage
 \textit{\textbf{Network data}}
 % -------------------------------
 \begin{figure}[htbp]
@@ -1926,7 +1958,7 @@ The website provides the ability to search using a variety of fields, including 
 \label{fig:metrika4}
 \end{center}
 \end{figure}
-
+                                                                                                                                                                                   
 \begin{figure}[htbp]
 \begin{center}
 \includegraphics[width=0.9\linewidth]{images/metrika5}
@@ -1942,6 +1974,298 @@ The website provides the ability to search using a variety of fields, including 
 \label{fig:metrika6}
 \end{center}
 \end{figure}
+
+\clearpage
+
+% --------------------------------------
+\subsubsection*{Nansen}
+% --------------------------------------
+\begin{figure}[htbp]
+\begin{center}
+\includegraphics[width=\linewidth]{images/nansen1}
+\caption{\textit{Deposits}: ETH that has been sent to the beacon deposit contract.\\
+\textit{Principal}: Principal amount of ETH deposited that have been withdrawn to a wallet.\\
+\textit{Reward}: Earned rewards that have been withdrawn to a wallet.\\
+\textit{Cumulative Sum}: Deposits minus amount withdrawn.\\
+\textit{ETH Locked}: All ETH that ``is out of circulation'', i.e. ETH staked on Beacon chain, ETH deposited to the beacon contract but not validating yet, and
+rewards on the Beacon chain. Nansen Shapella dashboard (2 August 2023)}
+\label{fig:nansen1}
+\end{center}
+\end{figure}
+
+\begin{figure}[htbp]
+\begin{center}
+\includegraphics[width=0.45\linewidth]{images/nansen2}
+\includegraphics[width=0.45\linewidth]{images/nansen6}
+\caption{Locked ETH and validators. Nansen Shapella dashboard (2 August 2023)}
+\label{fig:nansen2}
+\end{center}
+\end{figure}
+
+\begin{figure}[htbp]
+\begin{center}
+\includegraphics[width=\linewidth]{images/nansen3a} \\
+\includegraphics[width=\linewidth]{images/nansen8}\\
+(a)\\
+\includegraphics[width=\linewidth]{images/nansen5}\\
+(b)
+\caption{(a) Locked ETH breakdown, (b) ETH depositors. Nansen Shapella dashboard (2 August 2023)}
+\label{fig:nansen3}
+\end{center}
+\end{figure}
+
+\begin{figure}[htbp]
+\begin{center}
+\includegraphics[width=0.8\linewidth]{images/nansen7}
+\caption{Top ETH depositing addresses. Nansen Shapella dashboard (2 August 2023)}
+\label{fig:nansen7}
+\end{center}
+\end{figure}
+
+\begin{figure}[htbp]
+\begin{center}
+\includegraphics[width=\linewidth]{images/nansen9}
+\caption{Distribution of average price and of staked ETH. Nansen Shapella dashboard (2 August 2023)}
+\label{fig:nansen9}
+\end{center}
+\end{figure}
+
+\begin{figure}[htbp]
+\begin{center}
+\includegraphics[width=\linewidth]{images/nansen10}\\
+\includegraphics[width=\linewidth]{images/nansen11}
+\caption{ETH and validators waiting for full exit. Nansen Eth2 dashboard (2 August 2023)}
+\label{fig:nansen10}
+\end{center}
+\end{figure}
+
+\begin{figure}[htbp]
+\begin{center}
+\includegraphics[width=\linewidth]{images/nansen12}
+\caption{Withdrawal queue. Nansen Eth2 dashboard (2 August 2023)}
+\label{fig:nansen12}
+\end{center}
+\end{figure}
+
+\begin{figure}[htbp]
+\begin{center}
+\includegraphics[width=\linewidth]{images/nansen13}\\
+\includegraphics[width=\linewidth]{images/nansen14}
+\caption{Withdrawal metrics. Nansen Eth2 dashboard (2 August 2023)}
+\label{fig:nansen13}
+\end{center}
+\end{figure}
+
+\clearpage
+
+% --------------------------------------
+\subsubsection*{BeaconScan}
+% --------------------------------------
+\begin{figure}[htbp]
+\begin{center}
+\includegraphics[width=\linewidth]{images/beaconscan1}
+\caption{View of current slot, epoch, number of active \& pending validators, voted \& eligible ETH, small chart of network participation, latest beacon chain blocks and the validators leader board. BeaconScan (3 August 2023)}
+\label{fig:beaconscan1}
+\end{center}
+\end{figure}
+
+\begin{figure}[htbp]
+\begin{center}
+\includegraphics[width=\linewidth]{images/beaconscan2}
+\caption{Forked blocks. BeaconScan (3 August 2023)}
+\label{fig:beaconscan2}
+\end{center}
+\end{figure}
+
+\begin{figure}[htbp]
+\begin{center}
+\includegraphics[width=\linewidth]{images/beaconscan3}
+\caption{Skipped blocks. BeaconScan (3 August 2023)}
+\label{fig:beaconscan3}
+\end{center}
+\end{figure}
+
+\begin{figure}[htbp]
+\begin{center}
+\includegraphics[width=\linewidth]{images/beaconscan4}
+\caption{List of validators. BeaconScan (3 August 2023)}
+\label{fig:beaconscan4}
+\end{center}
+\end{figure}
+
+\begin{figure}[htbp]
+\begin{center}
+\includegraphics[width=\linewidth]{images/beaconscan5}
+\caption{Leaderboard of validator staking income. BeaconScan (3 August 2023)}
+\label{fig:beaconscan5}
+\end{center}
+\end{figure}
+
+\begin{figure}[htbp]
+\begin{center}
+\includegraphics[width=\linewidth]{images/beaconscan6}
+\caption{Details of slashed validators. BeaconScan (3 August 2023)}
+\label{fig:beaconscan6}
+\end{center}
+\end{figure}
+
+\begin{figure}[htbp]
+\begin{center}
+\includegraphics[width=\linewidth]{images/beaconscan7}
+\caption{Eth2 Deposits received. BeaconScan (3 August 2023)}
+\label{fig:beaconscan7}
+\end{center}
+\end{figure}
+
+\begin{figure}[htbp]
+\begin{center}
+\includegraphics[width=\linewidth]{images/beaconscan8}
+\caption{Histogram of proposed, skipped and forked blocks. BeaconScan (3 August 2023)}
+\label{fig:beaconscan8}
+\end{center}
+\end{figure}
+
+\begin{figure}[htbp]
+\begin{center}
+\includegraphics[width=\linewidth]{images/beaconscan9}
+\caption{Graph of number of validators over time. BeaconScan (3 August 2023)}
+\label{fig:beaconscan9}
+\end{center}
+\end{figure}
+
+\begin{figure}[htbp]
+\begin{center}
+\includegraphics[width=\linewidth]{images/beaconscan10}
+\caption{Graph of number of attestations over time. BeaconScan (3 August 2023)}
+\label{fig:beaconscan10}
+\end{center}
+\end{figure}
+
+\begin{figure}[htbp]
+\begin{center}
+\includegraphics[width=\linewidth]{images/beaconscan11}
+\caption{Visualisation of network participant rate. BeaconScan (3 August 2023)}
+\label{fig:beaconscan11}
+\end{center}
+\end{figure}
+
+\begin{figure}[htbp]
+\begin{center}
+\includegraphics[width=\linewidth]{images/beaconscan12}
+\caption{Daily validator income. BeaconScan (3 August 2023)}
+\label{fig:beaconscan12}
+\end{center}
+\end{figure}
+
+\begin{figure}[htbp]
+\begin{center}
+\includegraphics[width=\linewidth]{images/beaconscan13}
+\caption{Histogram of daily deposits. BeaconScan (3 August 2023)}
+\label{fig:beaconscan13}
+\end{center}
+\end{figure}
+
+\begin{figure}[htbp]
+\begin{center}
+\includegraphics[width=\linewidth]{images/beaconscan14}
+\caption{Histogram of income distribution. BeaconScan (3 August 2023)}
+\label{fig:beaconscan14}
+\end{center}
+\end{figure}
+
+\begin{figure}[htbp]
+\begin{center}
+\includegraphics[width=\linewidth]{images/beaconscan15}
+\caption{Histogram of current balance distribution. BeaconScan (3 August 2023)}
+\label{fig:beaconscan15}
+\end{center}
+\end{figure}
+
+\begin{figure}[htbp]
+\begin{center}
+\includegraphics[width=\linewidth]{images/beaconscan16}
+\caption{Bar chart of effective balance distribution. BeaconScan (3 August 2023)}
+\label{fig:beaconscan16}
+\end{center}
+\end{figure}
+
+\begin{figure}[htbp]
+\begin{center}
+\includegraphics[width=\linewidth]{images/beaconscan17}
+\caption{Word cloud of top 25 graffiti text occurences. BeaconScan (3 August 2023)}
+\label{fig:beaconscan17}
+\end{center}
+\end{figure}
+
+\begin{figure}[htbp]
+\begin{center}
+\includegraphics[width=\linewidth]{images/beaconscan18}
+\caption{Line graph of chain data growth in archive mode. BeaconScan (3 August 2023)}
+\label{fig:beaconscan18}
+\end{center}
+\end{figure}
+
+\begin{figure}[htbp]
+\begin{center}
+\includegraphics[width=\linewidth]{images/beaconscan19}
+\caption{Time series of liveness as the difference between the last finalised epoch and the head epoch. BeaconScan (3 August 2023)}
+\label{fig:beaconscan19}
+\end{center}
+\end{figure}
+
+\clearpage
+
+% --------------------------------------
+\subsubsection*{Parsec}
+% --------------------------------------
+\begin{figure}[htbp]
+\begin{center}
+\includegraphics[width=0.8\linewidth]{images/parsec1}
+\caption{ETH staking flows, liquid staking derivatives mint and burn volumes, and ETH stake withdrawn by validators. Shangai dashboard by Parsec (3 August 2023)}
+\label{fig:parsec1}
+\end{center}
+\end{figure}
+
+\begin{figure}[htbp]
+\begin{center}
+\includegraphics[width=\linewidth]{images/parsec2}
+\caption{Validators pending activation, price comparison \gls{ldo} \textbackslash ETH, \gls{fxs} \textbackslash ETH, and \gls{rpl} \textbackslash ETH, \gls{cbeth} discount- line graph of exchange rate and \gls{cbeth} \textbackslash ETH, \gls{steth} discount - line graph of exchange rate and \gls{steth} \textbackslash ETH; graph of validators waiting to exit. Shangai dashboard by Parsec (3 August 2023)}
+\label{fig:parsec2}
+\end{center}
+\end{figure}
+
+\begin{figure}[htbp]
+\begin{center}
+\includegraphics[width=\linewidth]{images/parsec3}
+\caption{\gls{steth} withdrawals requested (individual). \gls{steth} Withdrawals dashboard by Parsec (3 August 2023)}
+\label{fig:parsec3}
+\end{center}
+\end{figure}
+
+\begin{figure}[htbp]
+\begin{center}
+\includegraphics[width=\linewidth]{images/parsec4}
+\caption{\gls{steth} withdrawals requested (aggregate). \gls{steth} Withdrawals dashboard by Parsec (3 August 2023)}
+\label{fig:parsec4}
+\end{center}
+\end{figure}
+
+\begin{figure}[htbp]
+\begin{center}
+\includegraphics[width=\linewidth]{images/parsec5}
+\caption{Token balance - Lido: Withdrawals NFT and \gls{steth} histogram. \gls{steth} Withdrawals dashboard by Parsec (3 August 2023)}
+\label{fig:parsec5}
+\end{center}
+\end{figure}
+
+\begin{figure}[htbp]
+\begin{center}
+\includegraphics[width=\linewidth]{images/parsec6}
+\caption{Token accumulation. \gls{steth} Withdrawals dashboard by Parsec (4 August 2023)}
+\label{fig:parsec6}
+\end{center}
+\end{figure}
+
 
 \clearpage
 % --------------------------------------
