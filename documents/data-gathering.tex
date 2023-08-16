@@ -77,7 +77,7 @@ The information gathering is targeted towards the proposal being evaluated, viz.
 
 In other words, the floating minimum balance proposal is one of the ways put forward by Vitalik to manage a cap on the total number of validators. In this proposal, the validator with the lowest balance will be kicked out when the total number of validators is greater than the cap. 
 
-Vitalik highlighted a potential vulnerability that could be introduced with this proposal, viz. the emergence of a new type of griefing attack \cite{Buterin2018c} where validators split their stake in order to push smaller validators out. 
+Vitalik highlighted a potential vulnerability that could be introduced with this proposal, viz. the emergence of a new type of griefing attack \cite{buterin2018c} where validators split their stake in order to push smaller validators out. 
 
 The consequence of such a successful griefing attack is that the wealthier validators increase their reward, \textit{R}, because the total deposit amount, \textit{D}, decreases. (Current formula to calculate the validator reward: $R = \frac{k}{\sqrt{D}}$).
 
@@ -98,7 +98,7 @@ Recently a proposal has been put forward to increase the maximum effective balan
 \item There is currently an \gls{eip} in draft form to implement the proposal to increase the maximum effective balance. Here is the \href{https://github.com/ethereum/EIPs/pull/7251/commits/ec37fceec914af2a3fd298ef6f6cc13b5d41c533#diff-0e923b63b339f877c14b995b0c69d4962489dce485fb0e31ef49a4dd303e0b56}{pull request}. The initial draft by Mike Neuder is in his GitHub repo: \href{https://github.com/michaelneuder/EIPs/blob/max-eb-increase/EIPS/eip-increase-maxeb.md}{max effective balance increase proposal} \cite{Neuder2023c}.
 \item Mike Neuder added a very useful \href{https://notes.ethereum.org/@mikeneuder/eip-7251-faq}{FAQ post for EIP7251}.
 \item Christine Kim publishes regular summaries of the \textit{Ethereum All Core Developers (AllCoreDevs)} calls. \href{https://www.galaxy.com/research/insights/ethereum-all-core-developers-consensus-call-111/}{\textit{Call 111}} and \href{https://www.galaxy.com/research/insights/ethereum-all-core-developers-consensus-call-112/}{\textit{Call 112}} include the main discussion points for the proposal to increase the maximum effective balance for validators. Recordings of the meetings are available on YouTube. During \textit{Call 111} the discussion around the increase in maximum effective balance starts around 59 mins (\href{https://youtu.be/ybgQuRcz9sg?t=3569}{recording}) and for \textit{Call 112} the discussion starts around 46 mins (\href{https://youtu.be/zdqtl9x\_UjA?t=2775}{recording})
-\end{itemize}{
+\end{itemize}
 
 With this proposal validators can choose to auto-compound their stake, instead of having any rewards above the 32 ETH effective balance automatically withdrawn into their account. Therefore validators do not have to wait until 32 ETH has been accumulated before another 32 ETH deposit can be made, but they can automatically compound their stake with rewards earned. The flow-on effect is that this would increase their rewards since rewards are based on the effective balance of the validator, making it attractive to smaller, typically solo, stakers, who have to wait for a very long time to earn enough ETH for another 32 ETH stake. It should also be attractive to larger stakers who regularly earn far greater rewards, and instead of waiting for a newly created validator to be activated in the long activation queue, that stake will immediately earn additional rewards. On the other hand consolidation and compounding of validators run a risk of increased slashing penalties.
 
@@ -152,8 +152,8 @@ The rewards for attestations and sync committee are split $\frac{7}{8}^{th}$ and
 
 By participating in Ethereum’s consensus, honest validators earn rewards in two ways\cite{breslina}:
 \begin{itemize}
-\item \gls{cl} rewards, that comprise approximately 70\% of the total validator rewards, which are described in more detail below.
-\item \gls{el} rewards, that comprise approximately 30\% of total rewards, and are sourced from
+\item \gls{cl} rewards, described in more detail below.
+\item \gls{el} rewards are sourced from
 	\begin{itemize}
 	\item priority fees
 	\item \gls{mev}
@@ -200,6 +200,7 @@ where & \texttt{ }  MIN\_PER\_EPOCH\_CHURN\_LIMIT = 4, \\
 
 Currently this equates to around 10 per epoch, but as the validator set grows, so the churn limit increases \cite{liquid2023}.
 The validator activation queue has been very full since the implementation of withdrawal of stake, and the queue is currently around 80,000 with a wait time of approximate 33 days \cite{ea2023q}. 
+There is a dashboard of the \href{https://www.validatorqueue.com/}{validator queue} showing the length of the queue and the estimated waiting time for activation \cite{ea2023q}.
 A temporary measure has been proposed to cap the churn limit at 12 to slow down the rate of growth of the validator set. \cite{dapplion}.
 
 % ---------------------------------------------------------------
@@ -317,7 +318,7 @@ There are also crypto analytical companies such as \href{https://parsec.finance/
 % ---------------------------------------------------------------
 \subsection{Griefing/discouragement attacks}
 % ---------------------------------------------------------------
-According to Buterin a griefing attack is when a validator acts maliciously inside a consensus mechanism to reduce other validators' revenue even at some cost to themselves to encourage the victims to drop out of the mechanism \cite{Buterin2018c}.
+According to Buterin a griefing attack is when a validator acts maliciously inside a consensus mechanism to reduce other validators' revenue even at some cost to themselves to encourage the victims to drop out of the mechanism \cite{buterin2018c}.
 
 The two main motivations for reducing the number of participants are most likely because fewer participants:
 \begin{itemize}
@@ -359,7 +360,7 @@ The Rated network also provides detailed metrics and visualisations to gauge the
 \item The beacon chain \textbf{genesis block number} is 11182202
 \end{itemize}
 
-There is a rate limit of 10 per epoch for validator activations and exits. These limits need to be taken into account when validators are combined into larger validators. Moreover, there is another mechanism in place which bypasses the entry and exit rate limiting, viz. top-ups. Validators top their stake up when it drops below 32~ETH so that they maximise their rewards. 
+The dynamic rate limit of validator activations and exits per epoch need to be taken into account when validators are combined into larger validators. Moreover, there is another mechanism in place which bypasses the entry and exit rate limiting, viz. top-ups. Validators currently top their stake up when it drops below 32~ETH so that they maximise their rewards without having to go into the queue. Clearly these are smaller amounts of ETH since if a validator's effective balance falls below 16~ETH they are automatically exited by the protocol, hence the maximum amount of a top-up is 16~ETH.
 % ---------------------------------------------------------
  \subsection{Key Parameters }
  % ---------------------------------------------------------
@@ -421,9 +422,13 @@ There are several helpful documents explaining in detail the different options a
 \begin{itemize}
 \item \href{https://ethereum.org/en/staking/solo/}{Solo staking} \cite{efsolo}
 \item \href{https://ethereum.org/en/staking/saas/}{Staking as a service (Saas)} \cite{efsaas}
-\item \href{https://ethereum.org/en/staking/pools/}{Pooled staking} \cite{efpools}
-\item \href{https://www.validatorqueue.com/}{Validator queue} \cite{ea2023q}
+\item \href{https://ethereum.org/en/staking/pools/}{Pooled staking} - ``many of these options include what is known as `liquid staking' which involves an ERC-20 liquidity token that represents the staked ETH.'' \cite{efpools} 
+\item \href{https://ethereum.org/en/staking/}{Centralised exchanges} \cite{efstaking}
 \end{itemize}
+
+The Ethereum Foundation provides a \href{https://ethereum.org/en/staking/#comparison-of-options}{Comparison of staking options}, outlining the key differences between solo staking, staking as a service and pooled staking. The legal implications of staking are discussed in Consensys blog post \href{https://consensys.net/blog/news/staking-is-data-validation-not-investment/}{Staking is Data Validation, Not Investment} \cite{corva2023}.
+
+Re-staking is deemed to be out of scope for this grant research topic, but there are good resources to explain the concept and discuss the implications of re-staking. A blog post by Buterin \href{https://vitalik.ca/general/2023/05/21/dont\_overload.html}{Don`t overload Ethereum`s consensus} discusses the various approaches to re-staking and explains why some techniques bring ``high systemic risks to the ecosystem'' \cite{buterin2023a}. Another interesting read is from the Substack post by Tripoli: \href{https://dataalways.substack.com/p/endgame-perils-of-restaking}{Endgame Perils of Restaking}, and the addendum to the post: \href{https://dataalways.substack.com/p/addendum-endgame-perils-of-restaking}{Addendum: Endgame Perils of Restaking}.
 
 The Ethereum Foundation and EtherScan conducted a survey of stakers \cite{Smith2023}, according to the following categories: solo staking, staking pool service, mini node operator (Rocketpool), and those not yet staking. The responses were analysed and the key trends, take aways, and predictions reported. The large majority of the respondents were either solo stakers or mini pool operators.
 
