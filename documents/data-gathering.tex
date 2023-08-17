@@ -62,7 +62,7 @@ ConsenSys Software R\&D}
 \newacronym{mm}{MM}{MetaMask}
 \newacronym{pc}{PC}{personal computer}
 \newacronym{pos}{PoS}{proof of stake}
-\newacronym{rig}{RIG}{Rigorous Incentives Group}
+\newacronym{rig}{RIG}{Robust Incentives Group}
 \newacronym{rpl}{RPL}{Rocket Pool}
 \newacronym{ssf}{SSF}{single slot finality}
 \newacronym{steth}{stETH}{Lido staked Ether}
@@ -115,11 +115,10 @@ In order to analyse the variable minimum validator deposit proposal and the incr
 
 \begin{itemize}
 \item Committees - selection and rewards
+\item Staker wealth and distribution
 \item Validator rewards
 \item Validator yield
 \item Validator slashing and penalties
-\item Staker wealth and distribution
-\item Staker consolidation
 \item Staked ETH as a percentage of ETH supply over time
 \item Assessment of potential griefing/discouragement attacks
 \item Assessment and projection of centralisation forces with respect to large stakers (both for EIP7251 and for this project)
@@ -140,10 +139,49 @@ Beacon committees are allocated to each epoch by the protocol in such a way that
 
 Each slot typically has several committees, sometimes referred to as `subcommittees' \cite{Neuder2023b}, and the same number of subcommittees is allocated to each slot in the epoch, and hence the total number of committees in an epoch is a multiple of 32 \cite{Edgington2023}.
 
-In contrast to the short duration of the committees where each validator attests once per epoch, sync committees, consisting of 512 validators that are chosen at random, persist for 256 epochs (27.3 hours).  When a proposer includes the sync committee's output, they receive a reward that is proportional to the reward of the whole committee \cite{Edgington2023}.
+In contrast to the short duration of the committees where each validator attests once per epoch, sync committees, consisting of 512 validators that are chosen at random \textbf {with replacement} (i.e. although unlikely, a validator can be chosen more than once), persist for 256 epochs (27.3 hours).  When a proposer includes the sync committee's output, they receive a reward that is proportional to the reward of the whole committee \cite{Edgington2023}.
 
 The rewards for attestations and sync committee are split $\frac{7}{8}^{th}$ and $\frac{1}{8}^{th}$ between the validators performing these duties and the proposer that includes the evidence in blocks, respectively.
 
+% ---------------------------------------------------------------
+\subsection{Staker wealth and distribution}
+% ---------------------------------------------------------------
+Validators can stake their ETH in four different ways \cite{breslina}. The links provide a more detailed description of the options available for stakers, and figures~\ref{fig:solo}~and~\ref{fig:pooled} on page~\pageref{fig:solo}~-~\pageref{fig:pooled} visualise the different ways of staking.
+
+\begin{itemize}
+\item \href{https://ethereum.org/en/staking/solo/}{Solo staking} \cite{efsolo}
+\item \href{https://ethereum.org/en/staking/saas/}{Staking as a service (Saas)} \cite{efsaas}
+\item \href{https://ethereum.org/en/staking/pools/}{Pooled staking} - ``many of these options include what is known as `liquid staking' which involves an ERC-20 liquidity token that represents the staked ETH.'' \cite{efpools} 
+\item \href{https://ethereum.org/en/staking/}{Centralised exchanges} \cite{efstaking}
+\end{itemize}
+
+The Ethereum Foundation provides a \href{https://ethereum.org/en/staking/#comparison-of-options}{\textit{Comparison of staking options}}, outlining the key differences between solo staking, staking as a service and pooled staking. The legal implications of staking are discussed in Consensys blog post \href{https://consensys.net/blog/news/staking-is-data-validation-not-investment/}{\textit{Staking is Data Validation, Not Investment}} \cite{corva2023}.
+
+Re-staking is deemed to be out of scope for this grant research topic, but there are good resources to explain the concept and discuss the implications of re-staking. A blog post by Buterin \href{https://vitalik.ca/general/2023/05/21/dont\_overload.html}{\textit{Don`t overload Ethereum`s consensus}} discusses the various approaches to re-staking and explains why some techniques bring ``high systemic risks to the ecosystem'' \cite{buterin2023a}. Another interesting perspective is from the Substack post by Tripoli: \href{https://dataalways.substack.com/p/endgame-perils-of-restaking}{\textit{Endgame Perils of Restaking}}, and the addendum to the post: \href{https://dataalways.substack.com/p/addendum-endgame-perils-of-restaking}{\textit{Addendum: Endgame Perils of Restaking}}.
+
+\begin{figure}[htbp]
+\begin{center}
+\includegraphics[width=0.7\linewidth]{images/solo-saas}
+\caption{Solo staking, staking as a service (credit: Andrew Breslin)}
+\label{fig:solo}
+\end{center}
+\end{figure}
+
+\begin{figure}[htbp]
+\begin{center}
+\includegraphics[width=0.7\linewidth]{images/pooled-custodial}
+\caption{Pooled staking, Custodial staking (credit:Andrew Breslin)}
+\label{fig:pooled}
+\end{center}
+\end{figure}
+
+We can at best have an informed guess about current staker wealth distribution. Some staking pools can be identified, but even then we may not be aware of all of the validator nodes and validators that they run. However, the largest staking pool, Lido, is transparent regarding its overall control of validators. Lido operates on a trusted setup, and Consensys staking runs several Lido operators. 
+
+
+
+The Ethereum Foundation and EtherScan conducted a survey of stakers \cite{Smith2023}, according to the following categories: solo staking, staking pool service, mini node operator (Rocketpool), and those not yet staking. The responses were analysed and the key trends, take aways, and predictions reported. The large majority of the respondents were either solo stakers or mini pool operators.
+
+Justin Drake and Mike Neuder also had conversations with stakers with the biggest stakers that they talked to being Coinbase, a few different Lido operators and Kraken. They concluded that there are probably a few reasons to motivate bigger stakers to consolidate their validators if the maximum deposit size is increased from 32 ETH to 2,048ETH. Arguably this proposal is aimed largely at the bigger stakers rather than the smaller, solo stakers. The reasons they may want to consolidate are: to reduce operational cost, although it is likely not particularly high infrastructure costs, Mike Neuder estimated in the region of a few \$100 per week, but key management would be the more challenging side of running many validators that can be consolidated into fewer validators if this proposal is implemented. The questions raised by LIDO and the responses provided by the EF are in the documents listed on page~\pageref{eip7251}.
 
 % ---------------------------------------------------------------
 \subsection{Validator rewards}
@@ -185,7 +223,7 @@ All reward calculations are based on the `base reward per increment', where an i
  b = Gwei \left( \frac{EFFECTIVE\_BALANCE\_INCREMENT * BASE\_REWARD\_FACTOR}{\sqrt {total \texttt{ } active \texttt{ } balance  \texttt{ } of  \texttt{ } current  \texttt{ } state}} \right)
 \end{equation*}
 
-In the long run, validators can expect to earn $32b \texttt{ } Gwei$ per epoch. Note that as the \textit{total active balance} changes, \textit{b} changes  \cite{Edgington2023}. When we have auto-compounding of stake, it will also affect the expected rewards. However, simply consolidating validators is not expected to impact on \textit{b}, since the total active balance will remain unchanged. However, as the number of active validators increase, and consequently the total active balance, the impact on expected earnings becomes greater.
+In the long run, validators can expect to earn $32b \texttt{ } Gwei$ per epoch if they maintain their effective balance at 32 ETH. Note that as the \textit{total active balance} changes, \textit{b} changes  \cite{Edgington2023}. When we have auto-compounding of stake, it will also affect the expected rewards. However, simply consolidating validators is not expected to impact on \textit{b}, since the total active balance will remain unchanged. However, as the number of active validators increase, and consequently the total active balance, the impact on expected earnings becomes greater.
 
 When a validator submits a request to exit, they are expected to still perform their duties until they reach their exit epoch, which is usually approximately 2 epochs later. The waiting time to exit depends on the exit queue which is currently (26 July 2023) empty. 
 
@@ -278,35 +316,6 @@ Slashing is the most severe penalty a validator is subjected to and as explained
 \item Non-participation of a member incurs a penalty equivalent to the reward they would have received if it was correct
 \end{itemize}
 
-% ---------------------------------------------------------------
-\subsection{Staker wealth and distribution}
-% ---------------------------------------------------------------
-Validators can stake their ETH in four different ways \cite{breslina}:
-\begin{itemize}
-\item Solo staking 
-\item Staking as a service
-\item Pooled staking
-\item Centralised exchange staking
-\end{itemize}
-
-\begin{figure}[htbp]
-\begin{center}
-\includegraphics[width=0.7\linewidth]{images/solo-saas}
-\caption{Solo staking, staking as a service (credit: Andrew Breslin)}
-\label{fig:solo}
-\end{center}
-\end{figure}
-
-\begin{figure}[htbp]
-\begin{center}
-\includegraphics[width=0.7\linewidth]{images/pooled-custodial}
-\caption{Pooled staking, Custodial staking (credit:Andrew Breslin)}
-\label{fig:pooled}
-\end{center}
-\end{figure}
-
-We can at best have an informed guess about current staker wealth distribution. Some staking pools can be identified, but even then we may not be aware of all of the validator nodes and validators that they run. However, the largest staking pool, Lido, is transparent regarding its overall control of validators. Lido operates on a trusted setup, and Consensys staking runs several Lido operators. 
-
 
 % ---------------------------------------------------------------------------------------
 \subsection{Staked ETH as a percentage of ETH supply over time}
@@ -314,6 +323,13 @@ We can at best have an informed guess about current staker wealth distribution. 
 Visualising the percentage of total ETH that is tied up in staking would be interesting to observe, especially as it has changed over time.
 
 There are also crypto analytical companies such as \href{https://parsec.finance/}{Parsec} that report on liquid staking derivatives. The analytics provided by Parsec are captured in figures~\ref{fig:parsec1}~-~\ref{fig:parsec6} on pages~\pageref{fig:parsec1}~-~\pageref{fig:parsec6}.
+
+According to the \href{https://launchpad.ethereum.org/en/}{Staking Launchpad} on June 2023:
+\begin{itemize}
+\item Total ETH staked: 19,357,605 ETH
+\item Total validators: 606,947
+\item Current \gls{apr}: 4.74\%
+\end{itemize}
 
 % ---------------------------------------------------------------
 \subsection{Griefing/discouragement attacks}
@@ -402,7 +418,7 @@ Rocket Pool has a simple explanation of the various validator rewards and a tabl
  \subsection{Total ETH Supply}
  % ---------------------------------------------------------
 \label{sec:ethsupply} 
-        The total supply of ETH used to be fairly simple to work out, but it is now more complicated for two main reasons:  implementation of EIP-1559 and the Merge.
+        The total supply of ETH is reasonably complicated to compute for two main reasons:  implementation of EIP-1559 and the Merge.
 Currently we are ``(a) burning ETH via the base fee and (b) the issuance is variable depending on the number of validators.'' \cite{Edgington2023}. 
 \begin{itemize}
 	\item Ultrasound is considered a credible source for total ETH supply projections. \\\textit{\href{https://ultrasound.money/}{Ultra sound money}} visualises various aspects of Ether supply since the Merge, gas, supply projections, the burn, total value secured - TVS and monetary premium. See figures~\ref{fig:ethsupply}~-~\ref{fig:monetary}, on pages~\pageref{fig:ethsupply}~-~\pageref{fig:monetary}.  
@@ -418,28 +434,6 @@ Currently we are ``(a) burning ETH via the base fee and (b) the issuance is vari
 \subsection{Validators, Stakers and Staking pools}
 % -----------------------------------------------------------------
 \label{sec:stakers}
-There are several helpful documents explaining in detail the different options available for staking:
-\begin{itemize}
-\item \href{https://ethereum.org/en/staking/solo/}{Solo staking} \cite{efsolo}
-\item \href{https://ethereum.org/en/staking/saas/}{Staking as a service (Saas)} \cite{efsaas}
-\item \href{https://ethereum.org/en/staking/pools/}{Pooled staking} - ``many of these options include what is known as `liquid staking' which involves an ERC-20 liquidity token that represents the staked ETH.'' \cite{efpools} 
-\item \href{https://ethereum.org/en/staking/}{Centralised exchanges} \cite{efstaking}
-\end{itemize}
-
-The Ethereum Foundation provides a \href{https://ethereum.org/en/staking/#comparison-of-options}{\textit{Comparison of staking options}}, outlining the key differences between solo staking, staking as a service and pooled staking. The legal implications of staking are discussed in Consensys blog post \href{https://consensys.net/blog/news/staking-is-data-validation-not-investment/}{\textit{Staking is Data Validation, Not Investment}} \cite{corva2023}.
-
-Re-staking is deemed to be out of scope for this grant research topic, but there are good resources to explain the concept and discuss the implications of re-staking. A blog post by Buterin \href{https://vitalik.ca/general/2023/05/21/dont\_overload.html}{\textit{Don`t overload Ethereum`s consensus}} discusses the various approaches to re-staking and explains why some techniques bring ``high systemic risks to the ecosystem'' \cite{buterin2023a}. Another interesting perspective is from the Substack post by Tripoli: \href{https://dataalways.substack.com/p/endgame-perils-of-restaking}{\textit{Endgame Perils of Restaking}}, and the addendum to the post: \href{https://dataalways.substack.com/p/addendum-endgame-perils-of-restaking}{\textit{Addendum: Endgame Perils of Restaking}}.
-
-The Ethereum Foundation and EtherScan conducted a survey of stakers \cite{Smith2023}, according to the following categories: solo staking, staking pool service, mini node operator (Rocketpool), and those not yet staking. The responses were analysed and the key trends, take aways, and predictions reported. The large majority of the respondents were either solo stakers or mini pool operators.
-
-Justin Drake and Mike Neuder also had conversations with stakers with the biggest stakers that they talked to being Coinbase, a few different Lido operators and Kraken. They concluded that there are probably a few reasons to motivate bigger stakers to consolidate their validators if the maximum deposit size is increased from 32ETH to 2048ETH. Arguably this proposal is aimed largely at the bigger stakers rather than the smaller, solo stakers. The reasons they may want to consolidate are: to reduce operational cost, although it is likely not particularly high infrastructure costs, Mike Neuder estimated in the region of a few \$100 per week, but key management would be the more challenging side of running many validators that can be consolidated into fewer validators if this proposal is implemented. The questions raised by LIDO and the responses provided by the EF are in the documents listed above.
-
-According to the \href{https://launchpad.ethereum.org/en/}{Staking Launchpad} on June 2023:
-\begin{itemize}
-\item Total ETH staked: 19,357,605 ETH
-\item Total validators: 606,947
-\item Current \gls{apr}: 4.74\%
-\end{itemize}
 
 \subsubsection*{LIDO}
 % ----------------------------
