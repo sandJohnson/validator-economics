@@ -1,0 +1,333 @@
+\begin{thebibliography}{10}
+\providecommand{\bibitemdeclare}[2]{}
+\providecommand{\surnamestart}{}
+\providecommand{\surnameend}{}
+\providecommand{\urlprefix}{Available at }
+\providecommand{\url}[1]{\texttt{#1}}
+\providecommand{\href}[2]{\texttt{#2}}
+\providecommand{\urlalt}[2]{\href{#1}{#2}}
+\providecommand{\doi}[1]{doi:\urlalt{http://dx.doi.org/#1}{#1}}
+\providecommand{\eprint}[1]{arXiv:\urlalt{https://arxiv.org/abs/#1}{#1}}
+\providecommand{\bibinfo}[2]{#2}
+
+\bibitemdeclare{article}{Aitchison2016}
+\bibitem{Aitchison2016}
+\bibinfo{author}{Laurence \surnamestart Aitchison\surnameend},
+  \bibinfo{author}{Nicola \surnamestart Corradi\surnameend} \&
+  \bibinfo{author}{Peter~E \surnamestart Latham\surnameend}
+  (\bibinfo{year}{2016}): \emph{\bibinfo{title}{{Zipf's Law Arises Naturally
+  When There Are Underlying, Unobserved Variables.}}}
+\newblock {\sl \bibinfo{journal}{PLoS computational biology}}
+  \bibinfo{volume}{12}(\bibinfo{number}{12}), p. \bibinfo{pages}{e1005110},
+  \doi{10.1371/journal.pcbi.1005110}.
+
+\bibitemdeclare{misc}{ea2023c}
+\bibitem{ea2023c}
+\bibinfo{author}{Ether \surnamestart alpha\surnameend} (\bibinfo{year}{2023}):
+  \emph{\bibinfo{title}{{Client diversity: Resource site to assist in Ethereum
+  client diversity efforts}}}.
+\newblock \urlprefix\url{https://clientdiversity.org/}.
+
+\bibitemdeclare{misc}{easunshine}
+\bibitem{easunshine}
+\bibinfo{author}{Ether \surnamestart alpha\surnameend} (\bibinfo{year}{2023}):
+  \emph{\bibinfo{title}{{Project Sunshine}}}.
+\newblock \urlprefix\url{https://ethsunshine.com/}.
+
+\bibitemdeclare{misc}{ea2023q}
+\bibitem{ea2023q}
+\bibinfo{author}{Ether \surnamestart alpha\surnameend} (\bibinfo{year}{2023}):
+  \emph{\bibinfo{title}{{Validator queue: Dashboard to monitor validator
+  enter/exit queues and wait times}}}.
+\newblock \urlprefix\url{https://www.validatorqueue.com/}.
+
+\bibitemdeclare{misc}{Asgaonkar2023}
+\bibitem{Asgaonkar2023}
+\bibinfo{author}{Aditya \surnamestart Asgaonkar\surnameend}
+  (\bibinfo{year}{2023}): \emph{\bibinfo{title}{{Removing Unnecessary Stress
+  from Ethereum’s P2P Network}}}.
+\newblock
+  \urlprefix\url{https://ethresear.ch/t/removing-unnecessary-stress-from-ethereums-p2p-network/15547}.
+
+\bibitemdeclare{misc}{breslina}
+\bibitem{breslina}
+\bibinfo{author}{Andrew \surnamestart Breslin\surnameend}
+  (\bibinfo{year}{2022}): \emph{\bibinfo{title}{{What is staking?}}}
+\newblock
+  \urlprefix\url{https://consensys.net/blog/ethereum-2-0/what-is-staking/}.
+
+\bibitemdeclare{misc}{buterin2017a}
+\bibitem{buterin2017a}
+\bibinfo{author}{Vitalik \surnamestart Buterin\surnameend}
+  (\bibinfo{year}{2017}): \emph{\bibinfo{title}{{The Meaning of
+  Decentralization}}}.
+\newblock
+  \urlprefix\url{https://medium.com/@VitalikButerin/the-meaning-of-decentralization-a0c92b76a274}.
+
+\bibitemdeclare{misc}{buterin2018c}
+\bibitem{buterin2018c}
+\bibinfo{author}{Vitalik \surnamestart Buterin\surnameend}
+  (\bibinfo{year}{2018}): \emph{\bibinfo{title}{{Discouragement Attacks}}}.
+\newblock
+  \urlprefix\url{https://eips.ethereum.org/assets/eip-2982/ef-Discouragement-Attacks.pdf}.
+
+\bibitemdeclare{misc}{buterin2023a}
+\bibitem{buterin2023a}
+\bibinfo{author}{Vitalik \surnamestart Buterin\surnameend}
+  (\bibinfo{year}{2023}): \emph{\bibinfo{title}{{Don`t overload Ethereum`s
+  consensus}}}.
+\newblock
+  \urlprefix\url{https://vitalik.ca/general/2023/05/21/dont\_overload.html}.
+
+\bibitemdeclare{misc}{buterin2023}
+\bibitem{buterin2023}
+\bibinfo{author}{Vitalik \surnamestart Buterin\surnameend}
+  (\bibinfo{year}{2023}): \emph{\bibinfo{title}{{Paths toward single-slot
+  finality}}}.
+\newblock
+  \urlprefix\url{https://notes.ethereum.org/@vbuterin/single\_slot\_finality}.
+
+\bibitemdeclare{book}{chattamvelli}
+\bibitem{chattamvelli}
+\bibinfo{author}{Rajan \surnamestart Chattamvelli\surnameend}
+  (\bibinfo{year}{2020}): \emph{\bibinfo{title}{{Discrete distributions in
+  engineering and the applied sciences}}}.
+\newblock \bibinfo{series}{Synthesis lectures on mathematics and statistics ;
+  34}, \bibinfo{publisher}{Morgan {\&} Claypool Publishers}.
+
+\bibitemdeclare{misc}{liquid2023}
+\bibitem{liquid2023}
+\bibinfo{author}{Liquid \surnamestart Collective\surnameend}
+  (\bibinfo{year}{2023}): \emph{\bibinfo{title}{{Ethereum's activation and exit
+  queues}}}.
+\newblock
+  \urlprefix\url{https://liquidcollective.io/eth-activations-and-exits/}.
+
+\bibitemdeclare{misc}{corva2023}
+\bibitem{corva2023}
+\bibinfo{author}{Matt \surnamestart Corva\surnameend} \& \bibinfo{author}{Bill
+  \surnamestart Hughes\surnameend} (\bibinfo{year}{2023}):
+  \emph{\bibinfo{title}{{Staking is Data Validation, Not Investment}}}.
+\newblock
+  \urlprefix\url{https://consensys.net/blog/news/staking-is-data-validation-not-investment/}.
+
+\bibitemdeclare{misc}{damato2023}
+\bibitem{damato2023}
+\bibinfo{author}{Francesco \surnamestart D'Amato\surnameend} \&
+  \bibinfo{author}{Mike \surnamestart Neuder\surnameend}
+  (\bibinfo{year}{2023}): \emph{\bibinfo{title}{{Security Considerations and
+  Spec Changes for a MAX\_EFFECTIVE\_BALANCE Increase}}}.
+\newblock
+  \urlprefix\url{https://notes.ethereum.org/@fradamt/meb-increase-security}.
+
+\bibitemdeclare{misc}{dapplion}
+\bibitem{dapplion}
+\bibinfo{author}{\surnamestart dapplion\surnameend} (\bibinfo{year}{2023}):
+  \emph{\bibinfo{title}{{Ethereum specs pull request: Add upper epoch churn
+  limit \#3448}}}.
+\newblock
+  \urlprefix\url{https://github.com/ethereum/consensus-specs/pull/3448}.
+
+\bibitemdeclare{techreport}{Edgington2023}
+\bibitem{Edgington2023}
+\bibinfo{author}{Benjamin \surnamestart Edgington\surnameend}
+  (\bibinfo{year}{2023}): \emph{\bibinfo{title}{{A technical handbook on
+  Ethereum's move to proof of stake and beyond}}}.
+\newblock \bibinfo{type}{Technical Report}.
+\newblock \urlprefix\url{https://eth2book.info/latest}.
+
+\bibitemdeclare{misc}{efpools}
+\bibitem{efpools}
+\bibinfo{author}{\surnamestart ethereum.org\surnameend} (\bibinfo{year}{2022}):
+  \emph{\bibinfo{title}{{Pooled staking}}}.
+\newblock \urlprefix\url{https://ethereum.org/en/staking/pools/}.
+
+\bibitemdeclare{misc}{efsolo}
+\bibitem{efsolo}
+\bibinfo{author}{\surnamestart ethereum.org\surnameend} (\bibinfo{year}{2022}):
+  \emph{\bibinfo{title}{{Solo staking}}}.
+\newblock \urlprefix\url{https://ethereum.org/en/staking/solo/}.
+
+\bibitemdeclare{misc}{efsaas}
+\bibitem{efsaas}
+\bibinfo{author}{\surnamestart ethereum.org\surnameend} (\bibinfo{year}{2022}):
+  \emph{\bibinfo{title}{{Staking as a service (Saas)}}}.
+\newblock \urlprefix\url{https://ethereum.org/en/staking/saas/}.
+
+\bibitemdeclare{misc}{efstaking}
+\bibitem{efstaking}
+\bibinfo{author}{\surnamestart ethereum.org\surnameend} (\bibinfo{year}{2022}):
+  \emph{\bibinfo{title}{{Staking with Ethereum}}}.
+\newblock \urlprefix\url{https://ethereum.org/en/staking/}.
+
+\bibitemdeclare{misc}{etherscan}
+\bibitem{etherscan}
+\bibinfo{author}{\surnamestart Etherscan\surnameend} (\bibinfo{year}{2023}):
+  \emph{\bibinfo{title}{{BeaconScan: The Official Etherscan Beacon Chain
+  Ethereum 2.0 Explorer}}}.
+\newblock \urlprefix\url{https://beaconscan.com/}.
+
+\bibitemdeclare{techreport}{Gencer}
+\bibitem{Gencer}
+\bibinfo{author}{Adem~Efe \surnamestart Gencer\surnameend},
+  \bibinfo{author}{Soumya \surnamestart Basu\surnameend},
+  \bibinfo{author}{Ittay \surnamestart Eyal\surnameend},
+  \bibinfo{author}{Robbert \surnamestart {Van Renesse}\surnameend} \&
+  \bibinfo{author}{Emin~G{\"{u}}n \surnamestart Sirer\surnameend}
+  (\bibinfo{year}{2018}): \emph{\bibinfo{title}{{Decentralization in Bitcoin
+  and Ethereum Networks}}}.
+\newblock \bibinfo{type}{Technical Report}, \bibinfo{address}{Berlin,
+  Heidelberg}.
+\newblock \eprint{1801.03998v2}.
+
+\bibitemdeclare{misc}{lidodoc}
+\bibitem{lidodoc}
+\bibinfo{author}{\surnamestart Hex\surnameend} (\bibinfo{year}{2023}):
+  \emph{\bibinfo{title}{{Lido on Ethereum Validator \& Node metrics}}}.
+\newblock
+  \urlprefix\url{https://app.hex.tech/8dedcd99-17f4-49d8-944e-4857a355b90a/app/3f7d6967-3ef6-4e69-8f7b-d02d903f045b/latest}.
+
+\bibitemdeclare{article}{JonesCharlesI.2015PaPT}
+\bibitem{JonesCharlesI.2015PaPT}
+\bibinfo{author}{Charles~I \surnamestart Jones\surnameend}
+  (\bibinfo{year}{2015}): \emph{\bibinfo{title}{{Pareto and Piketty: The
+  Macroeconomics of Top Income and Wealth Inequality}}}.
+\newblock {\sl \bibinfo{journal}{The Journal of economic perspectives}}
+  \bibinfo{volume}{29}(\bibinfo{number}{1}), pp. \bibinfo{pages}{29--46}.
+
+\bibitemdeclare{misc}{koliopoulos2023}
+\bibitem{koliopoulos2023}
+\bibinfo{author}{Aris \surnamestart Koliopoulos\surnameend}
+  (\bibinfo{year}{2023}): \emph{\bibinfo{title}{{Solo stakers: The backbone of
+  Ethereum}}}.
+\newblock \urlprefix\url{https://blog.rated.network/blog/solo-stakers}.
+
+\bibitemdeclare{article}{Kondor2014}
+\bibitem{Kondor2014}
+\bibinfo{author}{D{\'{a}}niel \surnamestart Kondor\surnameend},
+  \bibinfo{author}{M{\'{a}}rton \surnamestart P{\'{o}}sfai\surnameend},
+  \bibinfo{author}{Istv{\'{a}}n \surnamestart Csabai\surnameend} \&
+  \bibinfo{author}{G{\'{a}}bor \surnamestart Vattay\surnameend}
+  (\bibinfo{year}{2014}): \emph{\bibinfo{title}{{Do the rich get richer? An
+  empirical analysis of the Bitcoin transaction network}}}.
+\newblock {\sl \bibinfo{journal}{PloS one}}
+  \bibinfo{volume}{9}(\bibinfo{number}{2}), pp.
+  \bibinfo{pages}{e86197--e86197}.
+
+\bibitemdeclare{article}{Lin2021}
+\bibitem{Lin2021}
+\bibinfo{author}{Qinwei \surnamestart Lin\surnameend}, \bibinfo{author}{Chao
+  \surnamestart Li\surnameend}, \bibinfo{author}{Xifeng \surnamestart
+  Zhao\surnameend} \& \bibinfo{author}{Xianhai \surnamestart Chen\surnameend}
+  (\bibinfo{year}{2021}): \emph{\bibinfo{title}{{Measuring Decentralization in
+  Bitcoin and Ethereum using Multiple Metrics and Granularities}}}, pp.
+  \bibinfo{pages}{1--8}.
+\newblock \eprint{2101.10699}.
+
+\bibitemdeclare{misc}{nanseneth2}
+\bibitem{nanseneth2}
+\bibinfo{author}{\surnamestart Nansen\surnameend} (\bibinfo{year}{2023}):
+  \emph{\bibinfo{title}{{Eth2 Dashboard}}}.
+\newblock \urlprefix\url{https://pro.nansen.ai/eth2-deposit-contract}.
+
+\bibitemdeclare{misc}{nansenshapella}
+\bibitem{nansenshapella}
+\bibinfo{author}{\surnamestart Nansen\surnameend} (\bibinfo{year}{2023}):
+  \emph{\bibinfo{title}{{The Ethereum Shanghai (Shapella) Upgrade Dashboard}}}.
+\newblock
+  \urlprefix\url{https://query.nansen.ai/public/dashboards/Hk93n66vsO0uvycfui8ypF2xcpNhpraxfwX5AWZJ}.
+
+\bibitemdeclare{techreport}{Natale2022}
+\bibitem{Natale2022}
+\bibinfo{author}{U~\surnamestart Natale\surnameend} (\bibinfo{year}{2022}):
+  \emph{\bibinfo{title}{{Analyzing Ethereum Cryptoeconomics: the validator's
+  perspective}}}.
+\newblock \bibinfo{type}{Technical Report}, \bibinfo{institution}{Chorus}.
+\newblock
+  \urlprefix\url{https://docs.google.com/document/d/1r640UQOm2z-Q9nsJzqBq3BVgCtTL1\_Yc7WnPp4jEBgk}.
+
+\bibitemdeclare{misc}{Rated2023a}
+\bibitem{Rated2023a}
+\bibinfo{author}{Rated \surnamestart network\surnameend}
+  (\bibinfo{year}{2023}): \emph{\bibinfo{title}{{Network overview}}}.
+\newblock
+  \urlprefix\url{https://www.rated.network/overview?network=mainnet\&timeWindow=all\&rewardsMetric=average}.
+
+\bibitemdeclare{misc}{Neuder2023c}
+\bibitem{Neuder2023c}
+\bibinfo{author}{Mike \surnamestart Neuder\surnameend} (\bibinfo{year}{2023}):
+  \emph{\bibinfo{title}{{EIP 7251 Maximum effective balance increase proposal
+  [DRAFT]}}}.
+\newblock
+  \urlprefix\url{https://github.com/michaelneuder/EIPs/blob/max-eb-increase/EIPS/eip-increase-maxeb.md}.
+
+\bibitemdeclare{misc}{Neuder2023b}
+\bibitem{Neuder2023b}
+\bibinfo{author}{Mike \surnamestart Neuder\surnameend} (\bibinfo{year}{2023}):
+  \emph{\bibinfo{title}{Security Considerations and Spec Changes for a
+  MAX\_EFFECTIVE\_BALANCE Increase}}.
+\newblock \urlprefix\url{https://notes.ethereum.org/nHqON5l7SACkL\_nPwz8Vqw}.
+
+\bibitemdeclare{misc}{Neuder2023a}
+\bibitem{Neuder2023a}
+\bibinfo{author}{Mike \surnamestart Neuder\surnameend},
+  \bibinfo{author}{Francesco \surnamestart D'Amato\surnameend},
+  \bibinfo{author}{Aditya \surnamestart Asgaonkar\surnameend} \&
+  \bibinfo{author}{Justin \surnamestart Drake\surnameend}
+  (\bibinfo{year}{2023}): \emph{\bibinfo{title}{{Increase the
+  MAX\_EFFECTIVE\_BALANCE – a modest proposal}}}.
+\newblock
+  \urlprefix\url{https://ethresear.ch/t/increase-the-max-effective-balance-a-modest-proposal/15801/3}.
+
+\bibitemdeclare{misc}{Neuder2023d}
+\bibitem{Neuder2023d}
+\bibinfo{author}{Mike \surnamestart Neuder\surnameend} \&
+  \bibinfo{author}{Barnab\'e \surnamestart Monnot\surnameend}
+  (\bibinfo{year}{2023}): \emph{\bibinfo{title}{{[DRAFT] Slashing penalty
+  analysis; EIP-7251}}}.
+\newblock
+  \urlprefix\url{https://notes.ethereum.org/@mikeneuder/slashings-eip-7251}.
+
+\bibitemdeclare{techreport}{RocketPool2023}
+\bibitem{RocketPool2023}
+\bibinfo{author}{Rocket \surnamestart Pool\surnameend} (\bibinfo{year}{2023}):
+  \emph{\bibinfo{title}{{Rocket Pool: How Ethereum Staking Works}}}.
+\newblock \bibinfo{type}{Technical Report}.
+\newblock
+  \urlprefix\url{https://docs.rocketpool.net/guides/staking/overview.html#how-ethereum-staking-works}.
+
+\bibitemdeclare{misc}{Saltini2023}
+\bibitem{Saltini2023}
+\bibinfo{author}{Roberto \surnamestart Saltini\surnameend}
+  (\bibinfo{year}{2023}): \emph{\bibinfo{title}{{Upper bound on the probability
+  of one majority dishonest committee in the context of MAX\_EFFECTIVE\_BALANCE
+  increase}}}.
+\newblock \urlprefix\url{https://notes.ethereum.org/nHqON5l7SACkL_nPwz8Vqw}.
+
+\bibitemdeclare{techreport}{Smith2023}
+\bibitem{Smith2023}
+\bibinfo{author}{James \surnamestart Smith\surnameend} \&
+  \bibinfo{author}{Rodrigo \surnamestart Vasquez\surnameend}
+  (\bibinfo{year}{2023}): \emph{\bibinfo{title}{{Staking survey: Key trends,
+  take aways, and predictions}}}.
+\newblock \bibinfo{type}{Technical Report}, \bibinfo{institution}{Ethereum
+  Foundation and EthStaker}.
+\newblock
+  \urlprefix\url{https://lookerstudio.google.com/u/0/reporting/cafcee00-e1af-4148-bae8-442a88ac75fa/page/p_ja2srdhh2c}.
+
+\bibitemdeclare{misc}{Srinivasan2017}
+\bibitem{Srinivasan2017}
+\bibinfo{author}{Balaji~S. \surnamestart Srinivasan\surnameend} \&
+  \bibinfo{author}{Leland \surnamestart Lee\surnameend} (\bibinfo{year}{2017}):
+  \emph{\bibinfo{title}{{Quantifying Decentralization}}}.
+\newblock
+  \urlprefix\url{https://news.earn.com/quantifying-decentralization-e39db233c28e}.
+
+\bibitemdeclare{misc}{wood2016a}
+\bibitem{wood2016a}
+\bibinfo{author}{Gavin \surnamestart Wood\surnameend} (\bibinfo{year}{2016}):
+  \emph{\bibinfo{title}{{Ethereum: a secure decentralized generalised
+  transaction ledger}}}.
+\newblock \urlprefix\url{https://github.com/ethereum/yellowpaper}.
+
+\end{thebibliography}
