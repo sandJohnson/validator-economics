@@ -656,6 +656,7 @@ Using the current method of calculating inactivity leaks, the authors worked out
 \section{Challenges \& Additional Analysis Requirements}
 % -------------------------------------------------------------------------
 \begin{itemize}
+\item There are many challenges around exiting and activation of validators for consolidation. Therefore, as Asgaonkar points out, in-protocol consolidation needs to be in place \cite{Asgaonkar2023}.
 \item Ensure that solo stakers are not unduly disadvantaged with respect to being selected as a proposer.
 \item If more than one of the virtual validators of a consolidated validator is chosen, then it is still just that one validator in the set of aggregators. Does this mean that  the probability of fewer than 16 distinct aggregators will increase?
 \item Currently the proposer receives both the whistleblower reward and the proposer reward. Moreover, the whistleblower reward is proportional to the slashed validator's effective balance. \\
