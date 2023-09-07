@@ -85,7 +85,7 @@ The milestones and tasks for EF Academic Grant ID: FY23-1030 has been modified s
 
 EIP-7251 overlaps with the validator capping proposal of having a variable minimum balance, which this \gls{ef}-funded project is analysing and modelling. It is therefore important to ensure that our research complements the work already undertaken to assess security risks and other aspects associated with increasing the maximum effective balance.
 
-We would like to acknowledge the initial proposers of this idea and the consequent \gls{eip}: Aditya Asgaonkar and Mike Neuder, respectively. Roberto Saltini contributed to the analysis of the proposal and Barnab\'e Monnot is reviewing and collaborating with the \gls{ef} grant research team on the variation to the original grant proposal.
+We would like to acknowledge the initial proposers of this idea and the consequent \gls{eip}: Aditya Asgaonkar and Mike Neuder, respectively. Roberto Saltini contributed to the analysis of the proposal and Barnab\'e Monnot is reviewing and collaborating with the \gls{ef} grant research team on the variation to the original grant proposal. We thank Ben Edgington and Mikhail Kalinin for their insightful comments and feedback.
 
 % -------------------------------------------------------------------------------------
 \section{Background}
@@ -226,7 +226,6 @@ Neuder states ``This works as intended even with a higher MaxEB, though it will 
 \info [inline] {Perhaps the next section on security considerations and spec changes will address these concerns}
 \end{enumerate}
 
-%% Cut from here ...
 
 % ------------------------------------------------------------------------------------------------------------------------------------
 \section{Security Considerations \& Spec Changes for \\* MAX\_EFFECTIVE\_BALANCE Increase}
@@ -289,7 +288,7 @@ Based on the assumption that full consolidation is the worst case, the authors g
 % -------------------- -------------------
 Sub-committees are a legacy from the now defunct sharding design that required $\frac{2}{3}$ of the committee weight to be controlled by honest validators. Currently, their key role is in attestation aggregation, which only requires that at least one honest aggregator exists so that attestations from that subnet make it to the global gossip. The gossiped attestations ``influence the fork-choice rule, are included in blocks, earn attestation rewards, and lead to justification of epochs''  \cite{damato2023}.
 
-Aggregators are selected via a \gls{vrf} lottery to yield an expected number of 16 aggregators. According to Edgington \cite{Edgington2023}, although the target number of aggregators is 16, it is not infeasible that no aggregators are selected, or that more than 16 validators can be selected. Edgington \href{https://eth2book.info/capella/part2/building_blocks/aggregator/}{visualises the distribution of aggregators} in a histogram, showing that the expected number of aggregators is 16, with a minimum of 0 and a maximum of 32 for a sub-committee of size 256. The selection of aggregators are done as follows: a random number is generated for each sub-committee member, which is deterministic and verifiable. The assumption is that \gls{bls} signatures have random outputs, i.e. the assumption is that they are uniformly random. In other words, a validator signs the slot number, and hashes their signature giving their 32 bytes of randomness. If this random number is divisible by 23 then the member becomes an aggregator. It is a local computation and can be verified. The target is 16 aggregators per sub-committee, but the outcome could be that no aggregators are selected or that more than 16 are selected. Currently there may be a sub-committee with no aggregators every few weeks, which may mean that around 1.6\% of attestations may go missing which is not a great concern \cite{Edgington2023}.  Moreover, a block proposer, who notices attestations that have not been aggregated may decide to aggregate those signatures for inclusion in their block. The probability of having zero aggregators is the same as having 32 aggregators and the probability of more than 32 decreases rapidly to be negligible.
+Aggregators are selected via a \gls{vrf} lottery to yield an expected number of 16 aggregators. According to Edgington \cite{Edgington2023}, although the target number of aggregators is 16, it is not infeasible that no aggregators are selected, or that more than 16 validators can be selected. Edgington \href{https://eth2book.info/capella/part2/building_blocks/aggregator/}{visualises the distribution of aggregators} in a histogram, showing that the expected number of aggregators is 16, with a minimum of 0 and a maximum of 32 for a sub-committee of size 256. The selection of aggregators are done as follows: a random number is generated for each sub-committee member, which is deterministic and verifiable. The assumption is that \gls{bls} signatures have random outputs, i.e. the assumption is that they are uniformly random. In other words, a validator signs the slot number, and hashes their signature giving their 32 bytes of randomness. If this random number is divisible by 23 then the member becomes an aggregator. It is a local computation and can be verified. The target is 16 aggregators per sub-committee, but the outcome could be that no aggregators are selected or that more than 16 are selected. Currently there may be a sub-committee with no aggregators every few weeks, which may mean that around 1.6\% of attestations per slot committee ($\frac{1}{64}$) may go missing which is not a great concern \cite{Edgington2023}.  Moreover, a block proposer, who notices attestations that have not been aggregated may decide to aggregate those signatures for inclusion in their block. The probability of having zero aggregators is the same as having 32 aggregators and the probability of more than 32 decreases rapidly to be negligible.
 
 \change [inline] {TO DO:  Ben to check the accuracy of what I summarised for aggregator selection} 
 
@@ -348,7 +347,7 @@ The authors conclude that the following two beneficial properties hold when the 
 % -----------------------------------------------------------------
 \subsubsection*{Sync committee}
 % -----------------------------------------------------------------
-Selecting a sync committee member is proportional to a validator's effective balance. The acceptance probability will change from $\frac{b}{32}$ to $\frac{b}{2,048}$, where \textit{b = validator effective balance} because the denominator is MaxEB. Hence when the check is done to confirm or reject inclusion, validators with a small stake will be much more unlikely to be accepted as demonstrated by the logic below. 
+Selecting a sync committee member is proportional to a validator's effective balance, and the authors maintain that sync committee selection will still work as designed.
 
 Once a validator has been selected from the shuffled index, the check for inclusion in the sync committee is given by:
 \begin{equation*}
@@ -359,8 +358,11 @@ Once a validator has been selected from the shuffled index, the check for inclus
 \end{split}
 \end{equation*}
 
+\info [inline] {It appears to me that the acceptance probability will change from $\frac{b}{32}$ to $\frac{b}{2,048}$, where \textit{b = validator effective balance} because the denominator is MaxEB. Hence when the check is done to confirm or reject inclusion, validators with a small stake will be much more unlikely to be accepted as demonstrated by the logic below. Check flaws in my reasoning.}
+
 The only disadvantage the authors suggest, would be that the selection process will take longer because there will be more rejections of candidate validators, but they acknowledge that it will also become more unlikely for solo stakers to be selected as sync committee members.
-\unsure [inline] {How much of a concern is the under representation of solo stakers in sync committees?}
+\unsure [inline] {I presume the increased time to select the committee is due to the increase in the expected number of rejections when doing the inclusion check} 
+\info [inline] {If solo stakers do turn out to be disadvantaged, how much of a concern is the under representation of solo stakers in sync committees?}
 % -------------------------------------
 \subsection{Churn Invariants}
 % -------------------------------------
@@ -368,7 +370,14 @@ The number of validators entering and exiting the validator set is managed by a 
 
 Lion \cite{dapplion} proposed an upper churn limit as a temporarily fix \cite{dapplion}, but the overarching objective is to devise a mechanism to cap validator set size permanently.
 
-Implementation of EIP-7251 needs to ensure that the current maximum churn limit of $2^{16} = 65,536$ is upheld.\\
+The \texttt{CHURN\_LIMIT\_QUOTIENT} = 65536, and the churn limit is calculated as the integer, or floor, division of the total number of validators by this constant, i.e. 
+
+\begin{equation*}
+\begin{split}
+& \textit{upper churn limit} = \left\lfloor \frac{N}{65536} \right\rfloor, \textit{ where} \\
+& N = \textit{total number of active validators}
+\end{split}
+\end{equation*}
 
 \noindent
 We explore the following scenarios:
@@ -404,7 +413,7 @@ The authors propose that the churn limit is weight denominated.
 
 The authors then look at validator activations and exits, and again propose that validator weight, which in this context means the validators effective balance, into account. Details are provided for the proposed code changes.
 
-They also analyse top-ups for a validator's effective balance when the balance is below 32 ETH. Validator top-ups are capped at 16, which is a lot higher than the validator activation queue rate, and they propose to cap these top-ups at 32 ETH so that validators do not have a loop hole to bypass the churn limit for activations and exits.
+They also analyse top-ups for a validator's effective balance when the balance is below 32 ETH. Validator top-ups are capped at 16 per block, which is a lot higher than the validator activation queue rate, and they propose to cap these top-ups at 32 ETH so that validators do not have a loop hole to bypass the churn limit for activations and exits. Validators are currently able to top-up their effective balance regardless of whether it is below 32 ETH. However with the maximum effective balance presently at 32 ETH, there is no benefit to validators toping up their effective balance over the 32 ETH maximum. 
 
 % --------------------------------
 \subsection{Withdrawals}
@@ -417,7 +426,7 @@ The proposal is to introduce a new \gls{bls} prefix, \texttt{0x02}, so that the 
 \section{Upper bound on the probability of one majority \\* dishonest committee in the context of \\* MAX\_EFFECTIVE\_BALANCE increase}
 % -----------------------------------------------------------------
 
-In this post Saltini describes the derivation of an upper bound for the probability of having one dishonest committee if EIP-7251 is implemented.
+In \href{https://notes.ethereum.org/nHqON5l7SACkL_nPwz8Vqw}{this post} Saltini describes the derivation of an upper bound for the probability of having one dishonest committee if EIP-7251 is implemented.
 
 An assumption made for simplification of the calculations is that the weight of dishonest and honest validators are distributed equally amongst each group, i.e. regardless of the proportion of dishonest validators to honest validators, within each category the weights are evenly distributed.
 
