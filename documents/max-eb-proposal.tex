@@ -508,7 +508,7 @@ Saltini provides a detailed outline of determining an upper bound for maximising
 Minimising both Byzantine and honest validators is through maximum consolidation, i.e. all validators have an effective balance of MaxEB. A graph is generated to of the probability of having a majority dishonest committee, using a MaxEB of 8 times the current MaxEB of 32 ETH and with the total validator set weight equal to the total weight at the time of writing. The graph shows both the hypergeometric distribution and the upper bound.
 
 % ------------------------------------------------
-\subsection{Slashing penalty analysis}
+\section{Slashing penalty analysis}
 % ------------------------------------------------
 The main motivation for this \href{https://notes.ethereum.org/@mikeneuder/slashings-eip-7251}{post} is the concern of large stakers regarding slashing penalties for consolidated validators. The proposal consists of two parts:
 \begin{enumerate}
@@ -524,7 +524,7 @@ The main motivation for this \href{https://notes.ethereum.org/@mikeneuder/slashi
 	\end{itemize}
 \end{enumerate}
 
-\subsubsection*{Initial slashing penalty}
+\subsection{Initial slashing penalty}
 % -------------------------------------------------
 Currently this penalty is proportional to the validator's effective balance, and this would result in a penalty of 1 ETH if the validator had 32 ETH. However, if a fully consolidated validator with 2,048 ETH effective balance would incur an initial penalty of 64 ETH.
 
@@ -539,7 +539,7 @@ and generate graphs for $x=1, \frac{15}{16}, \frac{7}{8}, \frac{3}{4}, \frac{1}{
 
 The authors conclude that visually it appears that $x = \frac{3}{4} \texttt{ } \frac{7}{8}$ are good choices in terms of balancing the size of the initial slashing penalty and the risk for a consolidated validator.
 
-\subsubsection*{Correlation penalty}
+\subsection{Correlation penalty}
 % --------------------------------------------
 This penalty is incurred roughly 18 days (4,096 epochs) after the slashing event, half way between its exit epoch and the slashing event. The correlation penalty is important in assessing whether there appears to have been a coordinated attack on the chain.
 
@@ -599,7 +599,7 @@ The authors propose a function that preserves this requirement if the MaxEB prop
 Moreover, the new correlation penalty function scales quadratically as opposed to the current function that scales linearly. Clearly with the proposed new function, the slashing penalties are substantially reduced, not only for fully consolidated validator, but also for partially consolidated and solo validators. The authors demonstrate the comparative correlated slashing penalties for these three types of validators using both the current and the proposed functions \cite{Neuder2023d}.
 
 % -----------------------------------------
-\subsubsection*{Attestation penalty}
+\subsection{Attestation penalty}
 % -----------------------------------------
 Once a validator is slashed, their attestations (source, target and head votes) are deemed to be invalid and hence they incur attestation penalties for the 8,192 epochs until their exit epoch. 
 
@@ -628,7 +628,7 @@ Different weights are attached to each vote, but only the source (weight = 14) a
 
 This attestation penalty for a large slashed staker seems acceptable, but could potentially be adjusted by changing the number of epochs that the validator is deemed as being ``offline''.The size of this penalty needs to be such that the security model is not compromised. In other words it should never be a better option to self-slash to avoid inactivity penalties. Therefore, it needs to be greater than the inactivity penalties for an unslashed validator that is exiting and offline \cite{Neuder2023d}.
 
-\subsubsection*{Inactivity leak penalty}
+\subsection{Inactivity leak penalty}
 % -------------------------------------------------------------------
 An inactivity leak is currently defined as the situation when the chain has not been finalising for 4 epochs (this value is set by the protocol). Online validators are not penalised when this happens, i.e. no rewards are earned but the penalty is 0. On the other hand, offline validators, which includes slashed validators waiting to exit, start `leaking' state. The loss of stake means that the relative weight of the online validators will increase, which helps the chain to start finalising again. The inactivity penalty can be quite severe. 
 
