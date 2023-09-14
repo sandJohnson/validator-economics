@@ -1,0 +1,244 @@
+\documentclass[UTF8]{article}
+%\usepackage{natbib}
+\usepackage{geometry}                % See geometry.pdf to learn the layout options. There are lots.
+\geometry{a4paper}                   % ... or a4paper or a5paper or ... 
+
+%\geometry{landscape}                % Activate for for rotated page geometry
+\usepackage{breakurl}     
+\usepackage{graphicx}
+\usepackage{graphbox}
+\usepackage{hyperref}
+\usepackage{amssymb}
+\usepackage{epstopdf}
+\usepackage{algorithm}
+\usepackage{amsmath}
+\usepackage[noend]{algpseudocode}
+\usepackage{enumitem}
+\usepackage[acronym]{glossaries}
+\usepackage[hang,footnotesize,bf]{caption}
+\DeclareGraphicsRule{.tif}{png}{.png}{`convert #1 `dirname #1`/`basename #1 .tif`.png}
+
+
+% Copied from Stack Exchange for ToDo items
+% -----------------------------------------------------------
+\usepackage{xargs} 
+\usepackage[pdftex,dvipsnames]{xcolor}  % Coloured text etc.
+% 
+\usepackage[colorinlistoftodos,prependcaption,textsize=tiny]{todonotes}
+\newcommandx{\unsure}[2][1=]{\todo[linecolor=red,backgroundcolor=red!25,bordercolor=red,#1]{#2}}
+\newcommandx{\change}[2][1=]{\todo[linecolor=blue,backgroundcolor=blue!25,bordercolor=blue,#1]{#2}}
+\newcommandx{\info}[2][1=]{\todo[linecolor=OliveGreen,backgroundcolor=OliveGreen!25,bordercolor=OliveGreen,#1]{#2}}
+\newcommandx{\improvement}[2][1=]{\todo[linecolor=Plum,backgroundcolor=Plum!25,bordercolor=Plum,#1]{#2}}
+\newcommandx{\thiswillnotshow}[2][1=]{\todo[disable,#1]{#2}}
+
+
+\title{Validator Economics: Variable min validator deposit size\\
+\vspace{4pt}
+\large EF Academic Grant ID: FY23-1030\\
+\vspace{16pt}
+DRAFT MODEL, CHALLENGES \& POTENTIAL MITIGATIONS\\
+(MAXEB - EIP-7521) }
+\vspace{16pt}
+\author{Sandra Johnson\\
+ConsenSys Software R\&D}
+\date{\today}                                           % Activate to display a given date or no date
+
+\begin{document}
+\maketitle
+
+
+% Acronym definitions
+\newacronym{apr}{APR}{annual percentage rate}
+\newacronym{bls}{BLS}{Boneh–Lynn–Shacham}
+\newacronym{bn}{BN}{Bayesian network}
+\newacronym{cbeth}{cbETH}{Coinbase wrapped staked ETH}
+\newacronym{cdf}{CDF}{cumulative distribution function}
+\newacronym{cl}{CL}{consensus layer}
+\newacronym{dvt}{DVT}{distributed validator technology}
+\newacronym{eb}{EB}{effective balance}
+\newacronym{ef}{EF}{Ethereum Foundation}
+\newacronym{eip}{EIP}{Ethereum Improvement Proposal}
+\newacronym{el}{EL}{execution layer}
+\newacronym{epbs}{ePBS}{enshrined PBS}
+\newacronym{ffg}{FFG}{Friendly finality gadget}
+\newacronym{fxs}{FXS}{Frax share}
+\newacronym{ghost}{GHOST}{Greedy Heaviest-Observed Sub-Tree}
+\newacronym{ldo}{LDO}{Lido DAO}
+\newacronym{lmd}{LMD}{Latest message driven}
+\newacronym{mev}{MEV}{maximal extractable value}
+\newacronym{mm}{MM}{MetaMask}
+\newacronym{p2p}{p2p}{peer-to-peer}
+\newacronym{pbs}{PBS}{proposer builder separation}
+\newacronym{pc}{PC}{personal computer}
+\newacronym{pdf}{PDF}{probability density function}
+\newacronym{pos}{PoS}{proof of stake}
+\newacronym{rig}{RIG}{Robust Incentives Group}
+\newacronym{rpl}{RPL}{Rocket Pool}
+\newacronym{ssf}{SSF}{single-slot finality}
+\newacronym{steth}{stETH}{Lido staked Ether}
+\newacronym{ups}{UPS}{uninterruptable power supply}
+\newacronym{vrf}{VRF}{verifiable random function}
+
+% ------------------------------------------------------------------------------
+\section{Overview}
+% ------------------------------------------------------------------------------
+This document builds on the previous document, \textit{Milestone 1(EB): Review \& analyse EIP-7521}, addressing each of the identified challenges and applying example scenarios to the expected behaviour cited in blog posts and analysis done to date.
+
+In summary as mentioned in the previous document, the two key criteria we need to assess for this proposal, and indeed for any proposed strategy to reduce, or cap, the validator set size, are the risks and benefits introduced by that proposal. \\
+
+\noindent
+With respect to EIP-7521:
+\begin{itemize}
+\item \textbf{Risks}: What new risks are being introduced by this proposal? How are the various categories of stakers, and importantly the Ethereum ecosystem, affected?
+\item  \textbf{Benefits}: What are the benefits for stakers and the ecosystem? Does this proposal benefit one category of staker more than another? What benefits are there for the health of the ecosystem apart from the reduction in network load if stakers consolidate their stake as designed?
+\end{itemize}
+
+
+We need to bear in mind that regardless of the risks and benefits that we are analysing, this proposal relies on stakers being willing to consolidate at least some of their validators. This will depend on the messaging around the benefits of consolidation and their perception that the benefits to them and the ecosystem far outweigh the risks.
+
+The other big consideration is the impact on staking pools, their operational business models, and software changes required to take advantage of the increased maximum \gls{eb}.
+
+
+% -------------------------------------------------------------------------------------
+\section{Challenges \& Additional analysis requirements}
+% -------------------------------------------------------------------------------------
+\label{sec:challenges}
+In addition to the advantages and disadvantages highlighted in the \textit{ethresear.ch} post, \href{https://ethresear.ch/t/increase-the-max-effective-balance-a-modest-proposal/15801/3}{\textit{Increase the MAX\_EFFECTIVE\_BALANCE – a modest proposal}}, by  Neuder et al  \cite{Neuder2023a}, we propose additional questions and analysis below:
+\begin{enumerate}
+
+\item \textit{Proposer selection probability}: Demonstrate that this  probability remains unchanged and will not unduly disadvantage small-scale solo stakers \cite{Neuder2023a}. 
+
+\item \textit{Sync committee selection}: Demonstrate that this selection process works as designed even when there is a large increase in Max\gls{eb} \cite{Neuder2023a}.\\
+The denominator for the acceptance probability is MaxEB which means the probability will change from $\frac{b}{32}$ to $\frac{b}{2,048}$, where \textit{b = validator effective balance}. Check whether this adversely affects validators with a small stake, apart from the expected increase in time to select the committee, as D'Amato and Neuder pointed out \cite{damato2023}.
+
+\item \textit{Slot committees}: Demonstrate that not taking validator weight into account does not have any adverse downstream effects. D'Amato and Neuder state that even if one ``attestation is majority adversarial'', then the worst that can happen is that the attacker will execute a local reorg \cite{damato2023}. Explore in more detail, e.g. use an example or two, to ascertain the effect of variations in slot committee balances with the inclusion, or omission of fully consolidated stakers. 
+
+\item \textit{Worst case: Full consolidation}: D'Amato and Neuder identify full consolidation as the worst case scenario when we consider two groups of validators: honest and adversarial validators. Several reasons are given for this conclusion \cite{damato2023}. Using examples or other approaches we need to check the veracity of these statements, viz. that full consolidation:
+	\begin{itemize}
+	\item increases the probability that one or more committees will be majority dishonest
+	\item increases the variance of adversarial balances
+	\item increases the variance of the distribution of adversarial weight over committees
+	\item due to the above, it follows that it is more likely that there will be ``a positive deviation from the expected adversarial weight in a committee''. Apparently although there may also be ``negative deviations'' the adversarial party is not concerned because it merely aims to control at least one committee.
+	\item On the other hand, full consolidation of honest validators maximises the risk of negative deviations from the expected committee weight.
+	\item Honest validators benefit from spreading weight evenly across the committees because it minimises the risk of negative deviations.
+	\end{itemize}
+
+\item \textit{Aggregator selection}: Does the selection of more than one virtual validator of a consolidated validator change the probability distribution of sub-committees? Could the probability of fewer than 16 distinct aggregators increase? 
+
+\item \textit{Virtual validators}: D'Amato and Neuder's conjecture is that treating consolidated validators as several `virtual' validators yields two main benefits \cite{damato2023}. Demonstrate the correctness of these statements.:
+	\begin{itemize}
+	\item The total number of aggregators is unchanged, because one consolidated validator would account for only one aggregator.
+	\item The probability of at least one honest validator is equivalent to the current probability, because the introduction of virtual validators means that the probability of selecting an honest aggregator is the same as it is currently. The total number of honest validators prior to EIP-7251 is the same as the number of virtual and unconsolidated honest validators.
+	\end{itemize}
+
+\item \textit{Whistleblower reward}: Currently the proposer receives both the whistleblower reward and the proposer reward. Moreover, the whistleblower reward is proportional to the slashed validator's effective balance. How is this reward influenced by the increased maximum effective balance?	
+
+\item \textit{Slashing penalties}: Verify the suitability of the suggested changes to slashing penalties (initial and correlation penalties), as well as those penalties remaining unchanged (attestation and inactivity leak penalties), proposed by Neuder and Monnot \cite{Neuder2023d} using working examples, or other approaches.\\
+Moreover, based on the severity of the changed slashing penalties, what situation constitutes an attack on the chain? How do we assess whether the penalties are sufficient to deter adverse behaviour? Are the proposed changes too lenient for large stakers?
+
+\item \textit{Bayesian network model}: Build a \gls{bn} to capture current factors and interactions, including distributions around factors such as uptake of consolidation, current distribution of different categories of stakers, etc. \\
+Use the \gls{bn} model to gain insight into questions such as:
+	\begin{itemize}
+	\item What does the landscape look like if there is no consolidation, but some or all validators decide to compound their rewards? Is this a good or desirable outcome? 
+	\item Create some example scenarios that include solo, partial and fully consolidated stakers and how different compositions translate to the selection of validators for specific duties and ideally the probability of dishonest committees.
+	\end{itemize}
+
+\item \textit{Discouragement attacks}: Investigate potential griefing, or discouragement, attacks.
+
+\item \textit{Consolidating validators}: There are many challenges around exiting and activation of validators for consolidation. Therefore, as Asgaonkar points out, in-protocol consolidation needs to be in place \cite{Asgaonkar2023}.
+ 
+\end{enumerate}
+
+The authors conclude that the following two beneficial properties hold when the selection of aggregators are performed as suggested.
+
+\begin{itemize}
+\item The total number of aggregators is unchanged, because one consolidated validator would account for only one aggregator.
+\item The probability of at least one honest validator is equivalent to the current probability, because the introduction of virtual validators means that the probability of selecting an honest aggregator is the same as currently. The total number of honest validators prior to EIP-7251 is the same as the number of virtual and unconsolidated honest validators.
+\end{itemize}
+
+
+In summary it is important to ensure that small scale solo-stakers are not unduly disadvantaged with the introduction of a 2,048 ETH MaxEB, in terms of proposer selection etc. which may disincentivise the commitment to running a validator. What is being compromised to enable consolidation? Are there other aspects we have not considered? What are the negatives for solo stakers who are considered to be the backbone of Ethereum? Does MaxEB swing it too much in favour of large stakers?
+
+% ===============
+\section{Analysis}
+% ===============
+\label{sec:analysis}
+
+% ------------------------------------------------
+\subsection{Proposer selection}
+% ------------------------------------------------
+
+% ------------------------------------------------
+\subsection{Sync committee selection}
+% ------------------------------------------------
+
+% ------------------------------------------------
+\subsection{Slot committees}
+% ------------------------------------------------
+
+% ------------------------------------------------------
+\subsection{Worst case: Full consolidation}
+% ------------------------------------------------------
+
+% ------------------------------------------------
+\subsection{Aggregator selection}
+% ------------------------------------------------
+For the \href{https://eth2book.info/capella/part2/building_blocks/aggregator/}{existing distribution of the expected number of aggregators} per sub-committee, refer to Edgington's online book \cite{Edgington2023}.
+If more than one of the virtual validators of a consolidated validator is chosen, then it is still just that one validator in the set of aggregators. 
+
+% ------------------------------------------------
+\subsection{Virtual validators}
+% ------------------------------------------------
+
+\include{slashingpenalties}
+
+% ------------------------------------------------
+\subsection{Whistleblower reward}
+% ------------------------------------------------
+
+\include{bayesnet}
+
+
+
+% ---------------------------------------------------------------
+\subsection{Griefing/discouragement attacks}
+% ---------------------------------------------------------------
+According to Buterin a griefing attack is when a validator acts maliciously inside a consensus mechanism to reduce other validators' revenue even at some cost to themselves to encourage the victims to drop out of the mechanism \cite{buterin2018c}.
+
+The two main motivations for reducing the number of participants are most likely because fewer participants:
+\begin{itemize}
+\item mean greater rewards for those remaining in the mechanism
+\item helps to prepare an attack on the chain by reducing the cost of an attack
+\end{itemize}
+
+Some strategies have already been put in place to avoid discouragement attacks \cite{Edgington2023}:
+\begin{itemize}
+\item inverse square root scaling of validator rewards
+\item scaling of rewards with participation (viz. for each ``source, target, and head vote, the attester's reward is scaled by the proportion of the total stake that made the same vote'')
+\item zeroing attestation rewards during an inactivity leak
+\item rate limiting of validator exists, which means that an attacker needs to sustain an attack for longer and at greater cost in order to achieve the same outcome.
+\end{itemize}
+
+% ---------------------------------------------------------------
+\subsection{Centralisation forces}
+% ---------------------------------------------------------------
+Centralisation needs to be assessed within the context of this grant and the proposed increase in maximum effective balance, especially with respect to large stakers and staking pools.
+
+% ---------------------------------------------------------------
+\subsection{Health of the Ethereum ecosystem}
+% ---------------------------------------------------------------
+Ether alpha combines various aspects of the ecosystem to give an overall impression of the health of the network. They pull information from various sources for `Project Sunshine' dashboard \cite{easunshine}. 
+
+Historic and current trends for stake concentration are important to observe as these are warning signs that the chain is becoming more vulnerable to collusion. The consolidation of stake through EIP-7251 (currently in draft form) \cite{Neuder2023c} is unlikely to change the dynamics of stake concentration, since it is encouraging consolidation of validators already being operated by stakers. However, with more node operators and validators joining larger staking pools staked ETH will become more one-sided in favour of staking pools. 
+
+The Rated network also provides detailed metrics and visualisations to gauge the health of the network \cite{Rated2023a}. 
+
+%\clearpage
+
+\section{Bibliography}
+% -----------------------------
+\nocite{*}
+\bibliographystyle{eptcs}
+\bibliography{references}
+
+\end{document}

@@ -1,0 +1,36 @@
+% ------------------------------------------------
+\subsection{Bayesian network model}
+% ------------------------------------------------
+We build a \gls{bn} model to capture the key factors and interactions for an increase in MaxEB as proposed in EIP-7521.
+
+We assume that different groups, or categories, of stakers have different characteristics which will in turn influence their willingness to consolidate stake, as well as the uptake of validator consolidation.
+
+% ---------------------------------------------------------------
+\subsection{Key factors}
+% ---------------------------------------------------------------
+
+% ---------------------------------------------------------------
+\subsubsection*{Staker categories}
+ % ---------------------------------------------------------------
+Vitalik Buterin suggested potential categories as follows:
+\begin{itemize}
+\item Small-scale solo stakers (32 - a few hundred ETH)
+\item Large-scale individual solo stakers (1000+ ETH)
+\item Large-scale institutional solo stakers (ie. companies staking their own ETH)
+\item Centralised staking pools
+\item Semi-decentralised staking pools (Rocketpool, Lido... each one is different)
+\item Each of the above, but using \gls{dvt}
+\end{itemize}
+
+Although each of the categories will differ with the use of \gls{dvt}, we do not anticipate that \gls{dvt} will influence their behaviour with respect to validator consolidation in any meaningful way. 
+
+It will be challenging to assign a distribution across the proposed staker categories. However with current work on identifying validators, we would be able to assign some validators to staker categories and for those that are unknown, we can either replicate the distribution across the validators, or adjust them based on an assumption on the probability distribution across the unknown group. With the \gls{bn} we can also apply other distributions and see to what extent they affect the downstream probabilities.
+
+% ---------------------------------------------------------------
+\subsubsection*{Validator consolidation}
+ % ---------------------------------------------------------------
+ The implementation of EIP-7521 is likely to eventuate in a varying degree of consolidation within and across the various categories. We can use intuition for an initial uptake and vary this to test the downstream consequences of various scenarios.
+ 
+ 
+ 
+
