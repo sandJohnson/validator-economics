@@ -89,14 +89,13 @@ In summary as mentioned in the previous document, the two key criteria we need t
 \noindent
 With respect to EIP-7521:
 \begin{itemize}
-\item \textbf{Risks}: What new risks are being introduced by this proposal? How are the various categories of stakers, and importantly the Ethereum ecosystem, affected?
-\item  \textbf{Benefits}: What are the benefits for stakers and the ecosystem? Does this proposal benefit one category of staker more than another? What benefits are there for the health of the ecosystem apart from the reduction in network load if stakers consolidate their stake as designed?
+\item \textbf{Risks}: Are risks are being introduced by this proposal? Are there adverse affects on some categories of stakers, or the Ethereum ecosystem?
+\item  \textbf{Benefits}: Do all staker categories benefit equally from EIP-7521? Apart from the expected reduction in network load, are there other benefits to the health of the ecosystem?
 \end{itemize}
 
+We need to bear in mind that regardless of the risks and benefits, EIP-7521 relies on stakers' willingness to consolidate at least some of their validators. Therefore the messaging around the benefits of consolidation and the perception that the benefits to stakers and the ecosystem definitely outweigh any perceived risks needs to be compelling.
 
-We need to bear in mind that regardless of the risks and benefits that we are analysing, this proposal relies on stakers being willing to consolidate at least some of their validators. This will depend on the messaging around the benefits of consolidation and their perception that the benefits to them and the ecosystem far outweigh the risks.
-
-The other big consideration is the impact on staking pools, their operational business models, and software changes required to take advantage of the increased maximum \gls{eb}.
+The impact on staking pools, their operational business models, and software changes required to take advantage of the increased maximum will need to be discussed with stakeholders \gls{eb}.
 
 
 % -------------------------------------------------------------------------------------
@@ -111,7 +110,7 @@ In addition to the advantages and disadvantages highlighted in the \textit{ethre
 \item \textit{Sync committee selection}: Demonstrate that this selection process works as designed even when there is a large increase in Max\gls{eb} \cite{Neuder2023a}.\\
 The denominator for the acceptance probability is MaxEB which means the probability will change from $\frac{b}{32}$ to $\frac{b}{2,048}$, where \textit{b = validator effective balance}. Check whether this adversely affects validators with a small stake, apart from the expected increase in time to select the committee, as D'Amato and Neuder pointed out \cite{damato2023}.
 
-\item \textit{Slot committees}: Demonstrate that not taking validator weight into account does not have any adverse downstream effects. D'Amato and Neuder state that even if one ``attestation is majority adversarial'', then the worst that can happen is that the attacker will execute a local reorg \cite{damato2023}. Explore in more detail, e.g. use an example or two, to ascertain the effect of variations in slot committee balances with the inclusion, or omission of fully consolidated stakers. 
+\item \textit{Slot committees}: Demonstrate that not taking validator weight into account does not have any adverse downstream effects. D'Amato and Neuder state that even if one ``attestation is majority adversarial'', then the worst that can happen is that the attacker will execute a local reorg \cite{damato2023}. Explore in more detail, e.g. use an example or two, to ascertain the effect of variations in slot committee balances with the inclusion, or omission, of fully consolidated stakers. 
 
 \item \textit{Worst case: Full consolidation}: D'Amato and Neuder identify full consolidation as the worst case scenario when we consider two groups of validators: honest and adversarial validators. Several reasons are given for this conclusion \cite{damato2023}. Using examples or other approaches we need to check the veracity of these statements, viz. that full consolidation:
 	\begin{itemize}
@@ -148,14 +147,6 @@ Use the \gls{bn} model to gain insight into questions such as:
 \item \textit{Consolidating validators}: There are many challenges around exiting and activation of validators for consolidation. Therefore, as Asgaonkar points out, in-protocol consolidation needs to be in place \cite{Asgaonkar2023}.
  
 \end{enumerate}
-
-The authors conclude that the following two beneficial properties hold when the selection of aggregators are performed as suggested.
-
-\begin{itemize}
-\item The total number of aggregators is unchanged, because one consolidated validator would account for only one aggregator.
-\item The probability of at least one honest validator is equivalent to the current probability, because the introduction of virtual validators means that the probability of selecting an honest aggregator is the same as currently. The total number of honest validators prior to EIP-7251 is the same as the number of virtual and unconsolidated honest validators.
-\end{itemize}
-
 
 In summary it is important to ensure that small scale solo-stakers are not unduly disadvantaged with the introduction of a 2,048 ETH MaxEB, in terms of proposer selection etc. which may disincentivise the commitment to running a validator. What is being compromised to enable consolidation? Are there other aspects we have not considered? What are the negatives for solo stakers who are considered to be the backbone of Ethereum? Does MaxEB swing it too much in favour of large stakers?
 
