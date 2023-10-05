@@ -29,6 +29,7 @@
 \newcommandx{\change}[2][1=]{\todo[linecolor=blue,backgroundcolor=blue!25,bordercolor=blue,#1]{#2}}
 \newcommandx{\info}[2][1=]{\todo[linecolor=OliveGreen,backgroundcolor=OliveGreen!25,bordercolor=OliveGreen,#1]{#2}}
 \newcommandx{\improvement}[2][1=]{\todo[linecolor=Plum,backgroundcolor=Plum!25,bordercolor=Plum,#1]{#2}}
+\newcommandx{\feedback}[2][1=]{\todo[linecolor=Goldenrod,backgroundcolor=Goldenrod!25,bordercolor=Goldenrod,#1]{#2}}
 \newcommandx{\thiswillnotshow}[2][1=]{\todo[disable,#1]{#2}}
 
 
@@ -71,6 +72,7 @@ ConsenSys Software R\&D}
 \newacronym{pc}{PC}{personal computer}
 \newacronym{pdf}{PDF}{probability density function}
 \newacronym{pos}{PoS}{proof of stake}
+\newacronym{pr}{PR}{pull request}
 \newacronym{rig}{RIG}{Robust Incentives Group}
 \newacronym{rpl}{RPL}{Rocket Pool}
 \newacronym{ssf}{SSF}{single-slot finality}
@@ -99,7 +101,7 @@ The blog posts that propose and analyse the increased maximum effective balance 
 
 \item \href{https://hackmd.io/@0g8QuqEeQBe45CC8toURGw/HylpAVzIH2}{\textit{Upper bound on the probability of one majority dishonest committee in the context of MAX\_EFFECTIVE\_BALANCE increase}}, 21 June 2023 \cite{Saltini2023}.
 
-\item There is currently an \gls{eip} in draft form to implement the proposal to increase the maximum effective balance. Here is the \href{https://github.com/ethereum/EIPs/pull/7251/commits/ec37fceec914af2a3fd298ef6f6cc13b5d41c533#diff-0e923b63b339f877c14b995b0c69d4962489dce485fb0e31ef49a4dd303e0b56}{pull request}. The initial draft by Mike Neuder is in his GitHub repo: \href{https://github.com/michaelneuder/EIPs/blob/max-eb-increase/EIPS/eip-increase-MaxEB.md}{max effective balance increase proposal} \cite{Neuder2023c}.
+\item There is currently an \gls{eip} in draft form to implement the proposal to increase the maximum effective balance. Here is the \href{https://github.com/ethereum/EIPs/pull/7251/commits/ec37fceec914af2a3fd298ef6f6cc13b5d41c533#diff-0e923b63b339f877c14b995b0c69d4962489dce485fb0e31ef49a4dd303e0b56}{\gls{pr}}. The initial draft by Mike Neuder is in his GitHub repo: \href{https://github.com/michaelneuder/EIPs/blob/max-eb-increase/EIPS/eip-increase-MaxEB.md}{max effective balance increase proposal} \cite{Neuder2023c}.
 
 \item Mike Neuder added a very useful \href{https://notes.ethereum.org/@mikeneuder/eip-7251-faq}{\textit{FAQ post for EIP-7251}}.
 
@@ -112,7 +114,7 @@ The blog posts that propose and analyse the increased maximum effective balance 
 \item Christine Kim publishes regular summaries of the \textit{Ethereum All Core Developers (AllCoreDevs)} calls. \href{https://www.galaxy.com/research/insights/ethereum-all-core-developers-consensus-call-111/}{\textit{Call 111}} and \href{https://www.galaxy.com/research/insights/ethereum-all-core-developers-consensus-call-112/}{\textit{Call 112}} include the main discussion points for the proposal to increase the maximum effective balance for validators. Recordings of the meetings are available on YouTube. During \textit{Call 111} the discussion around the increase in maximum effective balance starts around 59 mins (\href{https://youtu.be/ybgQuRcz9sg?t=3569}{recording}) and for \textit{Call 112} the discussion starts around 46 mins (\href{https://youtu.be/zdqtl9x\_UjA?t=2775}{recording})
 \end{itemize}
 
-With EIP-7-7251 validators can choose to auto-compound their stake, instead of having any rewards above the 32 ETH effective balance automatically withdrawn into their account. Therefore validators do not have to wait until 32 ETH has been accumulated before another 32 ETH deposit can be made, but they can automatically compound their stake with rewards earned. The flow-on effect is that this would increase their rewards since rewards are based on the effective balance of the validator, making it attractive to smaller, typically solo, stakers, who have to wait for a very long time to earn enough ETH for another 32 ETH stake. It should also be attractive to larger stakers who regularly earn far greater rewards, and instead of waiting for a newly created validator to be activated in the long activation queue, that stake will immediately earn additional rewards. On the other hand consolidation and compounding of validators run a risk of increased slashing penalties.  
+With EIP-7251 validators can choose to auto-compound their stake, instead of having any rewards above the 32 ETH effective balance automatically withdrawn into their account. Therefore validators do not have to wait until 32 ETH has been accumulated before another 32 ETH deposit can be made, but they can automatically compound their stake with rewards earned. The flow-on effect is that this would increase their rewards since rewards are based on the effective balance of the validator, making it attractive to smaller, typically solo, stakers, who have to wait for a very long time to earn enough ETH for another 32 ETH stake. It should also be attractive to larger stakers who regularly earn far greater rewards, and instead of waiting for a newly created validator to be activated in the long activation queue, that stake will immediately earn additional rewards. On the other hand consolidation and compounding of validators run a risk of increased slashing penalties.  
 
 The two key criteria we need to assess are: risk and benefit. 
 \begin{itemize}
@@ -237,9 +239,10 @@ This post by D'Amato and Neuder looks in more depth at the implications of the i
 % ------------------------------------------------
 \begin{itemize}
 \item \textit{Slot committees}\\
-Selection of the 32 committees does not take validator effective balance into account. 
+Selection of the 32 committees does not take validator effective balance into account. However, when single slot finality is implemented, the fact that different committees may have different weights would not be relevant since all the active stake will vote in each slot.
 \info [inline] {Therefore a consolidated validator with a high stake is equally likely to be selected as a solo staker. If the `super' validator comprises of 5*32 ETH stake, then it can only be selected to be in one slot committee, where alternatively the staker could have had validators in up to 5 slot committees}
 \unsure [inline] {Use an example to check whether not taking weight into account could have adverse effects downstream}
+\feedback [inline] {Feedback from Barnab\'e: Probably the adverse effect here would be by chance having one slot with a lot of weight behind it and one slot with not a lot of weight. But with the move to SSF this disappears anyway (all stake votes every slot)}
 \item \textit{Sub-committees} \\
 The slot committees are split into a maximum of 64 sub-committees each. The sub-committees ``facilitate attestation aggregation at the p2p layer'' \cite{damato2023}. 
 \item \textit{Sync committee} \\
@@ -265,6 +268,7 @@ We summarise here the arguments made by the authors to demonstrate that full con
 \begin{itemize}
 \item increases the probability that one or more committees will be majority dishonest
 \unsure [inline] {If all validators (honest and dishonest) have the same MaxEB, why would this be any different to the current probability of a dishonest committee? Surely this is only the case if the dishonest stakers all consolidate, but not all the honest validators consolidate?}
+\feedback{Feedback from Barnab\'e: I am quite convinced by Roberto’s calculations that the probability increases. The coarser partition of stake means that there is more chances that ``one of the bins overflows'' (one of the slot has more malicious stake than honest)}
 \item increases the variance of adversarial balances
 \unsure [inline] {If all validators are fully consolidated, why would the variance of adversarial balances increase?}
 \item increases the variance of the distribution of adversarial weight over committees
@@ -336,6 +340,7 @@ Assume \texttt{ } there \texttt{ } 16 \texttt{ } draws \texttt{ } to \texttt{ } 
 \end{equation*}
 
 \unsure [inline] {I assume that if more than one of the virtual validators of a consolidated validator is chosen, then it is still just that one validator in the set of aggregators, meaning that it could increase the probability of fewer than 16 distinct aggregators?}
+\feedback [inline] {Feedback from Barnab\'e: Isn’t it already the case that one can be chosen multiple times for the aggregator role? i.e., isn’t the sampling already with replacement? }
 
 The authors conclude that the following two beneficial properties hold when the selection of aggregators are performed as suggested.
 
@@ -409,6 +414,7 @@ Still a lot larger than the maximum churn limit.
 The authors propose that the churn limit is weight denominated. 
 
 \unsure [inline] {I am not sure whether they are taking the proposal from Lion into account when they propose the changes in the blog post.}
+\feedback [inline] {It looks like this EIP will make it into Dencun so might be worth mentioning it here, but it doesn’t change much the calculations, it’s a bit like a parameter freeze.}
 \info [inline] {I need to check the pull request to look at details of the proposed spec changes}
 
 The authors then look at validator activations and exits, and again propose that validator weight, which in this context means the validators effective balance, into account. Details are provided for the proposed code changes.
@@ -420,7 +426,11 @@ They also analyse top-ups for a validator's effective balance when the balance i
 % --------------------------------
 Currently there is a sweep of the entire validator set to process withdrawals of all effective balances that are over 32 ETH, the current maximum for effective balances. 
 
-The proposal is to introduce a new \gls{bls} prefix, \texttt{0x02}, so that the automatic withdrawal for these validators only happen when their effective balance exceeds MaxEB (2,048 ETH). However, for this EIP to be acceptable to large stakers, they want to nominate the amount of a partial withdrawal. For example, perhaps a staker wants to maintain a consolidated validator that consists of five 32 ETH validator, then they may want to withdraw rewards in excess of 160 ETH and not the default value of 2,048 ETH. This requirement was already proposed by Asgaonkar in his initial proposal \cite{Asgaonkar2023}.
+The proposal is to introduce a new \gls{bls} prefix, \texttt{0x02}, so that the automatic withdrawal for these validators only happen when their effective balance exceeds MaxEB (2,048 ETH). 
+
+However, for this EIP to be acceptable to large stakers, they want to nominate the amount of a partial withdrawal. For example, perhaps a staker wants to maintain a consolidated validator that consists of five 32 ETH validator, then they may want to withdraw rewards in excess of 160 ETH and not the default value of 2,048 ETH. This requirement was already proposed by Asgaonkar in his initial proposal \cite{Asgaonkar2023}.
+
+Neuder has a \href{https://github.com/michaelneuder/consensus-specs/pull/3/files#diff-1cdf2318cbed64bdc20bd25631130be090a72ca7ff4f05bbc74c0c63a634e0f1R3709}{GitHub \gls{pr}} that proposes changes to withdrawal processing. According to the proposed changes for consolidated validators, any balance in excess of 2,048 ETH will be included in the automated partial withdrawal sweep.
 
 % -----------------------------------------------------------------
 \section{Upper bound on the probability of one majority \\* dishonest committee in the context of \\* MAX\_EFFECTIVE\_BALANCE increase}
@@ -476,7 +486,7 @@ The hypergeometric \gls{pdf} for \textit{x} successes in \textit{n} trials from 
 \begin{split}
 & f(x; k, N, n) = \frac{\binom{x}{k} \binom{N-k}{n-x}}{\binom{N}{n}} \textit{ where } x = 0, 1, 2, ..., min(n,k) \\
 & \textit{a distribution with three parameters: k, N, and n} \\
-& n = \textit{number of trials} \\
+& n = \textit{number of trials (or draws)} \\
 & k = \textit{no of items of one kind, i.e. Byzantine validators}  \\
 & \textit{and (n-k) of another kind, i.e. honest validators} \\
 & N = \textit{population size, i.e. the entire validator set} \\
@@ -488,20 +498,25 @@ The hypergeometric \gls{pdf} for \textit{x} successes in \textit{n} trials from 
 
 
 \noindent
-$F (x; k, n, N-k)$ is the \gls{cdf} for a hypergeometric distribution.\\
+$F (x; N, K, n) = P(X \geqslant x)  = 1 - P( X > x) $ is the \gls{cdf} for a hypergeometric distribution, where \\
+$N = $ \textit{ population size, i.e. active validator set}\\
+$K = $ \textit{ total number of success states in population, i.e. total number of Byzantine validators in the active validator set}  \\
+$n = $ \textit{ total number drawn from population, i.e. the number of validators in a slot committee} \\
+$x = $ \textit{ number of observed successes from n draws, i.e. number of Byzantine validators selected for a committee} \\
+
 \noindent
-There are several approximations for the \gls{cdf} of a hypergeometric distribution in terms of a binomial \gls{cdf} \cite{chattamvelli}.
+The binomial distribution is a good approximation of the hypergeometric distribution when $N$ much larger than $n$ \cite{chattamvelli}.
  
-\begin{equation*}
-\begin{split}
-& F (x; k, n, N-k) \simeq \sum_{j=0}^x \binom{n}{j}p^j(1-p)^{n-j}, where \\
-& p = \frac{\left( Np - \frac{x}{2} \right)}{\left( N - \frac{(n-1)}{2} \right)} - \frac{n(x - np - 0.5)}{6 (N - \frac{(n-1)}{2} )^2}\\
-& \textit{This can be expressed in terms of an incomplete beta function as:} \\
-& I_q(n-x, x+1), where \texttt{ } q = 1- p \\
-& \textit{Moreover, for large n, the binomial distribution can be expressed in terms of an F distribution, and} \\
-& \textit{Poisson tail probabilities in terms of a Chi-square distribution}\\
-\end{split}
-\end{equation*}
+%\begin{equation*}
+%\begin{split}
+%& F (x; k, n, N-k) \simeq \sum_{j=0}^x \binom{n}{j}p^j(1-p)^{n-j}, where \\
+%& p = \frac{\left( Np - \frac{x}{2} \right)}{\left( N - \frac{(n-1)}{2} \right)} - \frac{n(x - np - 0.5)}{6 (N - \frac{(n-1)}{2} )^2}\\
+%& \textit{This can be expressed in terms of an incomplete beta function as:} \\
+%& I_q(n-x, x+1), where \texttt{ } q = 1- p \\
+%\end{split}
+%\end{equation*}
+Moreover, for large $n$, the binomial distribution can be expressed in terms of an F distribution, and Poisson tail probabilities in terms of a Chi-square distribution.\\
+
 
 Saltini provides a detailed outline of determining an upper bound for maximising the probability that the total Byzantine weight of a committee is greater than the total weight of the honest validators in that committee \cite{Saltini2023}. He concludes with the aid of the Chernoff-Hoefding approach to calculating the upper bound of the tail for  that the ``tail upper bound is maximised by minimising \textit{h}'' \cite{Saltini2023}. Therefore this happens when we have maximum consolidation, based on the assumption that the ratio of honest validators to dishonest validators is great than $\frac{1}{2}$.
 
@@ -683,13 +698,13 @@ There are several helpful documents explaining in detail the different options a
 \item \href{https://ethereum.org/en/staking/}{Centralised exchanges} \cite{efstaking}
 \end{itemize}
 
-The Ethereum Foundation provides a \href{https://ethereum.org/en/staking/#comparison-of-options}{\textit{Comparison of staking options}}, outlining the key differences between solo staking, staking as a service and pooled staking. The legal implications of staking are discussed in Consensys blog post \href{https://consensys.net/blog/news/staking-is-data-validation-not-investment/}{\textit{Staking is Data Validation, Not Investment}} \cite{corva2023}.
+ethereum.org provides a \href{https://ethereum.org/en/staking/#comparison-of-options}{\textit{Comparison of staking options}}, outlining the key differences between solo staking, staking as a service and pooled staking. The legal implications of staking are discussed in Consensys blog post \href{https://consensys.net/blog/news/staking-is-data-validation-not-investment/}{\textit{Staking is Data Validation, Not Investment}} \cite{corva2023}.
 
 Re-staking is deemed to be out of scope for this grant research topic, but there are good resources to explain the concept and discuss the implications of re-staking. A blog post by Buterin \href{https://vitalik.ca/general/2023/05/21/dont\_overload.html}{\textit{Don`t overload Ethereum`s consensus}} discusses the various approaches to re-staking and explains why some techniques bring ``high systemic risks to the ecosystem'' \cite{buterin2023a}. Another interesting perspective is from the Substack post by Tripoli: \href{https://dataalways.substack.com/p/endgame-perils-of-restaking}{\textit{Endgame Perils of Restaking}}, and the addendum to the post: \href{https://dataalways.substack.com/p/addendum-endgame-perils-of-restaking}{\textit{Addendum: Endgame Perils of Restaking}}.
 
 The Ethereum Foundation and EtherScan conducted a survey of stakers \cite{Smith2023}, according to the following categories: solo staking, staking pool service, mini node operator (Rocketpool), and those not yet staking. The responses were analysed and the key trends, take aways, and predictions reported. The large majority of the respondents were either solo stakers or mini pool operators.
 
-Justin Drake and Mike Neuder also had conversations with stakers. The biggest stakers they talked to were Coinbase, a few different Lido operators and Kraken. They concluded that there are probably a few reasons to motivate bigger stakers to consolidate their validators if the maximum deposit size is increased from 32 ETH to 2,048 ETH. Arguably this proposal is aimed largely at the bigger stakers rather than the smaller, solo stakers. The reasons they may want to consolidate are: to reduce operational cost, although it is likely not particularly high infrastructure costs, Mike Neuder estimated in the region of a few \$100 per week, but key management would be the more challenging side of running many validators that can be consolidated into fewer validators if this proposal is implemented. The questions raised by LIDO and the responses provided by the \gls{ef} are in the documents listed above.
+Justin Drake and Mike Neuder also had conversations with stakers. The biggest stakers they talked to were Coinbase, a few different Lido operators and Kraken. They concluded that there are probably a few reasons to motivate bigger stakers to consolidate their validators if the maximum deposit size is increased from 32 ETH to 2,048 ETH. Arguably this proposal is aimed largely at the bigger stakers rather than the smaller, solo stakers. The reasons they may want to consolidate are: to reduce operational cost, although it is likely not particularly high infrastructure costs, Mike Neuder estimated in the region of a few \$100 per week, but key management would be the more challenging side of running many validators that can be consolidated into fewer validators if this proposal is implemented. The questions raised by Lido and the responses provided by the \gls{ef} are in the documents listed above.
 
 
 Meetings with Infura, Consensys staking and  \gls{mm} staking were very insightful and the range of infrastructure configurations was discussed as well as the types of staking. \gls{mm} staking is mainly targeting integration with fractional liquid staking pools and working closely with a fractional staking provider so that users can easily participate in staking via \gls{mm}.
@@ -709,10 +724,10 @@ According to the \href{https://launchpad.ethereum.org/en/}{Staking Launchpad} on
 % -----------------------------------------------------
 \label{sec:datastaking}
 
-\subsubsection*{LIDO}
+\subsubsection*{Lido}
 % ----------------------------
-LIDO is a popular liquid staking pool. 
-At the time of writing, 7 June 2023, the total amount of ETH staked with \href{https://lido.fi/ethereum}{LIDO}  is 7,127,430 ETH. 
+Lido is a popular liquid staking pool. 
+At the time of writing, 7 June 2023, the total amount of ETH staked with \href{https://lido.fi/ethereum}{Lido}  is 7,127,430 ETH. 
 
 %Several graphs have been generated in Dune Analytics. See Figures~\ref{fig:dunelido1}~to~\ref{fig:dunelido5} on pages~\pageref{fig:dunelido1}~to~\pageref{fig:dunelido5}.
 %

@@ -1,16 +1,18 @@
 % ------------------------------------------------
-\subsection{Bayesian network model}
+\subsubsection{Bayesian network model}
 % ------------------------------------------------
 We build a \gls{bn} model to capture the key factors and interactions for an increase in MaxEB as proposed in EIP-7521.
 
-We assume that different groups, or categories, of stakers have different characteristics which will in turn influence their willingness to consolidate stake, as well as the uptake of validator consolidation.
+We assume that different groups, or categories, of stakers have different characteristics which will in turn influence their willingness to consolidate stake, as well as the uptake of validator consolidation. \\
 
+\noindent
 % ---------------------------------------------------------------
-\subsection{Key factors}
+\textbf{Key factors} \\
 % ---------------------------------------------------------------
 
+\noindent
 % ---------------------------------------------------------------
-\subsubsection*{Staker categories}
+\textbf{Staker categories} \\
  % ---------------------------------------------------------------
 Vitalik Buterin suggested potential categories as follows:
 \begin{itemize}
@@ -24,12 +26,23 @@ Vitalik Buterin suggested potential categories as follows:
 
 Although each of the categories will differ with the use of \gls{dvt}, we do not anticipate that \gls{dvt} will influence their behaviour with respect to validator consolidation in any meaningful way. 
 
-It will be challenging to assign a distribution across the proposed staker categories. However with current work on identifying validators, we would be able to assign some validators to staker categories and for those that are unknown, we can either replicate the distribution across the validators, or adjust them based on an assumption on the probability distribution across the unknown group. With the \gls{bn} we can also apply other distributions and see to what extent they affect the downstream probabilities.
+It will be challenging to assign a distribution across the proposed staker categories. However with current work on identifying validators, we would be able to assign some validators to staker categories and for those that are unknown, we can either replicate the distribution across the validators, or adjust them based on an assumption on the probability distribution across the unknown group. With the \gls{bn} we can also apply other distributions and see to what extent they affect the downstream probabilities. \\
 
+
+\noindent
 % ---------------------------------------------------------------
-\subsubsection*{Validator consolidation}
+\textbf{Validator consolidation} \\
  % ---------------------------------------------------------------
- The implementation of EIP-7521 is likely to eventuate in a varying degree of consolidation within and across the various categories. We can use intuition for an initial uptake and vary this to test the downstream consequences of various scenarios.
+ The implementation of EIP-7521 is likely to eventuate in a varying degree of consolidation within and across the various categories. We can use intuition for an initial uptake and vary this to test the downstream consequences of various scenarios.  \\
+ 
+ \noindent
+ % ---------------------------------------------------------------
+\textbf{Health of the Ethereum ecosystem}
+% ---------------------------------------------------------------
+Ether alpha combines various aspects of the ecosystem to give an overall impression of the health of the network. They pull information from various sources for `Project Sunshine' dashboard \cite{easunshine}. 
+
+The Rated network also provides detailed metrics and visualisations to gauge the health of the network \cite{Rated2023a}. 
+
  
  
  

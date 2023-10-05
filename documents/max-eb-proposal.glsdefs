@@ -718,6 +718,36 @@ parent={},%
 %
 }%
 }%
+\ifglsentryexists{pr}{}%
+{%
+\gls@defglossaryentry{pr}%
+{%
+name={PR},%
+sort={PR},%
+type={acronym},%
+first={pull request\glsspace (PR)},%
+firstplural={pull requests\glsspace (PRs)},%
+text={PR},%
+plural={PRs},%
+description={pull request},%
+descriptionplural={pull request\acrpluralsuffix },%
+symbol={\relax },%
+symbolplural={\relax },%
+user1={},%
+user2={},%
+user3={},%
+user4={},%
+user5={},%
+user6={},%
+long={pull request},%
+longplural={pull requests},%
+short={PR},%
+shortplural={PRs},%
+counter={page},%
+parent={},%
+%
+}%
+}%
 \ifglsentryexists{rig}{}%
 {%
 \gls@defglossaryentry{rig}%

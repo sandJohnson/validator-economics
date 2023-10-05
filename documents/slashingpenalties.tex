@@ -1,6 +1,6 @@
 
 % ------------------------------------------------
-\subsection{Slashing penalties}
+\subsubsection*{Slashing penalties}
 % ------------------------------------------------
 In the \href{https://notes.ethereum.org/@mikeneuder/slashings-eip-7251}{blogpost} Neuder and Monnot propose the following for current slashing penalties \cite{Neuder2023d}: 
 \begin{itemize}
@@ -16,7 +16,8 @@ In the \href{https://notes.ethereum.org/@mikeneuder/slashings-eip-7251}{blogpost
 	\end{itemize}
 \end{itemize}
 
-\subsubsection*{Initial slashing penalty}
+\noindent
+\textbf{Initial slashing penalty} \\
 % -------------------------------------------------
 The initial slashing penalty is proportional to the validator's effective balance, with a maximum penalty of 1 ETH if the slashed validator has 32 ETH, the current MaxEB.
 If left unchanged, a fully consolidated validator would incur an initial slashing penalty of 64 ETH.
@@ -28,9 +29,10 @@ The authors propose the following function to calculate the new initial slashing
 
 In their \href{https://notes.ethereum.org/@mikeneuder/slashings-eip-7251}{blog post} they have graphs for $x=1, \frac{15}{16}, \frac{7}{8}, \frac{3}{4}, \frac{1}{2}$ and a line for a constant initial penalty of 1 ETH \cite{Neuder2023d}.
 
-The authors conclude that visually it appears that $x = \frac{3}{4}$ and $\frac{7}{8}$ are good choices in terms of balancing the size of the initial slashing penalty and the risk for a consolidated validator.
+The authors conclude that visually it appears that $x = \frac{3}{4}$ and $\frac{7}{8}$ are good choices in terms of balancing the size of the initial slashing penalty and the risk for a consolidated validator.\\
 
-\subsubsection*{Correlation penalty}
+\noindent
+\textbf{Correlation penalty} \\
 % --------------------------------------------
 This penalty is incurred roughly 18 days (4,096 epochs) after the slashing event, half way between its exit epoch and the slashing event \cite{Edgington2023}. The correlation penalty is important in penalising apparent coordinated attacks on the chain, and is the only other penalty that Neuder and Monnot propose to alter \cite{Neuder2023d}.
 
@@ -72,10 +74,11 @@ For EIP-7521 the authors propose a function that preserves the requirement that 
 
 Moreover, the new correlation penalty function scales quadratically as opposed to the current function that scales linearly. With the proposed new function, the slashing penalties are substantially reduced for all validators, regardless of whether they have consolidated stake.
 
-Refer to the \href{https://notes.ethereum.org/@mikeneuder/slashings-eip-7251}{blogpost} to view graphs showing the comparative correlated slashing penalties for solo (32 ETH), partially consolidated (256 ETH), and fully consolidated (2,048 ETH) validators applying both the current and the proposed functions \cite{Neuder2023d}.
+Refer to the \href{https://notes.ethereum.org/@mikeneuder/slashings-eip-7251}{blogpost} to view graphs showing the comparative correlated slashing penalties for solo (32 ETH), partially consolidated (256 ETH), and fully consolidated (2,048 ETH) validators applying both the current and the proposed functions \cite{Neuder2023d}. \\
 
+\noindent
 % -----------------------------------------
-\subsubsection*{Attestation penalty}
+\textbf{Attestation penalty} \\
 % -----------------------------------------
 Once a validator is slashed, their attestations (source, target and head votes) are deemed to be invalid and hence they incur attestation penalties for 8,192 epochs until their exit epoch. 
 
@@ -99,9 +102,10 @@ Different weights are attached to each vote, but only the source (weight = 14) a
 \end{split}
 \end{equation*}
 
-This attestation penalty for a large slashed staker seems acceptable, but could potentially be adjusted by changing the number of epochs that the validator is deemed as being ``offline''.The size of this penalty needs to be such that the security model is not compromised. In other words it should never be a better option to self-slash to avoid inactivity penalties. Therefore, it needs to be greater than the inactivity penalties for an unslashed validator that is exiting and offline \cite{Neuder2023d}.
+This attestation penalty for a large slashed staker seems acceptable, but could potentially be adjusted by changing the number of epochs that the validator is deemed as being ``offline''.The size of this penalty needs to be such that the security model is not compromised. In other words it should never be a better option to self-slash to avoid inactivity penalties. Therefore, it needs to be greater than the inactivity penalties for an unslashed validator that is exiting and offline \cite{Neuder2023d}. \\
 
-\subsubsection*{Inactivity leak penalty}
+\noindent
+\textbf{Inactivity leak penalty} \\
 % -------------------------------------------------------------------
 An \textit{inactivity leak} is signalled by the protocol when the chain has not been finalising for 4 epochs. During an inactivity leak online validators will not penalised, so although no rewards are being earned, the penalty is 0. 
 

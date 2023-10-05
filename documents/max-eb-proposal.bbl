@@ -71,6 +71,13 @@
 \newblock
   \urlprefix\url{https://eips.ethereum.org/assets/eip-2982/ef-Discouragement-Attacks.pdf}.
 
+\bibitemdeclare{misc}{buterin2020}
+\bibitem{buterin2020}
+\bibinfo{author}{Vitalik \surnamestart Buterin\surnameend}
+  (\bibinfo{year}{2020}): \emph{\bibinfo{title}{{Vitalik’s Annotated Ethereum
+  2.0 Spec}}}.
+\newblock \urlprefix\url{https://notes.ethereum.org/@vbuterin/SkeyEI3xv}.
+
 \bibitemdeclare{misc}{buterin2023a}
 \bibitem{buterin2023a}
 \bibinfo{author}{Vitalik \surnamestart Buterin\surnameend}
