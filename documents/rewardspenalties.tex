@@ -1,0 +1,171 @@
+% -----------------------------------------------------------
+\subsection{Analysis of Rewards \& Penalties}
+% -----------------------------------------------------------
+\subsubsection{Rewards}
+% ------------------------------------------------
+
+\textbf{Proposer rewards} \\
+% ------------------------------------------------
+\noindent
+\textit{Proposer award for attestations} \\
+% ------------------------------------------------
+
+
+\noindent
+\textit{Proposer award for sync committees} \\
+% ------------------------------------------------
+
+
+
+
+\noindent
+\textbf{Attestation rewards} \\
+% ------------------------------------------------
+
+
+
+\noindent
+\textbf{Whistleblower reward} \\
+% ------------------------------------------------
+
+
+\noindent
+\textbf{Sync committee rewards} \\
+% ------------------------------------------------
+
+
+% ------------------------------------------------
+\subsubsection{Penalties}
+% ------------------------------------------------
+% ------------------------------------------------
+\textbf{Slashing penalties} \\
+% ------------------------------------------------
+
+\noindent
+In the \href{https://notes.ethereum.org/@mikeneuder/slashings-eip-7251}{blogpost} Neuder and Monnot propose the following for current slashing penalties \cite{Neuder2023d}: 
+\begin{itemize}
+\item Changes to existing penalties:
+	\begin{itemize}
+	\item Changing the \textit{initial penalty} to be either fixed, or scaled sublinearly
+	\item Changing the \textit{correlation penalty} to scale quadratically rather than linearly.
+	\end{itemize}
+\item Unchanged penalties:
+	\begin{itemize}
+	\item \textit{Attestation penalties}
+	\item \textit{Inactivity leak penalties}
+	\end{itemize}
+\end{itemize}
+
+\noindent
+\textbf{\textit{Initial slashing penalty}} \\
+% -------------------------------------------------
+The initial slashing penalty is proportional to the validator's effective balance, with a maximum penalty of 1 ETH if the slashed validator has 32 ETH, the current MaxEB.
+If left unchanged, a fully consolidated validator would incur an initial slashing penalty of 64 ETH.
+
+Neuder and Monnot suggest that this penalty could either be changed to a constant value, or through a monotonically increasing function, e.g.  from the family of polynomials. The latter appears to be the preferred option. 
+
+The authors propose the following function to calculate the new initial slashing penalty:\\
+\textit{initial penalty =} $\frac{EB^x}{32}, \texttt{ } x \leqslant 1$ \\
+
+In their \href{https://notes.ethereum.org/@mikeneuder/slashings-eip-7251}{blog post} they have graphs for $x=1, \frac{15}{16}, \frac{7}{8}, \frac{3}{4}, \frac{1}{2}$ and a line for a constant initial penalty of 1 ETH \cite{Neuder2023d}.
+
+The authors conclude that visually it appears that $x = \frac{3}{4}$ and $\frac{7}{8}$ are good choices in terms of balancing the size of the initial slashing penalty and the risk for a consolidated validator.\\
+
+\noindent
+\textbf{\textit{Correlation penalty}} \\
+% --------------------------------------------
+This penalty is incurred roughly 18 days (4,096 epochs) after the slashing event, half way between its exit epoch and the slashing event \cite{Edgington2023}. The correlation penalty is important in penalising apparent coordinated attacks on the chain, and is the only other penalty that Neuder and Monnot propose to alter \cite{Neuder2023d}.
+
+The penalty for a slashed validator is calculated as follows using the previous 36 days from this ``half-way'' epoch.
+\begin{equation*}
+\begin{split}
+& \textit{correlation penalty} = \left\lfloor \frac{3*EB*SB}{TB} \right\rfloor, \texttt{ } where \\
+& 3 = \textit{Bellatrix multiplier} \\
+& EB = \textit{slashed validator's effective balance} \\
+& SB = \textit{total slashable balance} \\
+& TB = \textit{total effective balance of the beacon chain} \\
+& \therefore \textit{if SB} = \frac{1}{3} * TB \implies \textit{ correlation penalty} = EB \\
+& \textit{Similarly, if } 3*EB*SB <  TB \implies penalty = 0 \textit{ due to integer division} \\
+\end{split}
+\end{equation*}
+
+There is currently no correlation penalty for isolated slashing events and this continues to be the case for a fully consolidated validator with 2,048 ETH effective balance as shown below using 24 million ETH as the total staked ETH, (\textit{TB}):
+
+\begin{equation*}
+\begin{split}
+& \textit{ SB = EB for an isolated slashing} \\
+& \therefore  3*EB*SB =  3*EB*EB \\
+& \textit{Assuming EB = 2,048 \& TB } = 2.4 * 10^7, \textit{ then} \\
+& 3*EB*EB = 1.2582912 * 10^7 < 2.4 * 10^7 \\
+& \therefore penalty = 0
+\end{split}
+\end{equation*}
+
+For EIP-7521 the authors propose a function that preserves the requirement that when the total slashed balance is $\frac{1}{3}^{rd}$ of the total balance, the entire balance of the validator is slashed:
+
+\begin{equation*}
+\begin{split}
+& penalty' = \frac{3^2 * EB * SB^2}{TB^2} \\
+& \therefore \textit{if SB } = \frac{TB}{3}, \textit{ then} \\
+& penalty' =   \frac{3^2 * EB * \left(  \frac{TB}{3} \right)^2 }{TB^2} \\
+& \therefore penalty' = EB
+\end{split}
+\end{equation*}
+
+Moreover, the new correlation penalty function scales quadratically as opposed to the current function that scales linearly. With the proposed new function, the slashing penalties are substantially reduced for all validators, regardless of whether they have consolidated stake.
+
+Refer to the \href{https://notes.ethereum.org/@mikeneuder/slashings-eip-7251}{blogpost} to view graphs showing the comparative correlated slashing penalties for solo (32 ETH), partially consolidated (256 ETH), and fully consolidated (2,048 ETH) validators applying both the current and the proposed functions \cite{Neuder2023d}. \\
+
+\noindent
+\textbf{\textit{Attestation penalty}} \\
+% -----------------------------------------
+Once a validator is slashed, their attestations (source, target and head votes) are deemed to be invalid and hence they incur attestation penalties for 8,192 epochs until their exit epoch. 
+
+Different weights are attached to each vote, but only the source (weight = 14) and target (weight = 26) votes incur penalties. For each of the 8,192 epochs the slashed validator will incur:
+
+\begin{equation*}
+\begin{split}
+& Given:\\
+& \textit{base reward} = \frac{64}{ \left\lfloor \sqrt{TB} \right\rfloor} \textit{, weight denominator} = 64, \\
+& \textit{source weight} = 14 \textit{  \& target weight} = 26\\
+& \\
+& \therefore \textit{epoch attestation penalty} = \frac{\textit{base reward} * EB * (14 + 26)}{64} \\
+& \therefore \textit{ if } TB \approx 24 \textit{million ETH} = 2.4 * 10^6 * 10^9 \textit{ Gwei}\\
+& \textit{the integer square root of } 2.4 * 10^6 * 10^9 \textit{ Gwei} = 154,919,333 \\
+& \textit{base reward} = \frac{64 * 10^9}{154,919,333} = 413 \textit{ Gwei} \\
+& \\
+& \therefore \textit{for a \textbf{solo staker} with 32 ETH:} \\
+& \textit{total attestation penalty for 8,092 epochs} = 8192 * \frac{413*32*40}{64}  \textit{ Gwei}  \approx 0.06767 \texttt{ } ETH \\
+& \textit{for a \textbf{fully consolidated} validator with 2,048 ETH:} \\
+& \textit{total attestation penalty for 8,092 epochs} = 8192 * \frac{413*2048*40}{64}  \textit{ Gwei}\approx 4.331 \texttt{ } ETH \\
+\end{split}
+\end{equation*}
+
+This attestation penalty for a large slashed staker seems acceptable, but could potentially be adjusted by changing the number of epochs that the validator is deemed as being ``offline''.The size of this penalty needs to be such that the security model is not compromised. In other words it should never be a better option to self-slash to avoid inactivity penalties. Therefore, it needs to be greater than the inactivity penalties for an unslashed validator that is exiting and offline \cite{Neuder2023d}. \\
+
+\noindent
+\textbf{\textit{Inactivity leak penalty}} \\
+% -------------------------------------------------------------------
+An \textit{inactivity leak} is signalled by the protocol when the chain has not been finalising for 4 epochs. During an inactivity leak online validators will not penalised, so although no rewards are being earned, the penalty is 0. 
+
+On the other hand, offline validators, which includes slashed validators waiting to exit, start `leaking' state. The loss of stake means that the relative weight of the online validators will increase, which helps the chain to start finalising again. The inactivity penalty can be quite severe. 
+
+Using the current method, the authors calculated the penalty for three different effective balances: 32 ETH (solo validator), 256 ETH (partially consolidated validator),  and 2,048 ETH (fully consolidated validator).
+
+\begin{table}[htp]
+\caption{Inactivity leak penalties}
+\begin{center}
+\renewcommand{\arraystretch}{1.3}
+\begin{tabular}{|l|l|l|l|}
+\hline
+\textbf{validator size} & \textbf{16 epoch leak} & \textbf{128 epoch leak} & \textbf{1024 epoch leak} \\
+\hline
+32 ETH & 0.000259 ETH & 0.0157 ETH & 1.00 ETH \\
+256 ETH & 0.00208 ETH & 0.126 ETH & 8.01 ETH \\
+2048 ETH & 0.0166 ETH & 1.01 ETH & 64.1 ETH \\
+\hline
+\end{tabular}
+\end{center}
+\label{default}
+\end{table}%
+

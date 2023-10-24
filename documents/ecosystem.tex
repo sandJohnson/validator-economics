@@ -1,0 +1,37 @@
+\subsection{Analysis of Ethereum ecosystem \& protocol}
+% -------------------------------------------------------------------------
+% ------------------------------------------------------------
+\subsubsection{Worst case: Full consolidation}
+% -------------------------------------------------------------
+
+% ------------------------------------------------------------
+\subsubsection{Griefing / Discouragement attacks}
+% -------------------------------------------------------------
+According to Buterin a griefing attack is when a validator acts maliciously inside a consensus mechanism to reduce other validators' revenue even at some cost to themselves to encourage the victims to drop out of the mechanism \cite{buterin2018c}.
+
+The two main motivations for reducing the number of participants are most likely because fewer participants:
+\begin{itemize}
+\item mean greater rewards for those remaining in the mechanism
+\item helps to prepare an attack on the chain by reducing the cost of an attack
+\end{itemize}
+
+Some strategies have already been put in place to avoid discouragement attacks \cite{Edgington2023}:
+\begin{itemize}
+\item inverse square root scaling of validator rewards
+\item scaling of rewards with participation (viz. for each ``source, target, and head vote, the attester's reward is scaled by the proportion of the total stake that made the same vote'')
+\item zeroing attestation rewards during an inactivity leak
+\item rate limiting of validator exists, which means that an attacker needs to sustain an attack for longer and at greater cost in order to achieve the same outcome.
+\end{itemize}
+
+% ------------------------------------------------------------
+\subsubsection{Consolidation of validators}
+% -------------------------------------------------------------
+
+
+% ------------------------------------------------------------
+\subsubsection{Withdrawals}
+% -------------------------------------------------------------
+
+\subsubsection{Centralisation forces}
+% ---------------------------------------------------------------
+Historic and current trends for stake concentration are important to observe as these are warning signs that the chain is becoming more vulnerable to collusion. The consolidation of stake through EIP-7251 (currently in draft form) \cite{Neuder2023c} is unlikely to change the dynamics of stake concentration, since it is encouraging consolidation of validators already being operated by stakers. However, with more node operators and validators joining larger staking pools staked ETH will become more one-sided in favour of staking pools. 
