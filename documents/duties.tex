@@ -1,4 +1,4 @@
-% ===============
+ % ===============
 \section{Analysis - TO DO}
 % ===============
 \label{sec:analysis}
@@ -78,21 +78,26 @@ validator's index was randomly selected as the next candidate.
 \begin{equation*}
 \begin{split}
 & \textit{Given the candidate index belongs to a solo staker with an effective balance of 32 ETH, then } \\
-& P(proposer) = P\left(r \leqslant \frac{255*32}{2048} \right) \\
-& \therefore P(proposer) = P(r \leqslant 3.98) = \left(\frac{3.98-0}{255}\right) = 0.016\\
+& P(proposer \texttt{ } check \texttt{ } passed) = P\left(r \leqslant \frac{255*32}{2048} \right) = P(r \leqslant 3.98) = \left(\frac{3.98-0}{255}\right) = 0.016\\
+& \therefore P(proposer \texttt{ } check \texttt{ } passed)  \equiv \left(\frac{32}{2048}\right) = 0.016 \\
 & \\
-& \textit{Given the candidate index belongs to a staker with a partially consolidated validator (2 * 32 ETH) effective balance , then } \\
-& P(proposer) = P\left(r \leqslant \frac{255*64}{2048} \right) \\
-& \therefore P(proposer) = P(r \leqslant 7.97) = \left(\frac{7.97-0}{255}\right) = 0.031\\
+& \therefore \textit{Given the candidate index belongs to a staker with a partially consolidated validator (2 * 32 ETH) EB , then } \\
+&  P(proposer \texttt{ } check \texttt{ } passed) = \left(\frac{64}{2048} \right) = 0.031\\
 & \\
-& \textit{Given the candidate index belongs to a staker with a partially consolidated validator (5 * 32 ETH) effective balance , then } \\
-& P(proposer) = P\left(r \leqslant \frac{255*160}{2048} \right) \\
-& \therefore P(proposer) = P(r \leqslant 19.92) = \left(\frac{19.92-0}{255}\right) = 0.078\\
+& \therefore \textit{Given the candidate index belongs to a staker with a partially consolidated validator (5 * 32 ETH) EB , then } \\
+& P(proposer \texttt{ } check \texttt{ } passed) = \left(\frac{160}{2048} \right) = 0.078\\
 \end{split}
 \end{equation*}
 
+\begin{figure}[htbp]
+\begin{center}
+\includegraphics[width=0.6\linewidth]{images/proposer_check_graph}
+\caption{Probability of passing the proposer eligibility check for a candidate validator with an EB ranging from 32 to 2,048 ETH}
+\label{fig:proposerEB}
+\end{center}
+\end{figure}
 
-In other words, the probability of passing the check for selection to propose the next block is 1.6\% for an unconsolidated staker, 3.1\% for a validator with double the previous MaxEB, 7.8\% for a validator that has 5-fold the previous MaxEB (160 ETH), and the probability remains as 100\%, i.e. complete certainty that if a fully consolidated validator's index is selected as the next candidate, it will pass the proposer eligibility check.
+In other words, the probability of passing the check for selection to propose the next block varies from 0.016 for an unconsolidated validator to 1 for a fully consolidated validator, if that validator’s index is selected as the next candidate.
 
 Assuming a validator set size of 716,800, then
 the probability of any validator being chosen as the candidate index for the next block proposer is: \\
@@ -194,26 +199,70 @@ TOTAL & 100\% & \texttt{ } & 1.00 & \texttt{ } &  \texttt{ } \\
 \end{table}%
 \endgroup
 
-The above scenario tells an interesting story. If the lion share of the total stake is shared equally between single and fully consolidated validators, then it is equally likely for either category to be selected as a proposer of the next block. The varying proportions of, and extent of, consolidation would appear to be less desirable, but we need to put these observations in the context of the total stake for each of the categories in the scenario. \\
+The above scenario tells an interesting story. If the lion share of the total stake is shared equally between single and fully consolidated validators, then it is approximately equally likely for either category to be selected as a proposer of the next block. The varying proportions of, and extent of, consolidation would appear to be less desirable, but we need to put these observations in the context of the total stake for each of the categories in the scenario. \\
 
 Taking a very simple example, say we have a validator set size of 100, where 32 validators are run by single stakers, and there is 1 large staker running 64 validators. The large staker decides to consolidate all 64 validators into one `super' validator. Then the probability of the large staker's validator being selected as the candidate index for proposing the next block is $\frac{1}{33} = 0.03$, where previously it would have been $\frac{64}{100} = 0.64$ that one of its validators would be the candidate index selected. Once the check for proposer eligibility is made, the super validator will always pass that check, i.e. probability of 1. For a solo validator to be the selected candidate index would also be 0.03, but the probability that one of the solo stakers is selected, rather than a super validators is $\frac{32}{33} = 0.97$.
 
 \noindent
 \clearpage
+\noindent
+The probability that no validator in the active validator set is selected as proposer immediately following the switch to the new maximum effective balance EIP-7251, can be calculated as follows:\\
 
-\textbf{\textit{Proposer Bayesian network}} \\
+We know that if a candidate did not pass the selection process, then the next one in the shuffled index is used to check if they pass the proposer eligibility check. 
+
+Therefore we are interested in the probability that every  validator in the active validator set failed the eligibility check.
+
+We know that prior to consolidation, all the validators will have an \gls{eb} of 32 ETH.\\
+$\therefore$ \textit{ P(no proposer selected) =} $\binom{n}{k} p^k q^{(n-k)} = \binom{716,800}{716,800} 0.984^{716,800}0.016^0 = (0.984)^{716,800}$\\
+%Alternatively, $1 - \textit{P(one proposer selected)}$  = 
+$\therefore$ \textit{ P(no proposer selected) = } $0.984^{716,800} = 0$ \\
+Although for each validator the probability of passing the proposer check is quite low, viz. 0.016, it is highly unlikely, and essentially impossible, for every single validator in the validator set to fail the selection test.\\
+
+The probability of selecting the first candidate = 1/n, the probability of the next is 1/(n-1) .... 1/1 = $ \frac{1}{716,800!}$
+
+\noindent
+\textbf{\textit{Proposer selection \gls{bn}}} \\
 % -------------------
 \noindent
 Building on Scenario 3, we can develop a simple Bayesian network (BN)  to explore the consequences of various choices. The total number of validators before any consolidation of stake is assumed to be 716,800.  Moreover, we will make some assumptions about a possible distribution of consolidated and single validators for various categories of staker. All these assumptions can be replaced with alternative assumptions in the BN. 
 
-The following tables describe the key factors (nodes) in the BN and the probability table attached to each node. Figures xx to zz depict the BN structure and the resulting marginal probabilities when we run the network.
+The diagram in Figure \ref{fig:proposer} on page \pageref{fig:proposer} is visual representation of the example scenario depicted in the \gls{bn}.
+
+\begin{figure}[htbp]
+\begin{center}
+\includegraphics[width=\linewidth]{images/proposer-selection-diagram.pdf}
+\caption{Visual representation of the example scenario for validator consolidation}
+\label{fig:proposer}
+\end{center}
+\end{figure}
+
+
+The following tables describe the key factors (nodes) in the BN and the \gls{npt} attached to each node. Figures \ref{fig:proposerbn} and \ref{fig:proposerbnrun} depict the BN structure and the resulting marginal probabilities when we run the network, respectively.
  
+\begin{figure}[htbp]
+\begin{center}
+\includegraphics[width=0.6\linewidth]{images/proposer-bn}
+\caption{BN for proposer selection after EIP-7251}
+\label{fig:proposerbn}
+\end{center}
+\end{figure}
+
+\begin{figure}[htbp]
+\begin{center}
+\includegraphics[width=0.7\linewidth]{images/proposer-bn-run}
+\caption{Running the proposer selection BN}
+\label{fig:proposerbnrun}
+\end{center}
+\end{figure}
+
+\clearpage
+
  \begin{table}[htp]
-\caption{Staker categories}
+\caption{Staker categories - \gls{npt}}
 \begin{center}
 \begin{tabular}{|l|l|c|}
 \hline
-\textbf{Category} & \textbf{Description} & \textbf{Proportion of} \\
+\textbf{Category} & \textbf{Description} & \textbf{Fraction of} \\
  & & \textbf{validator set} \\
  \hline
 Small-scale solo stakers & 32 - a few hundred ETH & 0.30 \\
@@ -225,6 +274,47 @@ Semi-decentralized staking pools & Rocketpool, Lido... each one is different & 0
 \end{tabular}
 \end{center}
 \label{tbl:stakers}
+\end{table}%
+
+\begin{table}[htp]
+\caption{Consolidated validator types - \gls{cpt}}
+\begin{center}
+\begin{tabular}{|l|c|c|c|c|c|}
+\hline
+& \multicolumn{5}{c|}{\textbf{Staker categories}} \\
+\cline{2-6}
+\textbf{Validator}       & Small-scale & Large-scale & Large-scale & Centralised  & Semi- \\
+\textbf{consolidation} & staker         & individual    & institutional  & staking pools& decentralised \\
+                                  &                    & staker          & staker         &                      & staking pools \\
+\hline
+ Single  & 0.4	& 0.2	 & 0.15 & 0.25 & 0.3 \\
+ 2-fold  & 0.4 & 0.2 & 0.15 & 0.25 & 0.2 \\
+ 5-fold  & 0.2	 & 0.2 & 0.1 & 0.15 & 0.1 \\
+ 10-fold & 0 & 0.2 & 0.1 & 0.15 & 0.1 \\
+ 30-fold  & 0 & 0.1 & 0.2 & 0.1 & 0.1 \\
+ Maximum & 0 & 0.1 & 0.3 & 0.1 & 0.2 \\
+\hline
+\end{tabular}
+\end{center}
+\label{tbl:consolidation}
+\end{table}%
+
+\begin{table}[htp]
+\caption{Proposer check - \gls{cpt}}
+\begin{center}
+\begin{tabular}{|l|c|c|c|c|c|c|}
+\hline
+& \multicolumn{6}{c|}{\textbf{Validator consolidation}} \\
+\cline{2-7}
+\textbf{Proposer}  & Single & 2-fold & 5-fold & 10-fold  & 30-fold & Maximum \\
+\textbf{check passed}       &            &           &           &              &              & \\
+\hline
+false  & 0.984375 & 0.96875 & 0.921875 &0.84375 & 0.53125 & 0.0 \\
+ true  & 0.015625 & 0.03125 & 0.078125 &0.15625 & 0.46875 & 1.0 \\
+ \hline
+\end{tabular}
+\end{center}
+\label{tbl:proposercheck}
 \end{table}%
 
 
@@ -248,7 +338,7 @@ Partial (10-fold) & 9.00\% &  $\frac{0.0900 * 716,800}{10} = 6,451$ & $\frac{6,4
 Partial (30-fold) & 8.50\% &  $\frac{0.0850 * 716,800}{30} = 2,031$ & $\frac{2,031}{329,810} = 0.0062$ \\
 Fully (64-fold) & 13.00\% &  $\frac{0.1300 * 716,800}{2,048} = 1,456 $ & $\frac{1,456}{329,810} =  0.0044$\\
 \hline
-TOTAL & 100\% & 329,811 & 1.0000 \\
+TOTAL & 100\% & 329,810 & 1.0000 \\
 \hline
 
 \end{tabular}
@@ -267,6 +357,96 @@ As discussed in the \href{https://ethresear.ch/t/increase-the-max-effective-bala
 Sync committee members are selected with replacement from the active validator set. The probability of being selected is proportional to the ratio of the validator's effective balance, i.e. the number of increments, \textit{n}, to the total number of increments in the validator set, \textit{T}, i.e. $\frac{n}{T}$ \cite{Edgington2023}. 
 
 The denominator for the acceptance probability is MaxEB which means the probability will change from $\frac{b}{32}$ to $\frac{b}{2,048}$, where \textit{b = validator effective balance}. Check whether this adversely affects validators with a small stake, apart from the expected increase in time to select the committee, as D'Amato and Neuder pointed out \cite{damato2023}.
+
+From the \href{https://github.com/ethereum/consensus-specs/pull/2130#discussion\_r532499943}{discussion in Github} it is interesting to note that it was a deliberate choice to select sync committee members \textbf{with replacement}. This strategy is necessary if there is a situation where the number of active validators is less than pre-determined sync committee size. 
+
+Therefore, theoretically a validator can be chosen more than once to be in the committee, and consequently we can conclude that the size of the next sync committee is always $\leqslant SYNC\_COMMITTEE\_SIZE$.  
+
+The committee selection process is handled in \href{https://eth2book.info/capella/part3/helper/accessors/#def\_get\_next\_sync\_committee\_indices}{\textit{get\_next\_sync\_committee\_indices}} \cite{Edgington2023} shown below: 
+
+\lstset{language=Python}
+
+\begin{lstlisting}
+def get_next_sync_committee_indices(state: BeaconState) -> Sequence[ValidatorIndex]:
+    """
+    Return the sync committee indices, with possible duplicates, for the next sync committee.
+    """
+    epoch = Epoch(get_current_epoch(state) + 1)
+
+    MAX_RANDOM_BYTE = 2**8 - 1
+    active_validator_indices = get_active_validator_indices(state, epoch)
+    active_validator_count = uint64(len(active_validator_indices))
+    seed = get_seed(state, epoch, DOMAIN_SYNC_COMMITTEE)
+    i = 0
+    sync_committee_indices: List[ValidatorIndex] = []
+    while len(sync_committee_indices) < SYNC_COMMITTEE_SIZE:
+        shuffled_index = compute_shuffled_index(uint64(i % active_validator_count), active_validator_count, seed)
+        candidate_index = active_validator_indices[shuffled_index]
+        random_byte = hash(seed + uint_to_bytes(uint64(i // 32)))[i % 32]
+        effective_balance = state.validators[candidate_index].effective_balance
+        if effective_balance * MAX_RANDOM_BYTE >= MAX_EFFECTIVE_BALANCE * random_byte:
+            sync_committee_indices.append(candidate_index)
+        i += 1
+    return sync_committee_indices
+  \end{lstlisting}  
+  
+  \noindent 
+ Currently: \\
+ \noindent   
+$SYNC\_COMMITTEE\_SIZE = 2^9 = 512$ \textit{ validators}\\
+$EPOCHS\_PER\_SYNC\_COMMITTEE\_PERIOD = 2^8 = 256$ \textit{ epochs}, which is $\approx 27 hours$, i.e. sync committees are roughly in place for a day before the next committee takes over.
+ 
+The decision to accept a selected candidate validator  to participate in the sync committee, follows the same logic as is used for the acceptance of the candidate validator as a proposer. However, in this instance, we continue with the process until we have 255 sync committee members, which may contain duplicates as mentioned previously.
+ 
+To demonstrate that this process works as intended we consider a simple example scenario:
+
+
+\begin{table}[htp]
+\caption{Simple sync committee example scenario }
+\begin{center}
+\begin{tabular}{|l|c|c|c|c|c|c|r|}
+\hline
+& \textbf{Before } & \multicolumn{6}{c|}{\textbf{After}} \\
+& \textbf{consolidation} & \multicolumn{6}{c|} {\textbf{ consolidation}} \\
+\cline{2-8}
+\textbf{Staker}  & Single & Single & 2-fold & 5-fold & 10-fold & Maximum & Total \\
+\hline
+A & 128 & 128 & 0 &0 & 0 & 0 & 128 \\
+B  & 128 & 0 & 0 &0 & 0 & 2 & 2 \\
+C  & 128 & 14 & 5 & 4 & 2 & 1 & 26\\
+ \hline
+ TOTAL & 768 & 142 & 5 & 4 & 2 & 3 & 156 \\
+ \hline
+\end{tabular}
+\end{center}
+\label{tbl:syncscenario}
+\end{table}%
+
+Assuming that ``After consolidation'' in Table \ref{tbl:syncscenario} represents the decisions made by each of the stakers regarding the validators they run after the implementation of EIP-7521. We will now consider the probabilities prior to and after EIP-7521 for each of these three stakers. Table \ref{tbl:syncprobs} summarises the various probabilities for sync committee membership.
+
+\begin{table}[htp]
+\caption{Sync committee probabilities for example scenario }
+\begin{center}
+\begin{tabular}{|l|c|c|c|c|c|c|r|}
+\hline
+& \multicolumn{2}{c|}{\textbf{Before }} & \multicolumn{5}{c|}{\textbf{After}} \\
+& \multicolumn{2}{c|}{\textbf{EIP-7251}} & \multicolumn{5}{c|} {\textbf{EIP-7521}} \\
+\cline{2-3} \cline{4-8} \\
+                        &                      &                         &P(sync committee & 5-fold & 10-fold & P(sync committee& Total \\
+ \textbf{Staker} & P(selection) & P(acceptance) &member)               &  P(selection)&  P(acceptance) & member)  & Total \\
+\hline
+A & 128 & 128 & 0 &0 & 0 & 0 & 128 \\
+B  & 128 & 0 & 0 &0 & 0 & 2 & 2 \\
+C  & 128 & 14 & 5 & 4 & 2 & 1 & 26\\
+ \hline
+ TOTAL & 768 & 142 & 5 & 4 & 2 & 3 & 156 \\
+ \hline
+\end{tabular}
+\end{center}
+\label{tbl:syncprobs}
+\end{table}%
+
+
 % ------------------------------------------------
 \subsubsection*{Slot committees}
 % ------------------------------------------------

@@ -40,9 +40,19 @@
 % ------------------------------------------------
 \textbf{Slashing penalties} \\
 % ------------------------------------------------
+\noindent
+Listed below are links to posts about slashing penalties, the effect on them when EIP-7521 is implemented, including some proposals for modifications to existing penalties:
+\begin{enumerate}
+\item \href{https://a16zcrypto.com/posts/article/the-cryptoeconomics-of-slashing/}{The cryptoeconomics of slashing} by Kannan and Deb.
+\item \href{https://ethresear.ch/t/slashing-penalty-analysis-eip-7251/16509}{Slashing penalty analysis} by Neuder and Monnot.
+\item \href{https://notes.ethereum.org/@mikeneuder/slashings-eip-7251}{DRAFT] Slashing penalty analysis; EIP-7251} by Neuder and Monnot.
+\item \href{https://hackmd.io/@dapplion/maxeb_slashing_risks}{MaxEB slashing risks} by dapplion
+\item \href{https://colab.research.google.com/drive/1lBe4qH4oqI8D9cmcQGca3O1AdR3SVr5z?usp=sharing#scrollTo=Hiw1NPEZIQVi}{Slashing simulation code}
+\end{enumerate}
+
 
 \noindent
-In the \href{https://notes.ethereum.org/@mikeneuder/slashings-eip-7251}{blogpost} Neuder and Monnot propose the following for current slashing penalties \cite{Neuder2023d}: 
+In the $3^{rd}$ blogpost, Neuder and Monnot propose the following for current slashing penalties \cite{Neuder2023d}: 
 \begin{itemize}
 \item Changes to existing penalties:
 	\begin{itemize}
@@ -59,15 +69,15 @@ In the \href{https://notes.ethereum.org/@mikeneuder/slashings-eip-7251}{blogpost
 \noindent
 \textbf{\textit{Initial slashing penalty}} \\
 % -------------------------------------------------
-The initial slashing penalty is proportional to the validator's effective balance, with a maximum penalty of 1 ETH if the slashed validator has 32 ETH, the current MaxEB.
-If left unchanged, a fully consolidated validator would incur an initial slashing penalty of 64 ETH.
+The initial slashing penalty is proportional to the validator's effective balance, $MIN\_SLASHING\_PENALTY\_QUOTIENT\_BELLATRIX=32$, giving a maximum penalty of 1 ETH if the slashed validator has 32 ETH, the current MaxEB.
+If left unchanged, a fully consolidated validator would incur an initial slashing penalty of 64 ETH. There appears to be general agreement that this initial penalty is too high, and may deter larger stakers such as Lido to support EIP-7521.
 
-Neuder and Monnot suggest that this penalty could either be changed to a constant value, or through a monotonically increasing function, e.g.  from the family of polynomials. The latter appears to be the preferred option. 
+Neuder and Monnot suggest that the initial penalty could either be changed to a constant value, or through a monotonically increasing function, e.g.  from the family of polynomials. The latter appears to be the preferred option. However, mention has also been made of a zero initial slashing penalty since a slashed validator already incurs additional penalties while waiting for its exit epoch. 
 
-The authors propose the following function to calculate the new initial slashing penalty:\\
+For a monotonically increasing function, the authors propose the following function to calculate the revised initial slashing penalty:\\
 \textit{initial penalty =} $\frac{EB^x}{32}, \texttt{ } x \leqslant 1$ \\
 
-In their \href{https://notes.ethereum.org/@mikeneuder/slashings-eip-7251}{blog post} they have graphs for $x=1, \frac{15}{16}, \frac{7}{8}, \frac{3}{4}, \frac{1}{2}$ and a line for a constant initial penalty of 1 ETH \cite{Neuder2023d}.
+Their blogpost has graphs for $x=1, \frac{15}{16}, \frac{7}{8}, \frac{3}{4}, \frac{1}{2}$ and a line for a constant initial penalty of 1 ETH \cite{Neuder2023d}.
 
 The authors conclude that visually it appears that $x = \frac{3}{4}$ and $\frac{7}{8}$ are good choices in terms of balancing the size of the initial slashing penalty and the risk for a consolidated validator.\\
 
