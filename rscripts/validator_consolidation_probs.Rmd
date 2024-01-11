@@ -1,0 +1,291 @@
+---
+title: "Validator Economics: Proposer selection"
+author:
+- name: Sandra Johnson
+  url: https://twitter.com/sandJohnson
+  affiliation: Consensys Software Inc (Research Group)
+date: "`r Sys.Date()`"
+description: 
+  Visualisation of proposer selection probabilities for increased maximum effective balance.
+editor_options: 
+  markdown: 
+    wrap: 72
+---
+
+This R script is in GitHub \~/rig-sandbox/R scripts The output is
+included in the document "Validator Economics: Variable min validator
+deposit size, EF Academic Grant ID: FY23-1030, DRAFT MODEL, CHALLENGES &
+POTENTIAL MITIGATIONS (MAXEB - EIP-7521)" The source LaTeX files are in
+GitHub \~/validator-economics/documents
+
+```{r message=FALSE}
+library(data.table)
+library(ggplot2)
+#library(glue)          # Not really using glue in this Notebook, but it is useful!
+#library(jsonlite)
+library(knitr)
+library(lubridate)
+library(rmarkdown)
+library(skimr)
+library(tibble)
+library(tidyverse)
+
+options(digits=10)
+options(scipen = 999) 
+
+# See knit options in https://www.r-bloggers.com/2021/03/default-knitr-options-and-hooks/ 
+knitr::opts_chunk$set(dpi = if (knitr::is_latex_output()) 72 else 300,
+                      echo=FALSE)
+```
+
+## Proposer selection
+
+The probability of a proposer being selected is the result of the
+following process: 1) The validator indices are shuffled 2) A random
+byte is generated 2) The code iterates through this list, starting at
+the first entry and moving to the next candidate index if the current
+one does not pass the test The check is based on two variables: the
+candidate validator's effective balance and the random byte generated,
+and two constants: the maximum bytes number (255) and the maximum
+effective balance = 2.048 ETH (previously 32 ETH)
+
+Here we calculate the probability distribution using various
+consolidation options.
+
+## Blog post - graph of 716,800 randomly drawn values from U(0,255)
+- After the values have been drawn, we need to ensure that they are all integer values. We cannot have values greater than 255, so we use the floor function to round down to the nearest integer value.
+```{r cache=TRUE}
+set.seed(1)
+
+random_byte_values <- runif(716800,0,255)
+## ----------------------------------------------
+r_int <- floor(random_byte_values)
+x <- seq(0,255,1)
+r <- tibble(r_int)
+
+df <- r %>%
+  group_by(r_int) %>%
+  summarise(y = n()) %>%
+  arrange(r_int)
+
+df <- df %>%
+  mutate(prob = y/sum(y))
+
+```
+
+
+
+```{r}
+# -------------------------------------------
+# Scenario 1: All validators are solo stakers
+# -------------------------------------------
+validator_idx <- seq(0,716799)
+proposers_scenario_1_DF <- tibble(validator_idx, r_int)
+
+proposers_scenario_1_DF_MaxEB <- proposers_scenario_1_DF %>%
+  mutate(selected = case_when(
+      random_byte_values <= (255*32)/2048 ~ "yes",
+      TRUE ~ "no")
+    )
+maxeb_solo <- proposers_scenario_1_DF_MaxEB %>% 
+  count(selected)
+
+# Current situation: MaxEB = 32 ETH
+proposers_scenario_1_DF_current <- proposers_scenario_1_DF %>%
+  mutate(selected = case_when(
+      random_byte_values <= (255*32)/32 ~ "yes",
+      TRUE ~ "no")
+    )
+
+# As expected all single stake validators pass the proposer check
+current_solo <- proposers_scenario_1_DF_current %>% 
+  count(selected)
+
+solo_probability_maxeb <- maxeb_solo$n[2]/716800        # 0.01549
+
+# Check to see which validator indices were set to "accept"
+# ----------------------------------------------------------
+selected_validators <- proposers_scenario_1_DF_MaxEB %>%
+  filter(selected == "yes")
+
+first_selected_validator <- selected_validators$validator_idx[1]           ## >>> This was 26, so not a big deal really!!
+
+```
+
+## Scenario 2: All the validators have consolidated to the new increased maximum effective balance
+
+-   Using total deposit size as before, i.e. equivalent to 716,800
+    validators, will now have an active validator set size of 11,200
+-   Generate random bytes to simulate a possible outcome of random bytes
+    assigned to each validator.
+-   The probability of being chosen based on the effective balance will
+    again be 100%, so really this scenario is not of interest, just
+    interesting to see how small it got.
+
+## Scenario 3: The active validator set comprises of a "mixed bag" of validators: single stakers, partially consolidated and fully consolidated
+
+Based on the 716,800 active validator set:
+- five categories of stakers
+- six variations on the extent of consolidation of stake:
+
+-   32 ETH     (A) - 1x
+-   64 ETH     (B) - 2x
+-  160 ETH     (C) - 5x
+-  320 ETH     (D) - 10x
+-  960 ETH     (E) - 20x
+- 2048 ETH     (F) - 64x
+
+The active validator set size is adjusted based on the consolidation of stake   
+
+First shuffle the validator types & then generate random bytes for each validator before running through the check for acceptance.
+
+
+```{r}
+set.seed(5394)       # set some other random seed
+
+initial_validator_set_total <- 716800
+
+# Validator stake consolidation
+validator_consolidation_DF <- tibble(
+  name = c("32ETH", "64ETH", "160ETH", "320ETH", "960ETH", "2048ETH"),
+  code = c("A","B","C","D","E","F")
+)
+
+# Distribution of staker categories in the active validator set
+stakers_DF <- tibble(
+  name = c("small", "large individual", "large institutional", "centralised", "semi-decentralised"),
+  code = c("S1","S2", "S3", "S4", "S5"),
+  proportion = c(0.3,0.15,0.15,0.1,0.3),
+  
+  # Consolidation of stake for each staker category:
+  consolidation = list(
+    tibble(A=0.4,B=0.4,C=0.2,D=0,E=0,F=0),              # small staker
+    tibble(A=0.2,B=0.2,C=0.2,D=0.2,E=0.1,F=0.1),        # large indiv
+    tibble(A=0.15,B=0.15,C=0.1,D=0.1,E=0.2,F=0.3),      # large institutional
+    tibble(A=0.25,B=0.25,C=0.15,D=0.15,E=0.1,F=0.1),    # centralised
+    tibble(A=0.3,B=0.2,C=0.1,D=0.1,E=0.1,F=0.2)         # semi-decentralised 
+  )
+)
+
+# Staker category totals based on an example distribution of number of validators being run by each staking category
+# ------------------------------------------------------------------------------------------------------------------
+stakers_DF <- stakers_DF %>%
+  mutate(totals = proportion*active_validator_set_total)
+
+# Unnest the consolidation proportions
+stakers_DF_flat <- stakers_DF %>%
+  unnest(consolidation)
+
+# Working as I was hoping it would, i.e. multiplying totals[1] across 1st elements of A,B, ...
+# Now need to incorporate the actual consolidation too - reducing the actual numbers of the various types of validators
+# Possibly need to take floor function as an approximation?
+# ---------------------------------------------------------------------------------------------------------------------
+stakers_DF_flat <- stakers_DF_flat %>%
+  mutate(Atot = A*totals) %>%              #    32 ETH
+  mutate(Btot = floor(B*totals/2))  %>%    #    64 ETH
+  mutate(Ctot = floor(C*totals/5))  %>%    #   160 ETH
+  mutate(Dtot = floor(D*totals/10)) %>%    #   320 ETH
+  mutate(Etot = floor(E*totals/30)) %>%    #   960 ETH
+  mutate(Ftot = floor(F*totals/64))        # 2,048 ETH
+
+
+# Look at marking the validators with the staking category they belong to
+validator_consolidation_DF <- validator_consolidation_DF %>%
+  mutate(total = c(sum(stakers_DF_flat$Atot),
+                  sum(stakers_DF_flat$Btot),
+                  sum(stakers_DF_flat$Ctot),
+                  sum(stakers_DF_flat$Dtot),
+                  sum(stakers_DF_flat$Etot),
+                  sum(stakers_DF_flat$Ftot)))
+
+# What is the new total for the validator set after consolidation?
+# Using the floor function - came to 329,803. With BN model the total was 329,810.13
+# ----------------------------------------------------------------------------------
+adj_validator_total <- sum(validator_consolidation_DF$total)
+
+
+# TODO:
+# -----
+# - Of the ones from the various consolidation types that pass the test, what were the proportions for each type of validator?
+# - What do the proportion of validator types in the active validator set compare to the proportions that passed the proposer check?
+
+
+# CODE BELOW IS OUTDATED I THINK!!! I have been doing a new lot above! (11/1/24)
+# ==============================================================================
+# Generation of random bytes needs to be done later when we know the overall total
+random_byte_values_scenario3 <- runif(311584,0,255)
+r_int_scenario3 <- floor(random_byte_values_scenario3)
+
+# Scenario 3: Mixture of validators (different to BN model that combines across staker categories)
+# ------------------------------------------------------------------------------------------------
+validator_idx <- seq(0,311583)
+# Allocate the total of each consolidated validator type to the code used, e.g.
+# A - 2,048 ETH      B - 960 ETH      C - 320 ETH      D - 160 ETH         E - 64 ETH            F - 32 ETH
+
+scenario_3_totals <- data.table(
+  type = c("A","B","C","D","E"),
+  type_tot = c(3360,7168,14336,71680,215040)
+)
+
+proposer_types <-c(rep(c("A"), times=3360),
+                   rep(c("B"), times=7168),
+                   rep(c("C"), times=14336),
+                   rep(c("D"), times=71680),
+                   rep(c("E"), times=215040))
+
+proposers_scenario_3_DF_ordered <- data.table(validator_idx, r_int_scenario3, proposer_types)
+proposers_scenario_3_DF_shuffled <- proposers_scenario_3_DF_ordered %>%
+  mutate(shuffled_proposer_types = sample(proposer_types)) %>%
+  mutate(selected = case_when(
+      (shuffled_proposer_types == "A") & (r_int_scenario3 <= (255*2048)/2048) ~ "yes",
+      (shuffled_proposer_types == "B") & (r_int_scenario3 <= (255*320)/2048) ~ "yes",
+      (shuffled_proposer_types == "C") & (r_int_scenario3 <= (255*156)/2048) ~ "yes",
+      (shuffled_proposer_types == "D") & (r_int_scenario3 <= (255*64)/2048) ~ "yes",
+      (shuffled_proposer_types == "E") & (r_int_scenario3 <= (255*32)/2048) ~ "yes",
+      TRUE ~ "no")
+    )
+
+scenario_3_count <- proposers_scenario_3_DF_shuffled %>% 
+  group_by(shuffled_proposer_types) %>%
+  count(selected) %>%
+  mutate(type_total = scenario_3_totals$type_tot)
+
+df <- r %>%
+  group_by(r_int) %>%
+  summarise(y = n()) %>%
+  arrange(r_int)
+
+df <- df %>%
+  mutate(prob = y/sum(y))
+
+scenario3_barchart <- ggplot(data=scenario_3_count) + 
+#  geom_col(aes(x=shuffled_proposer_types,y=n, fill=selected)) +
+  geom_col(aes(x=shuffled_proposer_types,y=n,  fill=selected), position = "dodge") +
+  xlab("Was candidate index selected as proposer?") +
+  ylab("Number of validators") 
+
+ggsave("/Users/sandra/data/rig/plots/scenario3_barchart.png")
+
+# Check if there is another way of showing the relative yes to no selections...
+# scenario3_barchart2 <- ggplot(data=scenario_3_count) + 
+#   geom_bar(aes(x=shuffled_proposer_types, fill=selected), position = "dodge") +
+#   xlab("Was candidate index selected as proposer?") +
+#   ylab("Number of validators") 
+
+#ggsave("/Users/sandra/data/rig/plots/scenario3_barchart2.png")
+
+# Check to see which validator indices were set to "accept"
+# ----------------------------------------------------------
+selected_validators_scenario_3 <- proposers_scenario_3_DF_shuffled %>%
+  filter(selected=="yes")
+
+first_selected_validator_scenario_3 <-selected_validators_scenario_3[1] %>%
+  select(validator_idx,proposer_type=shuffled_proposer_types,selected)                  ## validator index = 0, and proposer type = B
+
+# Run simulations to see what happens over time
+
+
+# Note that in scenario 3, the apart from the change in the probability of a candidate index being selected as a proposer, the probability of being selected if you are a fully consolidated validator is hugely reduced. In this example we have the probability of being the candidate index as 3,360/311,584 = 0.0108 - approx 1.08%
+# In summary - I will include a table in the document to show how the dynamics change for this scenario.
+# 
+```
