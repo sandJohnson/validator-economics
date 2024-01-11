@@ -74,7 +74,7 @@ class validatoreconomics_v6_SJ
     instance validatoreconomics_v6_SJ_probs_1 : validatoreconomics_v6_SJ_probs (EB = EB; validatoreconomics_v6_SJ_probs_1_Candidate = Candidate, validatoreconomics_v6_SJ_probs_1_EB_copy = EB_copy)
     {
 	label = "Probability\ncalculations";
-	position = (360 320);
+	position = (400 320);
 	HR_LinkModeInstance = "";
 	HR_LinkControlPointsInstance = "";
 	HR_LinkGroupInstance = "[validatoreconomics_v6_SJ_probs_1_EB_copy;EB_copy:-3][validatoreconomics_v6_SJ_probs_1_Candidate;Candidate:-4][validatoreconomics_v6_SJ_probs_1_EB_copy;ProposerCheck:-4]";
@@ -83,14 +83,14 @@ class validatoreconomics_v6_SJ
 	HR_Group = "3";
 	HR_HTML_Desc = "";
 	HR_Desc = "";
-	HR_isCollapsed = "false";
+	HR_isCollapsed = "true";
 	HR_NodeSize = "(170, 72)";
     }
 
     node NextProposer
     {
 	label = "Proposer for \nnext block";
-	position = (360 648);
+	position = (390 576);
 	states = ("no" "yes");
 	HR_NodeSize = "(160, 40)";
 	HR_Group = "0";
@@ -102,7 +102,7 @@ class validatoreconomics_v6_SJ
     node ProposerCheck
     {
 	label = "Proposer \ncheck";
-	position = (468 540);
+	position = (518 438);
 	states = ("false" "true");
 	subtype = boolean;
 	HR_State_0 = "";
@@ -126,7 +126,7 @@ class validatoreconomics_v6_SJ
     node Candidate
     {
 	label = "Validator type\nselected as candidate for\nproposer duty";
-	position = (252 540);
+	position = (277 419);
 	states = ("false" "true");
 	subtype = boolean;
 	HR_LinkControlPoints = "";
@@ -143,7 +143,7 @@ class validatoreconomics_v6_SJ
     node EB
     {
 	label = "Consolidated \nvalidator types";
-	position = (360 144);
+	position = (398 182);
 	states = ("32ETH" "64ETH" "160ETH" "320ETH" "960ETH" "2048ETH");
 	subtype = number;
 	state_values = (1 2 5 10 30 64);
@@ -170,7 +170,7 @@ class validatoreconomics_v6_SJ
     node stakercategory
     {
 	label = "Staker\nCategories";
-	position = (360 36);
+	position = (395 41);
 	states = ("Small-scale staker" "Large-scale individual solo stakers" "Large-scale institutional solo stakers" "Centralized staking pools" "Semi-decentralized staking pools");
 	HR_State_4 = "rocketpool, Lido... each one is different";
 	HR_LinkControlPoints = "";

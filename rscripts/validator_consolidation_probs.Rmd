@@ -210,53 +210,124 @@ adj_validator_total <- sum(validator_consolidation_DF$total)
 # - What do the proportion of validator types in the active validator set compare to the proportions that passed the proposer check?
 
 
+# Construct a tibble for each validator type
+# ------------------------------------------
+validator_A <- tibble(
+  staker = c(rep("S1",stakers_DF_flat$Atot[1]),
+             rep("S2",stakers_DF_flat$Atot[2]),
+             rep("S3",stakers_DF_flat$Atot[3]),
+             rep("S4",stakers_DF_flat$Atot[4]),
+             rep("S5",stakers_DF_flat$Atot[5])),
+  type = rep("A",sum(stakers_DF_flat$Atot))
+  )
+
+validator_B <- tibble(
+  staker = c(rep("S1",stakers_DF_flat$Btot[1]),
+             rep("S2",stakers_DF_flat$Btot[2]),
+             rep("S3",stakers_DF_flat$Btot[3]),
+             rep("S4",stakers_DF_flat$Btot[4]),
+             rep("S5",stakers_DF_flat$Btot[5])),
+  type = rep("B",sum(stakers_DF_flat$Btot))
+  )
+
+validator_C <- tibble(
+  staker = c(rep("S1",stakers_DF_flat$Ctot[1]),
+             rep("S2",stakers_DF_flat$Ctot[2]),
+             rep("S3",stakers_DF_flat$Ctot[3]),
+             rep("S4",stakers_DF_flat$Ctot[4]),
+             rep("S5",stakers_DF_flat$Ctot[5])),
+  type = rep("C",sum(stakers_DF_flat$Ctot))
+  )
+
+validator_D <- tibble(
+  staker = c(rep("S1",stakers_DF_flat$Dtot[1]),
+             rep("S2",stakers_DF_flat$Dtot[2]),
+             rep("S3",stakers_DF_flat$Dtot[3]),
+             rep("S4",stakers_DF_flat$Dtot[4]),
+             rep("S5",stakers_DF_flat$Dtot[5])),
+  type = rep("D",sum(stakers_DF_flat$Dtot))
+  )
+
+validator_E <- tibble(
+  staker = c(rep("S1",stakers_DF_flat$Etot[1]),
+             rep("S2",stakers_DF_flat$Etot[2]),
+             rep("S3",stakers_DF_flat$Etot[3]),
+             rep("S4",stakers_DF_flat$Etot[4]),
+             rep("S5",stakers_DF_flat$Etot[5])),
+  type = rep("E",sum(stakers_DF_flat$Etot))
+  )    
+               
+validator_F <- tibble(
+  staker = c(rep("S1",stakers_DF_flat$Ftot[1]),
+             rep("S2",stakers_DF_flat$Ftot[2]),
+             rep("S3",stakers_DF_flat$Ftot[3]),
+             rep("S4",stakers_DF_flat$Ftot[4]),
+             rep("S5",stakers_DF_flat$Ftot[5])),
+  type = rep("F",sum(stakers_DF_flat$Ftot))
+  )   
+
+# Combine all the various validator types along with the staker group they belong to & then we can add random bytes to the validators,
+# shuffle the validators and see who passes the proposer eligibility test
+# -----------------------------------------------------------------------------------------------------------------------------------
+adjusted_validator_set_DF <- validator_A %>%
+  add_row(validator_B) %>%
+  add_row(validator_C) %>%
+  add_row(validator_D) %>%
+  add_row(validator_E) %>%
+  add_row(validator_F)
+  
+# Generate random bytes for the adjusted validator set
+random_byte_values_scenario3 <- runif(adj_validator_total,0,255)
+r_int_scenario3 <- floor(random_byte_values_scenario3)
+
+adjusted_validator_set_DF_scenario_3 <- adjusted_validator_set_DF %>%
+  mutate(validator_idx <- sample(seq(0,adj_validator_total-1))) %>%              # shuffle the validators      
+  mutate(r_int = r_int_scenario3) %>%                                            # assign random bytes
+  mutate(selected = case_when(                                                   # see which validators passed the proposer eligibility check
+      (type == "A") & (r_int <= (255*32)/2048) ~ "yes",
+      (type == "B") & (r_int <= (255*64)/2048) ~ "yes",
+      (type == "C") & (r_int <= (255*160)/2048) ~ "yes",
+      (type == "D") & (r_int <= (255*320)/2048) ~ "yes",
+      (type == "E") & (r_int <= (255*960)/2048) ~ "yes",
+      (type == "F") & (r_int <= (255*2048)/2048) ~ "yes",
+      TRUE ~ "no"))
+
+selected_validators_scenario_3 <- adjusted_validator_set_DF_scenario_3 %>%
+  filter(selected=="yes")
+
 # CODE BELOW IS OUTDATED I THINK!!! I have been doing a new lot above! (11/1/24)
 # ==============================================================================
-# Generation of random bytes needs to be done later when we know the overall total
-random_byte_values_scenario3 <- runif(311584,0,255)
-r_int_scenario3 <- floor(random_byte_values_scenario3)
 
 # Scenario 3: Mixture of validators (different to BN model that combines across staker categories)
 # ------------------------------------------------------------------------------------------------
-validator_idx <- seq(0,311583)
-# Allocate the total of each consolidated validator type to the code used, e.g.
-# A - 2,048 ETH      B - 960 ETH      C - 320 ETH      D - 160 ETH         E - 64 ETH            F - 32 ETH
 
-scenario_3_totals <- data.table(
-  type = c("A","B","C","D","E"),
-  type_tot = c(3360,7168,14336,71680,215040)
-)
+## CONTINUE HERE TOMORROW (12/1/24)!!!
+## - DISTINGUISH BETWEEN PROBABILITIES WITHIN GROUPS/TYPES/CATEGORIES AND OVERALL VALIDATOR SET!!
 
-proposer_types <-c(rep(c("A"), times=3360),
-                   rep(c("B"), times=7168),
-                   rep(c("C"), times=14336),
-                   rep(c("D"), times=71680),
-                   rep(c("E"), times=215040))
-
-proposers_scenario_3_DF_ordered <- data.table(validator_idx, r_int_scenario3, proposer_types)
-proposers_scenario_3_DF_shuffled <- proposers_scenario_3_DF_ordered %>%
-  mutate(shuffled_proposer_types = sample(proposer_types)) %>%
-  mutate(selected = case_when(
-      (shuffled_proposer_types == "A") & (r_int_scenario3 <= (255*2048)/2048) ~ "yes",
-      (shuffled_proposer_types == "B") & (r_int_scenario3 <= (255*320)/2048) ~ "yes",
-      (shuffled_proposer_types == "C") & (r_int_scenario3 <= (255*156)/2048) ~ "yes",
-      (shuffled_proposer_types == "D") & (r_int_scenario3 <= (255*64)/2048) ~ "yes",
-      (shuffled_proposer_types == "E") & (r_int_scenario3 <= (255*32)/2048) ~ "yes",
-      TRUE ~ "no")
-    )
-
-scenario_3_count <- proposers_scenario_3_DF_shuffled %>% 
-  group_by(shuffled_proposer_types) %>%
+scenario_3_count_validator_type <- adjusted_validator_set_DF_scenario_3 %>% 
+  group_by(type) %>%
   count(selected) %>%
-  mutate(type_total = scenario_3_totals$type_tot)
+  mutate(prob=case_when(
+    (type == "A") ~ n/sum(stakers_DF_flat$Atot),
+    (type == "B") ~ n/sum(stakers_DF_flat$Btot),
+    (type == "C") ~ n/sum(stakers_DF_flat$Ctot),
+    (type == "D") ~ n/sum(stakers_DF_flat$Dtot),
+    (type == "E") ~ n/sum(stakers_DF_flat$Etot),
+    (type == "F") ~ n/sum(stakers_DF_flat$Ftot),
+      TRUE ~ 0
+  ))
 
-df <- r %>%
-  group_by(r_int) %>%
-  summarise(y = n()) %>%
-  arrange(r_int)
-
-df <- df %>%
-  mutate(prob = y/sum(y))
+scenario_3_count_staker_category <- adjusted_validator_set_DF_scenario_3 %>% 
+  group_by(staker) %>%
+  count(selected) %>%
+  mutate(prob=case_when(
+    (staker == "S1") ~ n/stakers_DF_flat$totals[1],
+    (staker == "S2") ~ n/stakers_DF_flat$totals[2],
+    (staker == "S3") ~ n/stakers_DF_flat$totals[3],
+    (staker == "S4") ~ n/stakers_DF_flat$totals[4],
+    (staker == "S5") ~ n/stakers_DF_flat$totals[5],
+      TRUE ~ 0
+  ))
 
 scenario3_barchart <- ggplot(data=scenario_3_count) + 
 #  geom_col(aes(x=shuffled_proposer_types,y=n, fill=selected)) +
