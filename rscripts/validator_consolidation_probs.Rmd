@@ -400,7 +400,7 @@ r_int_scenario3_rounded <- floor(random_byte_values_scenario3_rounded)          
 # Floor values
 # -------------
 adjusted_validator_set_DF_scenario_3 <- adjusted_validator_set_DF %>%
-  mutate(validator_idx <- sample(seq(0,adj_validator_total-1))) %>%              # shuffle the validators      
+  mutate(validator_idx = sample(seq(0,adj_validator_total-1))) %>%              # shuffle the validators      
   mutate(r_int = r_int_scenario3) %>%                                            # assign random bytes
   mutate(selected = case_when(                                                   # see which validators passed the proposer eligibility check
       (type == "A") & (r_int <= (255*32)/2048) ~ "yes",
@@ -413,7 +413,7 @@ adjusted_validator_set_DF_scenario_3 <- adjusted_validator_set_DF %>%
 
 # Rounded values
 adjusted_validator_set_DF_scenario_3_rounded <- adjusted_validator_set_DF_rounded %>%
-  mutate(validator_idx <- sample(seq(0,adj_validator_total_rounded-1))) %>%              # shuffle the validators      
+  mutate(validator_idx = sample(seq(0,adj_validator_total_rounded-1))) %>%              # shuffle the validators      
   mutate(r_int = r_int_scenario3_rounded) %>%                                            # assign random bytes
   mutate(selected = case_when(                                                   # see which validators passed the proposer eligibility check
       (type == "A") & (r_int <= (255*32)/2048) ~ "yes",
@@ -432,9 +432,10 @@ selected_validators_scenario_3 <- adjusted_validator_set_DF_scenario_3 %>%
 selected_validators_scenario_3_rounded <- adjusted_validator_set_DF_scenario_3_rounded %>%
   filter(selected=="yes")
 
-## CONTINUE HERE TOMORROW (12/1/24)!!!
+## CONTINUE HERE !!!
 ## - DISTINGUISH BETWEEN PROBABILITIES WITHIN GROUPS/TYPES/CATEGORIES AND OVERALL VALIDATOR SET!!
 
+# Floor values
 scenario_3_count_validator_type <- adjusted_validator_set_DF_scenario_3 %>% 
   group_by(type) %>%
   count(selected) %>%
@@ -445,6 +446,20 @@ scenario_3_count_validator_type <- adjusted_validator_set_DF_scenario_3 %>%
     (type == "D") ~ n/sum(stakers_DF_flat$Dtot),
     (type == "E") ~ n/sum(stakers_DF_flat$Etot),
     (type == "F") ~ n/sum(stakers_DF_flat$Ftot),
+      TRUE ~ 0
+  )) 
+
+# Rounded values
+scenario_3_count_validator_type_rounded <- adjusted_validator_set_DF_scenario_3 %>% 
+  group_by(type) %>%
+  count(selected) %>%
+  mutate(prob=case_when(
+    (type == "A") ~ n/sum(stakers_DF_flat_rounded$Atot),
+    (type == "B") ~ n/sum(stakers_DF_flat_rounded$Btot),
+    (type == "C") ~ n/sum(stakers_DF_flat_rounded$Ctot),
+    (type == "D") ~ n/sum(stakers_DF_flat_rounded$Dtot),
+    (type == "E") ~ n/sum(stakers_DF_flat_rounded$Etot),
+    (type == "F") ~ n/sum(stakers_DF_flat_rounded$Ftot),
       TRUE ~ 0
   ))
 
@@ -460,34 +475,40 @@ scenario_3_count_staker_category <- adjusted_validator_set_DF_scenario_3 %>%
       TRUE ~ 0
   ))
 
-scenario3_barchart <- ggplot(data=scenario_3_count) + 
-#  geom_col(aes(x=shuffled_proposer_types,y=n, fill=selected)) +
-  geom_col(aes(x=shuffled_proposer_types,y=n,  fill=selected), position = "dodge") +
+# Using floor values: 
+# Prepare data for plotting
+# ----------------------------
+scenario3_barchart_data <- tibble(
+  type = scenario_3_count_validator_type$type,
+  selected = scenario_3_count_validator_type$selected,
+  total = scenario_3_count_validator_type$n,
+  prob = scenario_3_count_validator_type$prob
+) %>%
+add_row(type="F", selected = "no", total=0, prob = 0)                    # Add row for MaxEB validators who are all selected
+
+# CONTINUE HERE ON MONDAY OR TUESDAY!! 
+# LOOK AT HOW I CAN ADD A BOX MAPPING VALIDATOR TYPES TO ETH, OR CHANGING THE LABELS ON THE PLOT
+# ===============================================================================================>>>>>
+
+# Bar chart of the totals for each validator type that passed or failed the proposer check
+scenario3_barchart <- ggplot(data=scenario3_barchart_data) + 
+  #geom_col(aes(x=type,y=n,  fill=selected)) +                           # single stacked bar per validator type
+  geom_col(aes(x=type,y=total,  fill=selected), position = "dodge") +
+  geom_text(mapping = aes(x=type,y=total,label = case_when(selected == "no" ~ paste0("(", total, ")"),
+                                                   TRUE ~ "")), 
+            nudge_y = 2, nudge_x = -0.2, fontface = "italic") +
   xlab("Was candidate index selected as proposer?") +
-  ylab("Number of validators") 
+  ylab("Number of validators") +
+  labs(fill = "Passed proposer test?") 
 
-ggsave("/Users/sandra/data/rig/plots/scenario3_barchart.png")
+ggsave("/Users/sandra/data/rig/plots/scenario3_barchart_totals.png")
 
-# Check if there is another way of showing the relative yes to no selections...
-# scenario3_barchart2 <- ggplot(data=scenario_3_count) + 
-#   geom_bar(aes(x=shuffled_proposer_types, fill=selected), position = "dodge") +
-#   xlab("Was candidate index selected as proposer?") +
-#   ylab("Number of validators") 
+# Bar chart of the proportions for each validator type that passed or failed the proposer check
+scenario3_barchart_prob <- ggplot(data=scenario3_barchart_data) + 
+  #geom_col(aes(x=type,y=prob,  fill=selected)) +                           # single stacked bar per validator type
+  geom_col(aes(x=type,y=prob,  fill=selected), position = "dodge") +
+  xlab("Was candidate index selected as proposer?") +
+  ylab("Validator proportions") +
 
-#ggsave("/Users/sandra/data/rig/plots/scenario3_barchart2.png")
-
-# Check to see which validator indices were set to "accept"
-# ----------------------------------------------------------
-selected_validators_scenario_3 <- proposers_scenario_3_DF_shuffled %>%
-  filter(selected=="yes")
-
-first_selected_validator_scenario_3 <-selected_validators_scenario_3[1] %>%
-  select(validator_idx,proposer_type=shuffled_proposer_types,selected)                  ## validator index = 0, and proposer type = B
-
-# Run simulations to see what happens over time
-
-
-# Note that in scenario 3, the apart from the change in the probability of a candidate index being selected as a proposer, the probability of being selected if you are a fully consolidated validator is hugely reduced. In this example we have the probability of being the candidate index as 3,360/311,584 = 0.0108 - approx 1.08%
-# In summary - I will include a table in the document to show how the dynamics change for this scenario.
-# 
+ggsave("/Users/sandra/data/rig/plots/scenario3_barchart_prop.png")
 ```
