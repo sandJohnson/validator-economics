@@ -3,9 +3,12 @@
 % -----------------------------------------------------------
 \subsubsection{Rewards}
 % ------------------------------------------------
+Elowsson (2024) published a comprehensive post on ethresear.ch on Ethereum issuance. This post included analysis and modelling of consensus incentives and variability of solo staker reward, as well as several other aspects relevant to issuance and staker yield (\href{https://ethresear.ch/t/properties-of-issuance-level-consensus-incentives-and-variability-across-potential-reward-curves/18448}{Properties of issuance level: consensus incentives and variability across potential reward curves}).
 
+\noindent
 \textbf{Proposer rewards} \\
 % ------------------------------------------------
+
 \noindent
 \textit{Proposer award for attestations} \\
 % ------------------------------------------------
@@ -178,4 +181,58 @@ Using the current method, the authors calculated the penalty for three different
 \end{center}
 \label{default}
 \end{table}%
+
+\noindent
+\textbf{\textit{Potential slashing during consolidation}} \\
+% -------------------------------------------------------------------
+The points summarised here arose from discussions amongst several people, including Lion, Mikhail Kalinin, Francesco, Barnabé Monnot, Mike Neuder, Roberto Saltini.
+
+Importantly, we need to assess what effect the implementation of EIP-7521 could have on the risk of being slashed.
+
+As mentioned earlier Lion created a model for slashing risk profile. The link to the \href{https://colab.research.google.com/drive/1lBe4qH4oqI8D9cmcQGca3O1AdR3SVr5z?usp=sharing}{source Python code} has edit permissions, with an accompanying document on \href{https://hackmd.io/@dapplion/maxeb_slashing_risks}{MaxEB Slashing Risk}. \\
+
+\noindent
+\textbf{Scenarios}: 
+\begin{enumerate}
+\item Validation keys are stolen\\
+\\
+The balance is secured by withdrawal credentials, therefore malicious consolidation is not anticipated to be valuable for an attacker. \\
+\\
+Nonetheless, it would be helpful to know how pools manage withdrawals. To the best of our knowledge LIDO has single withdrawal credentials for all validators, and Rocket Pool different withdrawal credentials for each validator. On the other hand, centralised stakers, such as Coinbase, apparently try to obfuscate and will therefore probably have different sets of credentials.
+
+\item Chain forks during consolidation of validators \\
+\\
+It is vital that we keep track of slashing across both the source and target for consolidation, rather just one or the other. Francesco demonstrated the need for this by visualising the scenario in figure~\ref{fig:francesco1} on page \pageref{fig:francesco1}. The scenario is described below.
+\end{enumerate}
+
+\begin{figure}[htbp]
+\begin{center}
+\includegraphics[width=0.7\linewidth]{images/francesco1}
+\caption{A fork where consolidation is yet to occur and one where it has happened}
+\label{fig:francesco1}
+\end{center}
+\end{figure}
+
+\noindent
+\textbf{Scenario 2 - fork during consolidation} \\
+In figure~\ref{fig:francesco1} we see that validator \textit{n} consolidates to validator \textit{m} on chain \textit{A}, but not on chain \textit{B}. 
+
+Validator \textit{n} then signs two different blocks at the same slot, or does surround voting, in a way that is not deemed to be slashable in the existing consolidation \gls{pr}. Based on this potential scenario, Francesco wondered if it would be that complicated to enable slashing ``across consolidations''.
+
+Mikhail replied that this would be possible, providing that chain \textit{B} is aware that the consolidation happened on chain \textit{A}. Moreover, a slasher would need to resolve the final consolidation index in order to detect a new source of slashable offences between the source and target of consolidated validators.
+
+Mikhail suggested three options to enable slashing across consolidations:
+\begin{enumerate}
+\item pass the consolidating stake through the activation churn.\\
+\\
+Bypassing the exit churn would be the improvement for stakers and a consolidation to be reverted if the source is slashed before the \gls{eb} was fully activated, without the necessity to make the target liable for the source's slashings.\\
+Milhail feels that this option is more natural from the protocol perspective. Consolidating via churn when the queue is empty means it will be 4 epochs, instead of 2 epochs to wait for consolidation to be finalised. However, Francesco pointed out that a large amount of consolidations would require weeks or months of churn.  Nonetheless, Mikhail does not expect pools to consolidate much faster than allowed by the churn due to the inherent risks. The concern is that pools would be reluctant to consolidate via churn due to lost revenue. 
+
+\item finalise consolidation on-chain before activating a consolidated balance. This is akin to waiting for \textit{activation\_eligibility\_epoch} to be finalised. \\
+\\
+This is Mikhail's preferred option, with the addition of improving the slasher's design.
+\item accompanying the slashing message with the consolidation from another chain.
+\end{enumerate}
+
+
 
