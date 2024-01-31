@@ -1,0 +1,514 @@
+---
+title: "Validator Economics: Proposer selection"
+author:
+- name: Sandra Johnson
+  url: https://twitter.com/sandJohnson
+  affiliation: Consensys Software Inc (Research Group)
+date: "`r Sys.Date()`"
+description: 
+  Visualisation of proposer selection probabilities for increased maximum effective balance.
+editor_options: 
+  markdown: 
+    wrap: 72
+---
+
+This R script is in GitHub \~/rig-sandbox/R scripts The output is
+included in the document "Validator Economics: Variable min validator
+deposit size, EF Academic Grant ID: FY23-1030, DRAFT MODEL, CHALLENGES &
+POTENTIAL MITIGATIONS (MAXEB - EIP-7521)" The source LaTeX files are in
+GitHub \~/validator-economics/documents
+
+```{r message=FALSE}
+library(data.table)
+library(ggplot2)
+#library(glue)          # Not really using glue in this Notebook, but it is useful!
+#library(jsonlite)
+library(knitr)
+library(lubridate)
+library(rmarkdown)
+library(skimr)
+library(tibble)
+library(tidyverse)
+
+options(digits=10)
+options(scipen = 999) 
+
+# See knit options in https://www.r-bloggers.com/2021/03/default-knitr-options-and-hooks/ 
+knitr::opts_chunk$set(dpi = if (knitr::is_latex_output()) 72 else 300,
+                      echo=FALSE)
+```
+
+## Proposer selection
+
+The probability of a proposer being selected is the result of the
+following process: 1) The validator indices are shuffled 2) A random
+byte is generated 2) The code iterates through this list, starting at
+the first entry and moving to the next candidate index if the current
+one does not pass the test The check is based on two variables: the
+candidate validator's effective balance and the random byte generated,
+and two constants: the maximum bytes number (255) and the maximum
+effective balance = 2.048 ETH (previously 32 ETH)
+
+Here we calculate the probability distribution using various
+consolidation options.
+
+## Blog post - graph of 716,800 randomly drawn values from U(0,255)
+- After the values have been drawn, we need to ensure that they are all integer values. We cannot have values greater than 255, so we use the floor function to round down to the nearest integer value.
+```{r cache=TRUE}
+set.seed(1)
+
+random_byte_values <- runif(716800,0,255)
+## ----------------------------------------------
+r_int <- floor(random_byte_values)
+x <- seq(0,255,1)
+r <- tibble(r_int)
+
+df <- r %>%
+  group_by(r_int) %>%
+  summarise(y = n()) %>%
+  arrange(r_int)
+
+df <- df %>%
+  mutate(prob = y/sum(y))
+
+```
+
+
+
+```{r}
+# -------------------------------------------
+# Scenario 1: All validators are solo stakers
+# -------------------------------------------
+validator_idx <- seq(0,716799)
+proposers_scenario_1_DF <- tibble(validator_idx, r_int)
+
+# Proposed situation: MaxEB = 2048 ETH
+proposers_scenario_1_DF_MaxEB <- proposers_scenario_1_DF %>%
+  mutate(selected = case_when(
+      r_int <= (255*32)/2048 ~ "yes",
+      TRUE ~ "no")
+    )
+maxeb_solo <- proposers_scenario_1_DF_MaxEB %>% 
+  count(selected)
+
+# Current situation: MaxEB = 32 ETH
+proposers_scenario_1_DF_current <- proposers_scenario_1_DF %>%
+  mutate(selected = case_when(
+      r_int <= (255*32)/32 ~ "yes",
+      TRUE ~ "no")
+    )
+
+# As expected all single stake validators pass the proposer check
+current_solo <- proposers_scenario_1_DF_current %>% 
+  count(selected)
+
+solo_probability_maxeb <- maxeb_solo$n[2]/716800        # 0.01556, so a bit different to the 0.01395 probability calculated previously when iterating over all the 
+                                                        # possible outcomes, but not far off the mark - 0.00161. However this is the outcome for seed(1). 
+                                                        # 
+
+# Check to see which validator indices were set to "accept"
+# ----------------------------------------------------------
+selected_validators <- proposers_scenario_1_DF_MaxEB %>%
+  filter(selected == "yes")
+
+first_selected_validator <- selected_validators$validator_idx[1]           ## >>> This was 26, so not a big deal really!!
+
+```
+
+## Scenario 2: All the validators have consolidated to the new increased maximum effective balance
+
+-   Using total deposit size as before, i.e. equivalent to 716,800
+    validators, will now have an active validator set size of 11,200
+-   Generate random bytes to simulate a possible outcome of random bytes
+    assigned to each validator.
+-   The probability of being chosen based on the effective balance will
+    again be 100%, so really this scenario is not of interest, just
+    interesting to see how small it got.
+
+## Scenario 3: The active validator set comprises of a "mixed bag" of validators: single stakers, partially consolidated and fully consolidated
+This scenario is what is captured in the OOBN.
+
+Based on the 716,800 active validator set:
+- five categories of stakers
+- six variations on the extent of consolidation of stake:
+
+-   32 ETH     (A) - 1x
+-   64 ETH     (B) - 2x
+-  160 ETH     (C) - 5x
+-  320 ETH     (D) - 10x
+-  960 ETH     (E) - 20x
+- 2048 ETH     (F) - 64x
+
+The active validator set size is adjusted based on the consolidation of stake   
+
+First shuffle the validator types & then generate random bytes for each validator before running through the check for acceptance.
+
+
+```{r}
+set.seed(5394)       # set some other random seed
+
+initial_validator_set_total <- 716800
+
+# Validator stake consolidation
+validator_consolidation_DF <- tibble(
+  name = c("32ETH", "64ETH", "160ETH", "320ETH", "960ETH", "2048ETH"),
+  code = c("A","B","C","D","E","F")
+)
+
+# Distribution of staker categories in the active validator set
+stakers_DF <- tibble(
+  name = c("small", "large individual", "large institutional", "centralised", "semi-decentralised"),
+  code = c("S1","S2", "S3", "S4", "S5"),
+  proportion = c(0.3,0.15,0.15,0.1,0.3),
+  
+  # Consolidation of stake for each staker category:
+  consolidation = list(
+    tibble(A=0.4,B=0.4,C=0.2,D=0,E=0,F=0),              # small staker
+    tibble(A=0.2,B=0.2,C=0.2,D=0.2,E=0.1,F=0.1),        # large indiv
+    tibble(A=0.15,B=0.15,C=0.1,D=0.1,E=0.2,F=0.3),      # large institutional
+    tibble(A=0.25,B=0.25,C=0.15,D=0.15,E=0.1,F=0.1),    # centralised
+    tibble(A=0.3,B=0.2,C=0.1,D=0.1,E=0.1,F=0.2)         # semi-decentralised 
+  )
+)
+
+# Staker category totals based on an example distribution of number of validators being run by each staking category
+# ------------------------------------------------------------------------------------------------------------------
+stakers_DF <- stakers_DF %>%
+  mutate(totals = proportion*active_validator_set_total)
+
+# Check validator set total
+sum(stakers_DF$totals)
+
+
+# Unnest the consolidation proportions
+stakers_DF_flat <- stakers_DF %>%
+  unnest(consolidation)
+
+# Working as I was hoping it would, i.e. multiplying totals[1] across 1st elements of A,B, ...
+# Now need to incorporate the actual consolidation too - reducing the actual numbers of the various types of validators
+# Possibly need to take floor function as an approximation?
+# ---------------------------------------------------------------------------------------------------------------------
+# Rounding down totals so we only have "fully consolidated - by type" validators
+stakers_DF_flat <- stakers_DF_flat %>%
+  mutate(Atot = A*totals) %>%              #    32 ETH
+  mutate(Btot = floor(B*totals/2))  %>%    #    64 ETH
+  mutate(Ctot = floor(C*totals/5))  %>%    #   160 ETH
+  mutate(Dtot = floor(D*totals/10)) %>%    #   320 ETH
+  mutate(Etot = floor(E*totals/30)) %>%    #   960 ETH
+  mutate(Ftot = floor(F*totals/64))        # 2,048 ETH
+
+# No rounding - so "fractional" validators possible - which is the way things are handled in the BN model
+stakers_DF_flat_not_rounded_down <- stakers_DF_flat %>%
+  mutate(Atot = A*totals) %>%       #    32 ETH
+  mutate(Btot = B*totals/2)  %>%    #    64 ETH
+  mutate(Ctot = C*totals/5)  %>%    #   160 ETH
+  mutate(Dtot = D*totals/10) %>%    #   320 ETH
+  mutate(Etot = E*totals/30) %>%    #   960 ETH
+  mutate(Ftot = F*totals/64)        # 2,048 ETH
+
+# Round to the nearest full validator (in the real world this won't happen & stake not able to be consolidated to the extent desired will likely
+# be assigned to smaller validators (i.e. less consolidated)
+stakers_DF_flat_rounded <- stakers_DF_flat %>%
+  mutate(Atot = A*totals) %>%              #    32 ETH
+  mutate(Btot = round(B*totals/2,0))  %>%    #    64 ETH
+  mutate(Ctot = round(C*totals/5,0))  %>%    #   160 ETH
+  mutate(Dtot = round(D*totals/10,0))  %>%   #   320 ETH
+  mutate(Etot = round(E*totals/30,0)) %>%    #   960 ETH
+  mutate(Ftot = round(F*totals/64,0))        # 2,048 ETH
+
+# Look at marking the validators with the staking category they belong to
+validator_consolidation_DF <- validator_consolidation_DF %>%
+  mutate(total = c(sum(stakers_DF_flat$Atot),
+                  sum(stakers_DF_flat$Btot),
+                  sum(stakers_DF_flat$Ctot),
+                  sum(stakers_DF_flat$Dtot),
+                  sum(stakers_DF_flat$Etot),
+                  sum(stakers_DF_flat$Ftot)))
+
+# No rounding - so "fractional" validators possible ;-)
+validator_consolidation_DF_not_rounded_down <- validator_consolidation_DF %>%
+  mutate(total = c(sum(stakers_DF_flat_not_rounded_down$Atot),
+                  sum(stakers_DF_flat_not_rounded_down$Btot),
+                  sum(stakers_DF_flat_not_rounded_down$Ctot),
+                  sum(stakers_DF_flat_not_rounded_down$Dtot),
+                  sum(stakers_DF_flat_not_rounded_down$Etot),
+                  sum(stakers_DF_flat_not_rounded_down$Ftot)))
+
+validator_consolidation_DF_rounded <- validator_consolidation_DF %>%
+  mutate(total = c(sum(stakers_DF_flat_rounded$Atot),
+                  sum(stakers_DF_flat_rounded$Btot),
+                  sum(stakers_DF_flat_rounded$Ctot),
+                  sum(stakers_DF_flat_rounded$Dtot),
+                  sum(stakers_DF_flat_rounded$Etot),
+                  sum(stakers_DF_flat_rounded$Ftot)))
+
+# What is the new total for the validator set after consolidation?
+# Using the floor function - came to 329,803. With BN model the total was 329,810.13
+# ----------------------------------------------------------------------------------
+adj_validator_total <- sum(validator_consolidation_DF$total)
+adj_validator_total_not_rounded_down <- sum(validator_consolidation_DF_not_rounded_down$total)
+adj_validator_total_rounded <- sum(validator_consolidation_DF_rounded$total)
+
+# TODO:
+# -----
+# - Of the ones from the various consolidation types that pass the test, what were the proportions for each type of validator?
+# - What do the proportion of validator types in the active validator set compare to the proportions that passed the proposer check?
+
+
+# Construct a tibble for each validator type
+# ------------------------------------------
+# Floor values
+validator_A <- tibble(
+  staker = c(rep("S1",stakers_DF_flat$Atot[1]),
+             rep("S2",stakers_DF_flat$Atot[2]),
+             rep("S3",stakers_DF_flat$Atot[3]),
+             rep("S4",stakers_DF_flat$Atot[4]),
+             rep("S5",stakers_DF_flat$Atot[5])),
+  type = rep("A",sum(stakers_DF_flat$Atot))
+  )
+# Rounded values
+validator_A_rounded <- tibble(
+  staker = c(rep("S1",stakers_DF_flat_rounded$Atot[1]),
+             rep("S2",stakers_DF_flat_rounded$Atot[2]),
+             rep("S3",stakers_DF_flat_rounded$Atot[3]),
+             rep("S4",stakers_DF_flat_rounded$Atot[4]),
+             rep("S5",stakers_DF_flat_rounded$Atot[5])),
+  type = rep("A",sum(stakers_DF_flat_rounded$Atot))
+  )
+
+# Floor values
+validator_B <- tibble(
+  staker = c(rep("S1",stakers_DF_flat$Btot[1]),
+             rep("S2",stakers_DF_flat$Btot[2]),
+             rep("S3",stakers_DF_flat$Btot[3]),
+             rep("S4",stakers_DF_flat$Btot[4]),
+             rep("S5",stakers_DF_flat$Btot[5])),
+  type = rep("B",sum(stakers_DF_flat$Btot))
+  )
+# Rounded values
+validator_B_rounded <- tibble(
+  staker = c(rep("S1",stakers_DF_flat_rounded$Btot[1]),
+             rep("S2",stakers_DF_flat_rounded$Btot[2]),
+             rep("S3",stakers_DF_flat_rounded$Btot[3]),
+             rep("S4",stakers_DF_flat_rounded$Btot[4]),
+             rep("S5",stakers_DF_flat_rounded$Btot[5])),
+  type = rep("B",sum(stakers_DF_flat_rounded$Btot))
+  )
+
+# Floor values
+validator_C <- tibble(
+  staker = c(rep("S1",stakers_DF_flat$Ctot[1]),
+             rep("S2",stakers_DF_flat$Ctot[2]),
+             rep("S3",stakers_DF_flat$Ctot[3]),
+             rep("S4",stakers_DF_flat$Ctot[4]),
+             rep("S5",stakers_DF_flat$Ctot[5])),
+  type = rep("C",sum(stakers_DF_flat$Ctot))
+  )
+# Rounded values
+validator_C_rounded <- tibble(
+  staker = c(rep("S1",stakers_DF_flat_rounded$Ctot[1]),
+             rep("S2",stakers_DF_flat_rounded$Ctot[2]),
+             rep("S3",stakers_DF_flat_rounded$Ctot[3]),
+             rep("S4",stakers_DF_flat_rounded$Ctot[4]),
+             rep("S5",stakers_DF_flat_rounded$Ctot[5])),
+  type = rep("C",sum(stakers_DF_flat_rounded$Ctot))
+  )
+
+# Floor values
+validator_D <- tibble(
+  staker = c(rep("S1",stakers_DF_flat$Dtot[1]),
+             rep("S2",stakers_DF_flat$Dtot[2]),
+             rep("S3",stakers_DF_flat$Dtot[3]),
+             rep("S4",stakers_DF_flat$Dtot[4]),
+             rep("S5",stakers_DF_flat$Dtot[5])),
+  type = rep("D",sum(stakers_DF_flat$Dtot))
+  )
+# Rounded values
+validator_D_rounded <- tibble(
+  staker = c(rep("S1",stakers_DF_flat_rounded$Dtot[1]),
+             rep("S2",stakers_DF_flat_rounded$Dtot[2]),
+             rep("S3",stakers_DF_flat_rounded$Dtot[3]),
+             rep("S4",stakers_DF_flat_rounded$Dtot[4]),
+             rep("S5",stakers_DF_flat_rounded$Dtot[5])),
+  type = rep("D",sum(stakers_DF_flat_rounded$Dtot))
+  )
+
+# Floor values
+validator_E <- tibble(
+  staker = c(rep("S1",stakers_DF_flat$Etot[1]),
+             rep("S2",stakers_DF_flat$Etot[2]),
+             rep("S3",stakers_DF_flat$Etot[3]),
+             rep("S4",stakers_DF_flat$Etot[4]),
+             rep("S5",stakers_DF_flat$Etot[5])),
+  type = rep("E",sum(stakers_DF_flat$Etot))
+  )    
+# Rounded values
+validator_E_rounded <- tibble(
+  staker = c(rep("S1",stakers_DF_flat_rounded$Etot[1]),
+             rep("S2",stakers_DF_flat_rounded$Etot[2]),
+             rep("S3",stakers_DF_flat_rounded$Etot[3]),
+             rep("S4",stakers_DF_flat_rounded$Etot[4]),
+             rep("S5",stakers_DF_flat_rounded$Etot[5])),
+  type = rep("E",sum(stakers_DF_flat_rounded$Etot))
+  )
+
+# Floor values               
+validator_F <- tibble(
+  staker = c(rep("S1",stakers_DF_flat$Ftot[1]),
+             rep("S2",stakers_DF_flat$Ftot[2]),
+             rep("S3",stakers_DF_flat$Ftot[3]),
+             rep("S4",stakers_DF_flat$Ftot[4]),
+             rep("S5",stakers_DF_flat$Ftot[5])),
+  type = rep("F",sum(stakers_DF_flat$Ftot))
+  )   
+# Rounded values
+validator_F_rounded <- tibble(
+  staker = c(rep("S1",stakers_DF_flat_rounded$Ftot[1]),
+             rep("S2",stakers_DF_flat_rounded$Ftot[2]),
+             rep("S3",stakers_DF_flat_rounded$Ftot[3]),
+             rep("S4",stakers_DF_flat_rounded$Ftot[4]),
+             rep("S5",stakers_DF_flat_rounded$Ftot[5])),
+  type = rep("F",sum(stakers_DF_flat_rounded$Ftot))
+  )  
+
+
+# Combine all the various validator types along with the staker group they belong to & then we can add random bytes to the validators,
+# shuffle the validators and see who passes the proposer eligibility test
+# -----------------------------------------------------------------------------------------------------------------------------------
+adjusted_validator_set_DF <- validator_A %>%
+  add_row(validator_B) %>%
+  add_row(validator_C) %>%
+  add_row(validator_D) %>%
+  add_row(validator_E) %>%
+  add_row(validator_F)
+
+# Rounded values
+adjusted_validator_set_DF_rounded <- validator_A_rounded %>%
+  add_row(validator_B_rounded) %>%
+  add_row(validator_C_rounded) %>%
+  add_row(validator_D_rounded) %>%
+  add_row(validator_E_rounded) %>%
+  add_row(validator_F_rounded)
+  
+# Generate random bytes for the adjusted validator set
+random_byte_values_scenario3 <- runif(adj_validator_total,0,255)                   # floor
+random_byte_values_scenario3_rounded <- runif(adj_validator_total_rounded,0,255)   # rounded
+
+r_int_scenario3 <- floor(random_byte_values_scenario3)                             # floor
+r_int_scenario3_rounded <- floor(random_byte_values_scenario3_rounded)             # rounded
+
+# Floor values
+# -------------
+adjusted_validator_set_DF_scenario_3 <- adjusted_validator_set_DF %>%
+  mutate(validator_idx = sample(seq(0,adj_validator_total-1))) %>%              # shuffle the validators      
+  mutate(r_int = r_int_scenario3) %>%                                            # assign random bytes
+  mutate(selected = case_when(                                                   # see which validators passed the proposer eligibility check
+      (type == "A") & (r_int <= (255*32)/2048) ~ "yes",
+      (type == "B") & (r_int <= (255*64)/2048) ~ "yes",
+      (type == "C") & (r_int <= (255*160)/2048) ~ "yes",
+      (type == "D") & (r_int <= (255*320)/2048) ~ "yes",
+      (type == "E") & (r_int <= (255*960)/2048) ~ "yes",
+      (type == "F") & (r_int <= (255*2048)/2048) ~ "yes",
+      TRUE ~ "no"))
+
+# Rounded values
+adjusted_validator_set_DF_scenario_3_rounded <- adjusted_validator_set_DF_rounded %>%
+  mutate(validator_idx = sample(seq(0,adj_validator_total_rounded-1))) %>%              # shuffle the validators      
+  mutate(r_int = r_int_scenario3_rounded) %>%                                            # assign random bytes
+  mutate(selected = case_when(                                                   # see which validators passed the proposer eligibility check
+      (type == "A") & (r_int <= (255*32)/2048) ~ "yes",
+      (type == "B") & (r_int <= (255*64)/2048) ~ "yes",
+      (type == "C") & (r_int <= (255*160)/2048) ~ "yes",
+      (type == "D") & (r_int <= (255*320)/2048) ~ "yes",
+      (type == "E") & (r_int <= (255*960)/2048) ~ "yes",
+      (type == "F") & (r_int <= (255*2048)/2048) ~ "yes",
+      TRUE ~ "no"))
+
+# Floor values
+selected_validators_scenario_3 <- adjusted_validator_set_DF_scenario_3 %>%
+  filter(selected=="yes")
+
+# Rounded values
+selected_validators_scenario_3_rounded <- adjusted_validator_set_DF_scenario_3_rounded %>%
+  filter(selected=="yes")
+
+## CONTINUE HERE !!!
+## - DISTINGUISH BETWEEN PROBABILITIES WITHIN GROUPS/TYPES/CATEGORIES AND OVERALL VALIDATOR SET!!
+
+# Floor values
+scenario_3_count_validator_type <- adjusted_validator_set_DF_scenario_3 %>% 
+  group_by(type) %>%
+  count(selected) %>%
+  mutate(prob=case_when(
+    (type == "A") ~ n/sum(stakers_DF_flat$Atot),
+    (type == "B") ~ n/sum(stakers_DF_flat$Btot),
+    (type == "C") ~ n/sum(stakers_DF_flat$Ctot),
+    (type == "D") ~ n/sum(stakers_DF_flat$Dtot),
+    (type == "E") ~ n/sum(stakers_DF_flat$Etot),
+    (type == "F") ~ n/sum(stakers_DF_flat$Ftot),
+      TRUE ~ 0
+  )) 
+
+# Rounded values
+scenario_3_count_validator_type_rounded <- adjusted_validator_set_DF_scenario_3 %>% 
+  group_by(type) %>%
+  count(selected) %>%
+  mutate(prob=case_when(
+    (type == "A") ~ n/sum(stakers_DF_flat_rounded$Atot),
+    (type == "B") ~ n/sum(stakers_DF_flat_rounded$Btot),
+    (type == "C") ~ n/sum(stakers_DF_flat_rounded$Ctot),
+    (type == "D") ~ n/sum(stakers_DF_flat_rounded$Dtot),
+    (type == "E") ~ n/sum(stakers_DF_flat_rounded$Etot),
+    (type == "F") ~ n/sum(stakers_DF_flat_rounded$Ftot),
+      TRUE ~ 0
+  ))
+
+scenario_3_count_staker_category <- adjusted_validator_set_DF_scenario_3 %>% 
+  group_by(staker) %>%
+  count(selected) %>%
+  mutate(prob=case_when(
+    (staker == "S1") ~ n/stakers_DF_flat$totals[1],
+    (staker == "S2") ~ n/stakers_DF_flat$totals[2],
+    (staker == "S3") ~ n/stakers_DF_flat$totals[3],
+    (staker == "S4") ~ n/stakers_DF_flat$totals[4],
+    (staker == "S5") ~ n/stakers_DF_flat$totals[5],
+      TRUE ~ 0
+  ))
+
+# Using floor values: 
+# Prepare data for plotting
+# ----------------------------
+scenario3_barchart_data <- tibble(
+  type = scenario_3_count_validator_type$type,
+  selected = scenario_3_count_validator_type$selected,
+  total = scenario_3_count_validator_type$n,
+  prob = scenario_3_count_validator_type$prob
+) %>%
+add_row(type="F", selected = "no", total=0, prob = 0)                    # Add row for MaxEB validators who are all selected
+
+# CONTINUE HERE ON MONDAY OR TUESDAY!! 
+# LOOK AT HOW I CAN ADD A BOX MAPPING VALIDATOR TYPES TO ETH, OR CHANGING THE LABELS ON THE PLOT
+# ===============================================================================================>>>>>
+
+# Bar chart of the totals for each validator type that passed or failed the proposer check
+scenario3_barchart <- ggplot(data=scenario3_barchart_data) + 
+  #geom_col(aes(x=type,y=n,  fill=selected)) +                           # single stacked bar per validator type
+  geom_col(aes(x=type,y=total,  fill=selected), position = "dodge") +
+  geom_text(mapping = aes(x=type,y=total,label = case_when(selected == "no" ~ paste0("(", total, ")"),
+                                                   TRUE ~ "")), 
+            nudge_y = 2, nudge_x = -0.2, fontface = "italic") +
+  xlab("Was candidate index selected as proposer?") +
+  ylab("Number of validators") +
+  labs(fill = "Passed proposer test?") 
+
+ggsave("/Users/sandra/data/rig/plots/scenario3_barchart_totals.png")
+
+# Bar chart of the proportions for each validator type that passed or failed the proposer check
+scenario3_barchart_prob <- ggplot(data=scenario3_barchart_data) + 
+  #geom_col(aes(x=type,y=prob,  fill=selected)) +                           # single stacked bar per validator type
+  geom_col(aes(x=type,y=prob,  fill=selected), position = "dodge") +
+  xlab("Was candidate index selected as proposer?") +
+  ylab("Validator proportions") +
+
+ggsave("/Users/sandra/data/rig/plots/scenario3_barchart_prop.png")
+```

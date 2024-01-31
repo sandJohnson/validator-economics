@@ -398,11 +398,17 @@ $EPOCHS\_PER\_SYNC\_COMMITTEE\_PERIOD = 2^8 = 256$ \textit{ epochs}, which is $\
  
 The decision to accept a selected candidate validator  to participate in the sync committee, follows the same logic as is used for the acceptance of the candidate validator as a proposer. However, in this instance, we continue with the process until we have 255 sync committee members, which may contain duplicates as mentioned previously.
  
-To demonstrate that this process works as intended we consider a simple example scenario:
+To demonstrate that this process works as intended we consider a couple of simple example scenarios:
+\begin{enumerate}
+\item The active validator set has fewer than 255 validators
+\item The active validator set has more than 255 validators
+\end{enumerate}
+
+The first case is currently very unrealistic with an active validator count of approximately 900,000 at the end of January 2024, but we have left it in for completeness.
 
 
 \begin{table}[htp]
-\caption{Simple sync committee example scenario }
+\caption{Simple sync committee example scenario - fewer than 255 validators}
 \begin{center}
 \begin{tabular}{|l|c|c|c|c|c|c|r|}
 \hline
@@ -422,7 +428,10 @@ C  & 128 & 14 & 5 & 4 & 2 & 1 & 26\\
 \label{tbl:syncscenario}
 \end{table}%
 
-Assuming that ``After consolidation'' in Table \ref{tbl:syncscenario} represents the decisions made by each of the stakers regarding the validators they run after the implementation of EIP-7521. We will now consider the probabilities prior to and after EIP-7521 for each of these three stakers. Table \ref{tbl:syncprobs} summarises the various probabilities for sync committee membership.
+Note that we consider a consolidated validator as consisting of one or more virtual validators.
+Assuming that ``After consolidation'' in Table \ref{tbl:syncscenario} represents the decisions made by each of the stakers regarding the validators they run after the implementation of EIP-7521. We can calculate the probabilities prior to and after EIP-7521 for each of these three staker groups. Staker group A consists of single stakers, group B of consolidating into 10-fold and maxEB validators and group B has a collection of various degrees of consolidated validators. Table \ref{tbl:syncprobs} summarises the various probabilities for sync committee membership.
+
+
 
 \begin{table}[htp]
 \caption{Sync committee probabilities for example scenario }

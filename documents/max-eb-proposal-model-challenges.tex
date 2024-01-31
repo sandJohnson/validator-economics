@@ -82,6 +82,7 @@ Consensys Software R\&D}
 \newacronym{cdf}{CDF}{cumulative distribution function}
 \newacronym{cl}{CL}{consensus layer}
 \newacronym{cpt}{CPT}{conditional probability table}
+\newacronym{dos}{DoS}{denial of service}
 \newacronym{dvt}{DVT}{distributed validator technology}
 \newacronym{eb}{EB}{effective balance}
 \newacronym{ef}{EF}{Ethereum Foundation}
@@ -126,6 +127,16 @@ With respect to EIP-7521:
 We need to bear in mind that regardless of the risks and benefits, EIP-7521 relies on stakers' willingness to consolidate at least some of their validators. Therefore the messaging around the benefits of consolidation and the perception that the benefits to stakers and the ecosystem definitely outweigh any perceived risks needs to be compelling.
 
 The impact on staking pools, their operational business models, and software changes required to take advantage of the increased maximum will need to be discussed with stakeholders \gls{eb}.
+
+Mike Neuder summarised several concerns and potential problems if the MaxEB proposal is not implemented in the next hard fork:\\
+\noindent
+Without MaxEB:
+\begin{itemize}
+\item risk of massive influx of staking demand making the total validator count pushing the safety limits of the network
+\item risk of extending the earliest timeline for \gls{ssf} because consolidation may be a slow process that we need to start
+\item slightly more pooling pressure from solo stakers because there are no variable balances
+\item risk of longer time until we could drop the min effective balance because validator count is too high
+\end{itemize}
 
 \clearpage
 % -------------------------------------------------------------------------------------
