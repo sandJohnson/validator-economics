@@ -1,12 +1,12 @@
 ---
-title: "Validator Economics: Proposer selection"
+title: "Validator Economics: Sync committee selection"
 author:
 - name: Sandra Johnson
   url: https://twitter.com/sandJohnson
   affiliation: Consensys Software Inc (Research Group)
 date: "`r Sys.Date()`"
 description: 
-  Visualisation of proposer selection probabilities for increased maximum effective balance.
+  Calculation and visualisation of sync committee selection probabilities for increased maximum effective balance.
 editor_options: 
   markdown: 
     wrap: 72
@@ -38,23 +38,27 @@ knitr::opts_chunk$set(dpi = if (knitr::is_latex_output()) 72 else 300,
                       echo=FALSE)
 ```
 
-## Proposer selection
+## Sync committee selection
 
-The probability of a proposer being selected is the result of the
-following process: 1) The validator indices are shuffled 2) A random
-byte is generated 2) The code iterates through this list, starting at
-the first entry and moving to the next candidate index if the current
-one does not pass the test The check is based on two variables: the
-candidate validator's effective balance and the random byte generated,
-and two constants: the maximum bytes number (255) and the maximum
-effective balance = 2.048 ETH (previously 32 ETH)
+The probability of a validator being selected to participate in the sync committee
+adheres to the following process: 
+1) The validator indices are shuffled 
+2) One candidate validator results from the shuffled index
+3) A random byte is generated for this candidate (note this candidate may have been chosen before & more than likely
+   it would have had a different random byte generated)
+4) A comparison is made between the candidate validator's effective balance * maximum bytes value (255) and MaxEB * random byte generated. If the first term is bigger than the second, then the validator is added to the sync committee.
+5) Another iteration of the loop is executed until we have chosen enough validators to make up the sync committee
 
-Here we calculate the probability distribution using various
-consolidation options.
+This appears to be very similar at first glance to proposer selection, but the difference here is that 
+we are sampling WITH REPLACEMENT. Therefore each validator has a chance of being chosen more than once and the probabilities of being chosen do not change with each draw.
 
-## Blog post - graph of 716,800 randomly drawn values from U(0,255)
-- After the values have been drawn, we need to ensure that they are all integer values. We cannot have values greater than 255, so we use the floor function to round down to the nearest integer value.
+(NB: CHECK THAT PROPOSER SELECTION DOES IN FACT SAMPLE W/O REPLACEMENT, BECAUSE LOOKING AT THE CODE IT DOES NOT APPEAR TO ME TO BE THE CASE!!)
+
+###  Generate 255 random bytes that we will use to combine with validators selected from the active validator set
+
 ```{r cache=TRUE}
+# Generate 255 random bytes that we will use to combine with validators selected from the active validator set
+# ------------------------------------------------------------------------------------------------------------
 set.seed(1)
 
 random_byte_values <- runif(716800,0,255)
@@ -63,22 +67,89 @@ r_int <- floor(random_byte_values)
 x <- seq(0,255,1)
 r <- tibble(r_int)
 
-df <- r %>%
+df_sync_random <- r %>%
   group_by(r_int) %>%
   summarise(y = n()) %>%
   arrange(r_int)
 
-df <- df %>%
-  mutate(prob = y/sum(y))
+# Check proportions of random values generated
+df_sync_random  <- df_sync_random  %>%
+  mutate(prob = y/sum(y)) 
+
+
 
 ```
 
 
 
 ```{r}
-# -------------------------------------------
-# Scenario 1: All validators are solo stakers
-# -------------------------------------------
+# ---------------------------------------------------------------------------------------
+#' Scenario 1: 
+#' -----------
+#' - The total number of validators (n) in the active validator set is less than 255, meaning 
+#'   that even if all validators are chosen to participate in the sync committee, we will
+#'   still need more participants. Therefore there will be at least (255-n) duplicate entries.
+#' - Three staker groups: A, B, C
+#' - All validators owned by the three staker groups are solo stakers
+#' - A, B, and C have all staked the same amount, i.e. run the same number of validators
+# ---------------------------------------------------------------------------------------
+```
+# Scenario 2a: prior to EIP-7521
+
+- The total number of validators (n) in the active validator set is more than 255 (128*3=384) 
+- Three staker groups: A, B, C
+- All validators owned by the three staker groups are solo stakers
+- A, B, and C have all staked the same amount, i.e. run the same number of validators = 128
+
+```{r}
+
+```
+
+#' Scenario 2b: post EIP-7521
+#' -----------
+#' - The total number of validators (n) in the active validator set is more than 255 (128*3=384) 
+#' - Three staker groups: A, B, C
+#' - The validators owned by the three staker groups have been consolidated in different ways
+#' - A, B, and C have all staked the same amount, so even though the number of validators owned by each group may differ, 
+#'   they all have the same number of virtual validators.
+#' 
+#' NOTE: The concept of a virtual validator needs to work with validators that are not  multiples of 32 ETH.
+#' Reason being once we are compounding to various validators we will have validators that have fractions of 32 ETH added to them over time.
+#' ---------------------------------------------------------------------------------------
+```{r}
+# Number of trials = 255
+n <- 255
+
+# What we want to visualise is the probability distribution for membership of the sync committee for each of the staker groups
+# 1. As is currently the case
+# 2. After EIP-7521 has been implemented
+
+# Pre-EIP-7521
+scenario2b_pre_EIP7521_prob <- 1/3          # 128/384 
+
+# We want to visualise the probability that each of the groups have one or more validators in the sync committee
+# P(X >= 1) = 1 - P(X=0), i.e. it is 1 - probability that none of the validators in that staker group is in the sync committee
+
+
+
+# Post-EIP-7521 for three staking groups: A, B & C
+scenario2b_post_EIP7521_prob_A <- 128/156   # single stake (unconsolidated)
+scenario2b_post_EIP7521_prob_B <- 2/156     # maxEB stake
+scenario2b_post_EIP7521_prob_C <- 26/156    # varying consolidation 
+
+# Post-EIP-7521 for four consolidated validator types
+scenario2b_post_EIP7521_prob_single  <- 142/156  #  1 x 32 ETH
+scenario2b_post_EIP7521_prob_single  <- 5/156    #  2 x 32 ETH
+scenario2b_post_EIP7521_prob_5_fold  <- 4/156    #  5 x 32 ETH
+scenario2b_post_EIP7521_prob_10_fold <- 2/156    # 10 x 32 ETH
+scenario2b_post_EIP7521_prob_maxEB   <- 3/156    # 64 x 32 ETH
+
+
+
+```
+
+
+```{r}
 validator_idx <- seq(0,716799)
 proposers_scenario_1_DF <- tibble(validator_idx, r_int)
 
@@ -512,3 +583,34 @@ scenario3_barchart_prob <- ggplot(data=scenario3_barchart_data) +
 
 ggsave("/Users/sandra/data/rig/plots/scenario3_barchart_prop.png")
 ```
+## Testing section 
+Trying code from various sources
+
+```{r}
+# The code below comes from stat.ethz.ch 
+
+require(graphics)
+# Compute P(45 < X < 55) for X Binomial(100,0.5)
+sum(dbinom(46:54, 100, 0.5))
+
+## Using "log = TRUE" for an extended range :
+n <- 2000
+k <- seq(0, n, by = 20)
+plot (k, dbinom(k, n, pi/10, log = TRUE), type = "l", ylab = "log density",
+      main = "dbinom(*, log=TRUE) is better than  log(dbinom(*))")
+lines(k, log(dbinom(k, n, pi/10)), col = "red", lwd = 2)
+## extreme points are omitted since dbinom gives 0.
+mtext("dbinom(k, log=TRUE)", adj = 0)
+mtext("extended range", adj = 0, line = -1, font = 4)
+mtext("log(dbinom(k))", col = "red", adj = 1)
+
+# Trying something out
+x <- seq(0:255)
+size <- 255
+prob <- 1/3
+
+plot(dbinom(x, size, prob, log = FALSE))
+pbinom(q, size, prob, lower.tail = TRUE, log.p = FALSE)
+
+```
+

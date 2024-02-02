@@ -30,6 +30,8 @@ Endianness, the order of bytes in the binary representation of a number, is not 
 
 The \textit{swap-or-not-shuffle} technique \cite{hoang2014}  is used to shuffle the validator indices in preparation for the selection of a block proposer. This is done in \href{https://github.com/ethereum/consensus-specs/blob/9c35b7384e78da643f51f9936c578da7d04db698/specs/phase0/beacon-chain.md#compute_shuffled_index}{\textit{compute\_shuffled\_index}}.
 
+\href{https://notes.ethereum.org/@vbuterin/Sys3GLJbD}{Vitalik's annotated spec} explains the reasoning behind the process of computing the proposer index. ``The idea is that it chooses a proposer, accepts them with BALANCE/32 probability, and if it fails it keeps trying. This is done so that the probability of being selected as a proposer remains proportional to balance.''
+
 The computation to determine the proposer for the next block is done in \href{https://github.com/ethereum/consensus-specs/blob/9c35b7384e78da643f51f9936c578da7d04db698/specs/phase0/beacon-chain.md#compute_proposer_index}{\textit{compute\_proposer\_index}}: 
 
 \lstset{language=Python}
@@ -408,7 +410,7 @@ The first case is currently very unrealistic with an active validator count of a
 
 
 \begin{table}[htp]
-\caption{Simple sync committee example scenario - fewer than 255 validators}
+\caption{Simple sync committee example scenario 2 - more than 255 validators}
 \begin{center}
 \begin{tabular}{|l|c|c|c|c|c|c|r|}
 \hline
@@ -421,7 +423,7 @@ A & 128 & 128 & 0 &0 & 0 & 0 & 128 \\
 B  & 128 & 0 & 0 &0 & 0 & 2 & 2 \\
 C  & 128 & 14 & 5 & 4 & 2 & 1 & 26\\
  \hline
- TOTAL & 768 & 142 & 5 & 4 & 2 & 3 & 156 \\
+ TOTAL & 384 & 142 & 5 & 4 & 2 & 3 & 156 \\
  \hline
 \end{tabular}
 \end{center}
@@ -431,25 +433,25 @@ C  & 128 & 14 & 5 & 4 & 2 & 1 & 26\\
 Note that we consider a consolidated validator as consisting of one or more virtual validators.
 Assuming that ``After consolidation'' in Table \ref{tbl:syncscenario} represents the decisions made by each of the stakers regarding the validators they run after the implementation of EIP-7521. We can calculate the probabilities prior to and after EIP-7521 for each of these three staker groups. Staker group A consists of single stakers, group B of consolidating into 10-fold and maxEB validators and group B has a collection of various degrees of consolidated validators. Table \ref{tbl:syncprobs} summarises the various probabilities for sync committee membership.
 
-
-
 \begin{table}[htp]
 \caption{Sync committee probabilities for example scenario }
 \begin{center}
-\begin{tabular}{|l|c|c|c|c|c|c|r|}
+\begin{tabular}{|l|c|c|c|c|c|c|c|c|c|c|c|c|}
 \hline
-& \multicolumn{2}{c|}{\textbf{Before }} & \multicolumn{5}{c|}{\textbf{After}} \\
-& \multicolumn{2}{c|}{\textbf{EIP-7251}} & \multicolumn{5}{c|} {\textbf{EIP-7521}} \\
-\cline{2-3} \cline{4-8} \\
-                        &                      &                         &P(sync committee & 5-fold & 10-fold & P(sync committee& Total \\
- \textbf{Staker} & P(selection) & P(acceptance) &member)               &  P(selection)&  P(acceptance) & member)  & Total \\
+& \multicolumn{2}{c|}{\textbf{Before }} & \multicolumn{8}{c|}{\textbf{After}} \\
+& \multicolumn{2}{c|}{\textbf{EIP-7251}} & \multicolumn{8}{c|}{\textbf{EIP-7521}} \\
+\cline{2-3} \cline{4-11} 
+& \multicolumn{2}{c|}{Single} &  \multicolumn{2}{c|}{Single} & \multicolumn{2}{c|}{5-fold} &  \multicolumn{2}{c|}{10-fold} &  \multicolumn{2}{c|}{Maximum} \\
+\cline{2-3} \cline{4-5} \cline{6-7} \cline{8-9} \cline{10-11}
+ & Prob &  Prob  & Prob &  Prob  & Prob &  Prob & Prob &  Prob  & Prob &  Prob  \\
+\textbf{Staker}  & (select) &  (accept)  & (select) &  (accept)  & (select) &  (accept) & (select) &  (accept)  & (select) &  (accept)  \\
 \hline
-A & 128 & 128 & 0 &0 & 0 & 0 & 128 \\
-B  & 128 & 0 & 0 &0 & 0 & 2 & 2 \\
-C  & 128 & 14 & 5 & 4 & 2 & 1 & 26\\
- \hline
- TOTAL & 768 & 142 & 5 & 4 & 2 & 3 & 156 \\
- \hline
+%A & 128 & 128 & 0 &0 & 0 & 0 & 128 & 0 & 0 & 0 & 0  \\
+%B  & 128 & 0 & 0 &0 & 0 & 2 & 2 \\
+%C  & 128 & 14 & 5 & 4 & 2 & 1 & 26\\
+% \hline
+% TOTAL & 384 & 142 & 5 & 4 & 2 & 3 & 156 \\
+% \hline
 \end{tabular}
 \end{center}
 \label{tbl:syncprobs}
