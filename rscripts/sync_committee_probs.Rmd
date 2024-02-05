@@ -44,13 +44,12 @@ The probability of a validator being selected to participate in the sync committ
 adheres to the following process: 
 1) The validator indices are shuffled 
 2) One candidate validator results from the shuffled index
-3) A random byte is generated for this candidate (note this candidate may have been chosen before & more than likely
-   it would have had a different random byte generated)
+3) A random byte is generated for this candidate (note this candidate may have been chosen before & more than likely with a different generated random byte)
 4) A comparison is made between the candidate validator's effective balance * maximum bytes value (255) and MaxEB * random byte generated. If the first term is bigger than the second, then the validator is added to the sync committee.
-5) Another iteration of the loop is executed until we have chosen enough validators to make up the sync committee
+5) Another iteration of the loop is executed until we have chosen enough validators (each member of the committee is present >= 1) to make up the sync committee
 
 This appears to be very similar at first glance to proposer selection, but the difference here is that 
-we are sampling WITH REPLACEMENT. Therefore each validator has a chance of being chosen more than once and the probabilities of being chosen do not change with each draw.
+we are sampling WITH REPLACEMENT. Therefore each validator could be chosen more than once and the probabilities of being chosen do not change with each draw.
 
 (NB: CHECK THAT PROPOSER SELECTION DOES IN FACT SAMPLE W/O REPLACEMENT, BECAUSE LOOKING AT THE CODE IT DOES NOT APPEAR TO ME TO BE THE CASE!!)
 
@@ -61,19 +60,18 @@ we are sampling WITH REPLACEMENT. Therefore each validator has a chance of being
 # ------------------------------------------------------------------------------------------------------------
 set.seed(1)
 
-random_byte_values <- runif(716800,0,255)
+random_byte_values_sync <- runif(7680,0,255)
 ## ----------------------------------------------
-r_int <- floor(random_byte_values)
-x <- seq(0,255,1)
-r <- tibble(r_int)
+r_int_sync <- floor(random_byte_values_sync)
+r_sync <- tibble(r_int_sync)
 
-df_sync_random <- r %>%
-  group_by(r_int) %>%
+df_sync_random <- r_sync %>%
+  group_by(r_int_sync) %>%
   summarise(y = n()) %>%
-  arrange(r_int)
+  arrange(r_int_sync)
 
 # Check proportions of random values generated
-df_sync_random  <- df_sync_random  %>%
+df_sync_random_sync  <- df_sync_random  %>%
   mutate(prob = y/sum(y)) 
 
 
@@ -84,65 +82,101 @@ df_sync_random  <- df_sync_random  %>%
 
 ```{r}
 # ---------------------------------------------------------------------------------------
-#' Scenario 1: 
-#' -----------
-#' - The total number of validators (n) in the active validator set is less than 255, meaning 
-#'   that even if all validators are chosen to participate in the sync committee, we will
-#'   still need more participants. Therefore there will be at least (255-n) duplicate entries.
+#' Example Scenario: prior to EIP-7521
+#' -----------------------------------
 #' - Three staker groups: A, B, C
 #' - All validators owned by the three staker groups are solo stakers
 #' - A, B, and C have all staked the same amount, i.e. run the same number of validators
 # ---------------------------------------------------------------------------------------
 ```
-# Scenario 2a: prior to EIP-7521
+# Example Scenario: prior to EIP-7521
 
-- The total number of validators (n) in the active validator set is more than 255 (128*3=384) 
+- The total number of validators (n) in the active validator set is more than 255 (2560*3=7680) 
 - Three staker groups: A, B, C
 - All validators owned by the three staker groups are solo stakers
-- A, B, and C have all staked the same amount, i.e. run the same number of validators = 128
+- A, B, and C have all staked the same amount, i.e. run the same number of validators = 2560
 
 ```{r}
 
 ```
 
-#' Scenario 2b: post EIP-7521
-#' -----------
+#' Example Scenario: post EIP-7521
+#' -------------------------------
 #' - The total number of validators (n) in the active validator set is more than 255 (128*3=384) 
 #' - Three staker groups: A, B, C
 #' - The validators owned by the three staker groups have been consolidated in different ways
-#' - A, B, and C have all staked the same amount, so even though the number of validators owned by each group may differ, 
-#'   they all have the same number of virtual validators.
+#' - A, B, and C have all staked the same amount, so even though the number of validators owned by each group may differ, they all have the same number of virtual validators.
 #' 
 #' NOTE: The concept of a virtual validator needs to work with validators that are not  multiples of 32 ETH.
 #' Reason being once we are compounding to various validators we will have validators that have fractions of 32 ETH added to them over time.
 #' ---------------------------------------------------------------------------------------
 ```{r}
-# Number of trials = 255
-n <- 255
+
 
 # What we want to visualise is the probability distribution for membership of the sync committee for each of the staker groups
 # 1. As is currently the case
 # 2. After EIP-7521 has been implemented
 
-# Pre-EIP-7521
-scenario2b_pre_EIP7521_prob <- 1/3          # 128/384 
+# Pre-EIP-7521, the probability of one of the validators of each of the stakers being in the
+# sync committee is given by:
+scenario_pre_EIP7521_prob <- 1/3          # 2560/7680 
 
-# We want to visualise the probability that each of the groups have one or more validators in the sync committee
+# For each of the groups, we want to visualise the probability that one of their validators is chosen to be included in the sync committee
 # P(X >= 1) = 1 - P(X=0), i.e. it is 1 - probability that none of the validators in that staker group is in the sync committee
 
+# This is the density of the probability of the number of validators selected for the sync committee test
+n_sync <- 255       # sync committee size 
+x <- seq(0,255,1)
+p_bin <- scenario_pre_EIP7521_prob
+pre_eip_dbin <- dbinom(x,n_sync, p_bin)
 
+plot(x,dbinom(x,n_sync, p_bin),
+     type='h',
+     ylab ='Probability',
+     xlab = 'Validator selected'
+     )
+
+# We now need to combine this with the randomly generated values & check if they pass the test
+# Note that a validator may be selected more than once & each time a new random byte will be assigned
+
+#' PROCESS OF SELECTING SYNC COMMITTEE MEMBERS
+#' --------------------------------------------------------------------------
+#' 1. Shuffle index of validators (shuffled_index)
+#' 2. Assign candidate index (candidate_index <- shuffled_index)
+#' 3. Generate a random byte for that candidate
+#' 4. Check if the candidate passes the test
+#' 5. Yes - a. add to sync committee  if membership count is not yet 512
+#'        - b. increment membership counter
+#' 6. No - do not increment membership counter & pass through the loop again
+
+# Create the validator set consisting of an equal number of validators from each staker
+# Shuffle the entire set
+# -------------------------------------------------------------------------------------
+active_validators_df <- tibble(
+  staker = sample(c(rep("A",2560), rep("B",2560), rep("C", 2560))),
+  selected = rep(0,7680)
+)
+sync_committee_total <- 0
+sync_candidate <- sample(x=seq(0,7679),size = 1)      # draw a validator from the validator set
+
+###### >>>>> CONTINUE HERE TOMORROW!!!
+random_byte_values_sync <- runif(7680,0,255)
+r_int_sync <- floor(random_byte_values_sync)
+while (sync_committee_total < 512) {
+  
+}
 
 # Post-EIP-7521 for three staking groups: A, B & C
-scenario2b_post_EIP7521_prob_A <- 128/156   # single stake (unconsolidated)
-scenario2b_post_EIP7521_prob_B <- 2/156     # maxEB stake
-scenario2b_post_EIP7521_prob_C <- 26/156    # varying consolidation 
+scenario_post_EIP7521_prob_A <- 1280/1560   # single stake (unconsolidated)
+scenario_post_EIP7521_prob_B <- 20/1560     # maxEB stake
+scenario_post_EIP7521_prob_C <- 20/1560    # varying consolidation 
 
 # Post-EIP-7521 for four consolidated validator types
-scenario2b_post_EIP7521_prob_single  <- 142/156  #  1 x 32 ETH
-scenario2b_post_EIP7521_prob_single  <- 5/156    #  2 x 32 ETH
-scenario2b_post_EIP7521_prob_5_fold  <- 4/156    #  5 x 32 ETH
-scenario2b_post_EIP7521_prob_10_fold <- 2/156    # 10 x 32 ETH
-scenario2b_post_EIP7521_prob_maxEB   <- 3/156    # 64 x 32 ETH
+scenario_post_EIP7521_prob_single  <- 1420/1560  #  1 x 32 ETH
+scenario_post_EIP7521_prob_single  <- 50/1560    #  2 x 32 ETH
+scenario_post_EIP7521_prob_5_fold  <- 40/1560    #  5 x 32 ETH
+scenario_post_EIP7521_prob_10_fold <- 20/1560    # 10 x 32 ETH
+scenario_post_EIP7521_prob_maxEB   <- 30/1560    # 64 x 32 ETH
 
 
 

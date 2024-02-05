@@ -215,12 +215,19 @@ We know that if a candidate did not pass the selection process, then the next on
 Therefore we are interested in the probability that every  validator in the active validator set failed the eligibility check.
 
 We know that prior to consolidation, all the validators will have an \gls{eb} of 32 ETH.\\
-$\therefore$ \textit{ P(no proposer selected) =} $\binom{n}{k} p^k q^{(n-k)} = \binom{716,800}{716,800} 0.984^{716,800}0.016^0 = (0.984)^{716,800}$\\
+$\therefore$ \textit{ P(no proposer selected) =} $\binom{n}{k} p^k q^{(n-k)} = \binom{716,800}{716,800} 0.984^{716,800}0.016^0$ \\
 %Alternatively, $1 - \textit{P(one proposer selected)}$  = 
-$\therefore$ \textit{ P(no proposer selected) = } $0.984^{716,800} = 0$ \\
+$\therefore$ \textit{ P(no proposer selected) = } $0.984^{716,800} \approx 0$ \\
 Although for each validator the probability of passing the proposer check is quite low, viz. 0.016, it is highly unlikely, and essentially impossible, for every single validator in the validator set to fail the selection test.\\
 
-The probability of selecting the first candidate = 1/n, the probability of the next is 1/(n-1) .... 1/1 = $ \frac{1}{716,800!}$
+The probability of selecting a candidate in the first round = 1/n, the probability of the next, given the validator was not selected in the first round, is 1/(n-1) .... 1/1 = $ \frac{1}{716,800!}$ \\
+We need to calculate all the possible combinations for a validator to be selected in any round: \\
+
+\noindent
+\textit{P(validator selected as next proposer) }$= \sum^{n}_{i=1} p_i * (\prod_{j-1}^{i}(1-p_{j-1})) $, \textit{ where}\\
+$p_i = P(\textit{round i proposer}) = P(\textit{round i candidate}) * P(\textit{passing proposer check)}$,
+\textit{n=716,800}, and\\
+$p_0 = 0$ \\
 
 \noindent
 \textbf{\textit{Proposer selection \gls{bn}}} \\
@@ -360,9 +367,9 @@ Sync committee members are selected with replacement from the active validator s
 
 The denominator for the acceptance probability is MaxEB which means the probability will change from $\frac{b}{32}$ to $\frac{b}{2,048}$, where \textit{b = validator effective balance}. Check whether this adversely affects validators with a small stake, apart from the expected increase in time to select the committee, as D'Amato and Neuder pointed out \cite{damato2023}.
 
-From the \href{https://github.com/ethereum/consensus-specs/pull/2130#discussion\_r532499943}{discussion in Github} it is interesting to note that it was a deliberate choice to select sync committee members \textbf{with replacement}. This strategy is necessary if there is a situation where the number of active validators is less than pre-determined sync committee size. 
+From the \href{https://github.com/ethereum/consensus-specs/pull/2130#discussion\_r532499943}{discussion in Github} it is interesting to note that it was a deliberate choice to select sync committee members \textbf{with replacement}. This strategy is necessary if there is a situation where the number of active validators is less than pre-determined sync committee size. However, the current active validator count is approximately 900,000 (end of January 2024), and therefore this situation is irrelevant.
 
-Therefore, theoretically a validator can be chosen more than once to be in the committee, and consequently we can conclude that the size of the next sync committee is always $\leqslant SYNC\_COMMITTEE\_SIZE$.  
+If we draw one candidate from the complete validator set for each iteration, then a validator can theoretically be chosen more than once to be in the next sync committee, and consequently we can conclude that the number of distinct validators in the next sync committee is always $\leqslant SYNC\_COMMITTEE\_SIZE$.  
 
 The committee selection process is handled in \href{https://eth2book.info/capella/part3/helper/accessors/#def\_get\_next\_sync\_committee\_indices}{\textit{get\_next\_sync\_committee\_indices}} \cite{Edgington2023} shown below: 
 
@@ -400,17 +407,10 @@ $EPOCHS\_PER\_SYNC\_COMMITTEE\_PERIOD = 2^8 = 256$ \textit{ epochs}, which is $\
  
 The decision to accept a selected candidate validator  to participate in the sync committee, follows the same logic as is used for the acceptance of the candidate validator as a proposer. However, in this instance, we continue with the process until we have 255 sync committee members, which may contain duplicates as mentioned previously.
  
-To demonstrate that this process works as intended we consider a couple of simple example scenarios:
-\begin{enumerate}
-\item The active validator set has fewer than 255 validators
-\item The active validator set has more than 255 validators
-\end{enumerate}
-
-The first case is currently very unrealistic with an active validator count of approximately 900,000 at the end of January 2024, but we have left it in for completeness.
-
+To demonstrate that this process works as intended we consider a simple example scenario:
 
 \begin{table}[htp]
-\caption{Simple sync committee example scenario 2 - more than 255 validators}
+\caption{Simple sync committee example -  validators}
 \begin{center}
 \begin{tabular}{|l|c|c|c|c|c|c|r|}
 \hline
@@ -419,11 +419,11 @@ The first case is currently very unrealistic with an active validator count of a
 \cline{2-8}
 \textbf{Staker}  & Single & Single & 2-fold & 5-fold & 10-fold & Maximum & Total \\
 \hline
-A & 128 & 128 & 0 &0 & 0 & 0 & 128 \\
-B  & 128 & 0 & 0 &0 & 0 & 2 & 2 \\
-C  & 128 & 14 & 5 & 4 & 2 & 1 & 26\\
+A & 2560 & 2560 & 0 &0 & 0 & 0 &  2560 \\
+B  & 2560 & 0 & 0 &0 & 0 & 40 & 40 \\
+C  & 2560 & 280 & 100 & 80 & 40 & 20 & 520\\
  \hline
- TOTAL & 384 & 142 & 5 & 4 & 2 & 3 & 156 \\
+ TOTAL & 7680 & 2840 & 100 & 80 & 40 & 60 & 3020 \\
  \hline
 \end{tabular}
 \end{center}
@@ -436,6 +436,7 @@ Assuming that ``After consolidation'' in Table \ref{tbl:syncscenario} represents
 \begin{table}[htp]
 \caption{Sync committee probabilities for example scenario }
 \begin{center}
+\setlength\tabcolsep{2pt}                % lessen the white space between table cells (default is 6pt)
 \begin{tabular}{|l|c|c|c|c|c|c|c|c|c|c|c|c|}
 \hline
 & \multicolumn{2}{c|}{\textbf{Before }} & \multicolumn{8}{c|}{\textbf{After}} \\
@@ -446,12 +447,10 @@ Assuming that ``After consolidation'' in Table \ref{tbl:syncscenario} represents
  & Prob &  Prob  & Prob &  Prob  & Prob &  Prob & Prob &  Prob  & Prob &  Prob  \\
 \textbf{Staker}  & (select) &  (accept)  & (select) &  (accept)  & (select) &  (accept) & (select) &  (accept)  & (select) &  (accept)  \\
 \hline
-%A & 128 & 128 & 0 &0 & 0 & 0 & 128 & 0 & 0 & 0 & 0  \\
-%B  & 128 & 0 & 0 &0 & 0 & 2 & 2 \\
-%C  & 128 & 14 & 5 & 4 & 2 & 1 & 26\\
-% \hline
-% TOTAL & 384 & 142 & 5 & 4 & 2 & 3 & 156 \\
-% \hline
+A & 0 & 0 & 0 &0 & 0 & 0 & 0 & 0 & 0 & 0  \\
+B & 0 & 0 & 0 &0 & 0 & 0 & 0 & 0 & 0 & 0  \\
+C & 0 & 0 & 0 &0 & 0 & 0 & 0 & 0 & 0 & 0  \\
+\hline
 \end{tabular}
 \end{center}
 \label{tbl:syncprobs}
