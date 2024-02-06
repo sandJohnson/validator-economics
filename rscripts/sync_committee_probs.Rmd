@@ -37,6 +37,11 @@ options(scipen = 999)
 knitr::opts_chunk$set(dpi = if (knitr::is_latex_output()) 72 else 300,
                       echo=FALSE)
 ```
+## Fetch R functions to use
+```{r}
+source("sync_functions.R")
+```
+
 
 ## Sync committee selection
 
@@ -99,24 +104,22 @@ df_sync_random_sync  <- df_sync_random  %>%
 ```{r}
 
 ```
+## Example Scenario: post EIP-7521
 
-#' Example Scenario: post EIP-7521
-#' -------------------------------
-#' - The total number of validators (n) in the active validator set is more than 255 (128*3=384) 
-#' - Three staker groups: A, B, C
-#' - The validators owned by the three staker groups have been consolidated in different ways
-#' - A, B, and C have all staked the same amount, so even though the number of validators owned by each group may differ, they all have the same number of virtual validators.
-#' 
-#' NOTE: The concept of a virtual validator needs to work with validators that are not  multiples of 32 ETH.
-#' Reason being once we are compounding to various validators we will have validators that have fractions of 32 ETH added to them over time.
-#' ---------------------------------------------------------------------------------------
+ - The total number of validators (n) in the active validator set is more than 255 (128*3=384) 
+ - Three staker groups: A, B, C
+ - The validators owned by the three staker groups have been consolidated in different ways
+ - A, B, and C have all staked the same amount, so even though the number of validators owned by each group may differ, they all have the same number of virtual validators.
+
+### NOTE: The concept of a virtual validator needs to work with validators that are not  multiples of 32 ETH.
+Reason being once we are compounding to various validators we will have validators that have fractions of 32 ETH added to them over time.
+
+- What we want to visualise is the probability distribution for membership of the sync committee for each of the staker groups:
+ 1. As is currently the case
+ 2. After EIP-7521 has been implemented
 ```{r}
-
-
-# What we want to visualise is the probability distribution for membership of the sync committee for each of the staker groups
-# 1. As is currently the case
-# 2. After EIP-7521 has been implemented
-
+# Binomial distribution for sync committee selection
+# ---------------------------------------------------
 # Pre-EIP-7521, the probability of one of the validators of each of the stakers being in the
 # sync committee is given by:
 scenario_pre_EIP7521_prob <- 1/3          # 2560/7680 
@@ -135,48 +138,91 @@ plot(x,dbinom(x,n_sync, p_bin),
      ylab ='Probability',
      xlab = 'Validator selected'
      )
+```
 
-# We now need to combine this with the randomly generated values & check if they pass the test
+## PROCESS OF SELECTING SYNC COMMITTEE MEMBERS
+
+ 1. Shuffle index of validators (shuffled_index)
+ 2. Assign candidate index (candidate_index <- shuffled_index)
+ 3. Generate a random byte for that candidate
+ 4. Check if the candidate passes the test
+ 5. Yes - a. add to sync committee  if membership count is not yet 512
+        - b. increment membership counter
+ 6. No - do not increment membership counter & pass through the loop again
+
+```{r}
+# We need to combine a candidate with the randomly generated value & check if it passes the test
 # Note that a validator may be selected more than once & each time a new random byte will be assigned
 
-#' PROCESS OF SELECTING SYNC COMMITTEE MEMBERS
-#' --------------------------------------------------------------------------
-#' 1. Shuffle index of validators (shuffled_index)
-#' 2. Assign candidate index (candidate_index <- shuffled_index)
-#' 3. Generate a random byte for that candidate
-#' 4. Check if the candidate passes the test
-#' 5. Yes - a. add to sync committee  if membership count is not yet 512
-#'        - b. increment membership counter
-#' 6. No - do not increment membership counter & pass through the loop again
-
-# Create the validator set consisting of an equal number of validators from each staker
-# Shuffle the entire set
+#' EXAMPLE SCENARIO, PRE-EIP7521: 
+#' ------------------------------
+#' Total validator set size - 7,680, three stakers, each with 2,560 validators
+# Shuffle the entire set each time to draw the next candidate
 # -------------------------------------------------------------------------------------
 active_validators_df <- tibble(
   staker = sample(c(rep("A",2560), rep("B",2560), rep("C", 2560))),
-  selected = rep(0,7680)
 )
-sync_committee_total <- 0
-sync_candidate <- sample(x=seq(0,7679),size = 1)      # draw a validator from the validator set
 
-###### >>>>> CONTINUE HERE TOMORROW!!!
-random_byte_values_sync <- runif(7680,0,255)
-r_int_sync <- floor(random_byte_values_sync)
-while (sync_committee_total < 512) {
-  
-}
+# Note we are assuming that all validators have 32 ETH EB
+# Pre-EIP-7521 all validators will pass the sync committee check
+# We are therefore only really looking at how many validators have been selected 
+# more than once to join the sync committee
+
+sync_committee_df <- assign_sync_committee(active_validators_df)
+sync_committee_unique_df <- assign_unique_sync_mbrs(sync_committee_df) 
+
+# Running the above grouping had values of 490 and 495 unique validators.
+# Being a small validator set this is unsurprising
+
+# Check staker representation in the sync committee
+# Appears to be a similar distribution for the 3 staking groups in the large active validator set
+sync_staker_totals_df <- assign_total_sync_stakers(sync_committee_df)
+
+# Perhaps we need to do this for the current validator set size!!
+# Using 900,000 for active validator set size & repeat the above procedure
+# ========================================================================
+active_validators_df_now <- tibble(
+  staker = sample(c(rep("A",300000), rep("B",300000), rep("C", 300000))),
+  selected = rep(0,900000)
+)
+sync_committee_df_now <- assign_sync_committee(active_validators_df_now)
+sync_committee_unique_df_now <- assign_unique_sync_mbrs(sync_committee_df_now) 
+
+# As expected no duplicates when the active validator set is so large, there were no validators
+# elected to the sync committee more than once ^^
+
+# Let us also look at how the stakers fared. They all had the same number of validators and 
+# all validators had 32 ETH with MaxEB = 32 ETH
+sync_staker_totals_df_now <- assign_total_sync_stakers(sync_committee_df_now)
+
+## TODO: Plot proportion of stake (each 1/3) against the proportional 
+## ----  representation in the sync committee (A: 152/512, B: 187/512, C: 173/512)
+##                                            (A: 0.298,   B: 0.365,   C: 0.338 )
+# ======================================================================================
+```
+
+
+```{r}
+# Sync committee selection post-EIP-7521
+# --------------------------------------
+active_validators_df_maxeb <- tibble(
+  staker = c(rep("A",2560), rep("B",40), rep("C", 520)),
+  EB = c(rep(32,2560), rep(2048,40), rep(32,280), rep(64,100), rep(320,40), rep(2048,20))
+)
+
+## CONTINUE HERE TOMORROW!!!!
 
 # Post-EIP-7521 for three staking groups: A, B & C
-scenario_post_EIP7521_prob_A <- 1280/1560   # single stake (unconsolidated)
-scenario_post_EIP7521_prob_B <- 20/1560     # maxEB stake
-scenario_post_EIP7521_prob_C <- 20/1560    # varying consolidation 
+scenario_post_EIP7521_prob_A <- 2560/3020   # single stake (unconsolidated)
+scenario_post_EIP7521_prob_B <- 40/3020     # maxEB stake
+scenario_post_EIP7521_prob_C <- 520/3020    # varying consolidation 
 
 # Post-EIP-7521 for four consolidated validator types
-scenario_post_EIP7521_prob_single  <- 1420/1560  #  1 x 32 ETH
-scenario_post_EIP7521_prob_single  <- 50/1560    #  2 x 32 ETH
-scenario_post_EIP7521_prob_5_fold  <- 40/1560    #  5 x 32 ETH
-scenario_post_EIP7521_prob_10_fold <- 20/1560    # 10 x 32 ETH
-scenario_post_EIP7521_prob_maxEB   <- 30/1560    # 64 x 32 ETH
+scenario_post_EIP7521_prob_single  <- 2840/3020  #  1 x 32 ETH
+scenario_post_EIP7521_prob_single  <- 100/3020    #  2 x 32 ETH
+scenario_post_EIP7521_prob_5_fold  <- 80/3020    #  5 x 32 ETH
+scenario_post_EIP7521_prob_10_fold <- 40/3020    # 10 x 32 ETH
+scenario_post_EIP7521_prob_maxEB   <- 60/3020    # 64 x 32 ETH
 
 
 
