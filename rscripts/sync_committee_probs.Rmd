@@ -271,4 +271,24 @@ scenario_post_EIP7521_prob_maxEB   <- 60/3020    # 64 x 32 ETH
 
 
 ```
+## Probabilities and Expected values
+```{r}
+# Totals for each type of validator
+active_validators_df_maxeb_now_EB_totals <- active_validators_df_maxeb_now %>%
+  group_by(EB) %>%
+  summarise(selected = n()) 
+
+# Totals for each staker
+active_validators_df_maxeb_now_staker_totals <- active_validators_df_maxeb_now %>%
+  group_by(staker) %>%
+  summarise(selected = n()) %>%
+  mutate(prob = selected/397158)
+
+# Totals by staker & validator type
+active_validators_df_maxeb_now_staker_EB_totals <- active_validators_df_maxeb_now %>%
+  group_by(staker, EB) %>%
+  summarise(total = n(), .groups = 'keep') %>%  # summarise with both grouping vars (default is 'drop_last')
+  mutate(prob = total/397158) %>%
+  arrange(EB,staker)
+```
 
