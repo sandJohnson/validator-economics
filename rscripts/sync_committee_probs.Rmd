@@ -285,10 +285,43 @@ active_validators_df_maxeb_now_staker_totals <- active_validators_df_maxeb_now %
   mutate(prob = selected/397158)
 
 # Totals by staker & validator type
+# Add probability column, which is the probability of being selected as a 
+# sync committee member
 active_validators_df_maxeb_now_staker_EB_totals <- active_validators_df_maxeb_now %>%
   group_by(staker, EB) %>%
   summarise(total = n(), .groups = 'keep') %>%  # summarise with both grouping vars (default is 'drop_last')
   mutate(prob = total/397158) %>%
   arrange(EB,staker)
+
+# Expected numbers in the sync committee
+# Expected value = n*p 
+expected_sync_mbrs <- active_validators_df_maxeb_now_staker_EB_totals %>%
+  mutate(selectacceptprob = prob * case_when(
+      EB == 32 ~ (1/64),
+      EB == 64 ~ (2/64),
+      EB == 160 ~ (5/64),
+      EB == 320 ~ (10/64),
+      EB == 960 ~ (30/64),
+      EB == 2048 ~ 1,
+      TRUE ~ 0)
+      ) 
+
+totalselectacceptprobs = sum(expected_sync_mbrs$selectacceptprob)
+
+# Expected proportions by staker and EB (i.e. validator consolidation type)
+expected_sync_mbrs <- expected_sync_mbrs %>%
+  mutate(expected = (selectacceptprob/totalselectacceptprobs) * 512) %>%
+  mutate(proportions = expected/total) 
+
+# Check total selected = 512 
+sync_committee_total <- sum(expected_sync_mbrs$expected)
+
+# Showing that the expected number from each staker is the same
+# Is this correct? 
+# Need to think this through again ..........<<<<< START HERE TOMORROW!!!
+expected_sync_mbrs_staker <- expected_sync_mbrs %>%
+  group_by(staker) %>%
+  summarise(expected_staker = sum(expected))     
+
 ```
 
