@@ -5,7 +5,7 @@
 % ------------------------------------------------
 Elowsson (2024) published a comprehensive post on ethresear.ch on Ethereum issuance. This post included analysis and modelling of consensus incentives and variability of solo staker reward, as well as several other aspects relevant to issuance and staker yield (\href{https://ethresear.ch/t/properties-of-issuance-level-consensus-incentives-and-variability-across-potential-reward-curves/18448}{Properties of issuance level: consensus incentives and variability across potential reward curves}).
 
-Note that rewards earned by a compounding validator does not need to pass through the activation churn due to the small amounts of ETH involved (in conversation with Mikhail).
+Note that rewards earned by a compounding validator does not need to pass through the activation churn due to the small amounts of ETH involved (in conversation with Mikhail). \\ 
 
 \noindent
 \textbf{Proposer rewards} \\
@@ -36,7 +36,18 @@ Note that rewards earned by a compounding validator does not need to pass throug
 
 \noindent
 \textbf{Sync committee rewards} \\
-% ------------------------------------------------
+% --------------------------------------------
+A sync committee of 512 members is selected from the active validator every 256 epochs. To become a member, the next validator selected from a shuffled index is checked to see if it passes the sync membership test. The entire validator set is shuffled every time before another validator is drawn randomly from the set. Therefore, validators may be selected more than once, but this rarely happens when the validator set is very large, as is currently the case ($\sim$ 900,000 in January 2024).
+
+The per-epoch reward for each sync committee member that performs its duties correctly during that epoch is calculated as follows: 
+
+
+``Sync committee participants receive a reward for every slot that they correctly perform their duties. With 512 members in the committee, and 32 slots per epoch, the reward per validator per slot for correct participation is
+
+
+There is the total increments of the whole active validator set, so this is a large number. The per-epoch per-validator reward is 32 times this.
+
+The maximum issuance per epoch to sync committee members in respect of their sync contributions is then''
 
 
 % ------------------------------------------------
