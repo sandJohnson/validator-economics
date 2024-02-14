@@ -26,11 +26,31 @@ Some strategies have already been put in place to avoid discouragement attacks \
 % ------------------------------------------------------------
 \subsubsection{Consolidation of validators}
 % -------------------------------------------------------------
+Slashing as a direct result of consolidation of validators is discussed in \ref{consolidationslashing}. The example given is when the consolidation event occurs during a fork in the chain.
 
+Mike Neuder had a proposal that did not get much traction, but that sounded interesting:\\
+\begin{itemize}
+\item Have a one-time consolidation event
+\item A hot update of validator balances during the hard fork on pre-signed messages 
+\end{itemize}
+If this was an option then there would be no ip merge needed and we have people committing to merging validators.
+
+Lion thought it was an interesting idea, but not sure if such an event would negate consolidation concerns. It appears that Francesco was also not in favour of such a proposal, but unsure of the reasons why.
 
 % ------------------------------------------------------------
 \subsubsection{Withdrawals}
 % -------------------------------------------------------------
+There is also discussion around how withdrawals for consolidated validators should work. There are two main ways of achieving this, and some stakers may want both, instead of settling for one of the two options:
+\begin{itemize}
+\item Custom ceilings
+\item Partial withdrawals
+\end{itemize}
+
+The idea of custom ceilings is that a staker nominates a ceiling for a consolidated validator, and when that ceiling it reached, then the partial withdrawal sweep will move any balance above the ceiling into the validator's account. In other words it functions like the current withdrawal sweep, but in stead of kicking in at 32ETH balance for each validator, it will vary as specified for each consolidated validator.
+
+The contention here is that custom ceilings add complexity to the protocol. which is unnecessary if partial withdrawals cover all the use cases.  However, \gls{el} partials are gas consuming, and from conversations that Mike Neuder had with staking pools, they prefer custom ceilings to partials. The added bonus is that it makes the change entirely a \gls{cl}  layer change.
+
+Moreover the consolidation exercise is viewed as a one-off event meaning that there is no expectation that adjustments of ceilings should be catered for.
 
 \subsubsection{Centralisation forces}
 % ---------------------------------------------------------------

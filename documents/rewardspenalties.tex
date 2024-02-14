@@ -5,6 +5,8 @@
 % ------------------------------------------------
 Elowsson (2024) published a comprehensive post on ethresear.ch on Ethereum issuance. This post included analysis and modelling of consensus incentives and variability of solo staker reward, as well as several other aspects relevant to issuance and staker yield (\href{https://ethresear.ch/t/properties-of-issuance-level-consensus-incentives-and-variability-across-potential-reward-curves/18448}{Properties of issuance level: consensus incentives and variability across potential reward curves}).
 
+Note that rewards earned by a compounding validator does not need to pass through the activation churn due to the small amounts of ETH involved (in conversation with Mikhail).
+
 \noindent
 \textbf{Proposer rewards} \\
 % ------------------------------------------------
@@ -75,7 +77,7 @@ In the $3^{rd}$ blogpost, Neuder and Monnot propose the following for current sl
 The initial slashing penalty is proportional to the validator's effective balance, $MIN\_SLASHING\_PENALTY\_QUOTIENT\_BELLATRIX=32$, giving a maximum penalty of 1 ETH if the slashed validator has 32 ETH, the current MaxEB.
 If left unchanged, a fully consolidated validator would incur an initial slashing penalty of 64 ETH. There appears to be general agreement that this initial penalty is too high, and may deter larger stakers such as Lido to support EIP-7521.
 
-Neuder and Monnot suggest that the initial penalty could either be changed to a constant value, or through a monotonically increasing function, e.g.  from the family of polynomials. The latter appears to be the preferred option. However, mention has also been made of a zero initial slashing penalty since a slashed validator already incurs additional penalties while waiting for its exit epoch. 
+Neuder and Monnot suggest that the initial penalty could either be changed to a constant value, or through a monotonically increasing function, e.g.  from the family of polynomials. The latter appears to be the preferred option. However, mention has also been made of a zero initial slashing penalty since a slashed validator already incurs additional penalties such as attestation penalties and lost revenue while waiting for its exit epoch. Francesco is not in favour of a zero initial penalty because that means that there is no penalty to proposal equivocation, which is already a relatively cheap \gls{dos} attack vector on the network. For example, it is not good if someone can make 1,000 different blocks at zero cost.
 
 For a monotonically increasing function, the authors propose the following function to calculate the revised initial slashing penalty:\\
 \textit{initial penalty =} $\frac{EB^x}{32}, \texttt{ } x \leqslant 1$ \\
@@ -83,6 +85,10 @@ For a monotonically increasing function, the authors propose the following funct
 Their blogpost has graphs for $x=1, \frac{15}{16}, \frac{7}{8}, \frac{3}{4}, \frac{1}{2}$ and a line for a constant initial penalty of 1 ETH \cite{Neuder2023d}.
 
 The authors conclude that visually it appears that $x = \frac{3}{4}$ and $\frac{7}{8}$ are good choices in terms of balancing the size of the initial slashing penalty and the risk for a consolidated validator.\\
+
+Since the previous discussion and reasoning, an alternative point of view has been put forward, and that is to set the initial slashing penalty to zero. LIDO appears in favour of a small penalty as a deterrent, but penalties are already incurred due to the enforced wait time to the exit epoch and a small or zero initial penalty would not seem all that relevant. Moreover, a zero initial slashing penalty would favour smaller stakers over larger stakers.
+
+Lion commented that setting the initial slashing penalty to zero does not fix the original aim of splitting attester and proposer slashing.  Although not specifically related to MaxEB, Lion summarised discussion around proposer and attester slashing in the following \href{https://docs.google.com/document/d/1mOc5nokVm3jx4bCffTuQ_xjYV4zVlDLPI-KEhFWWP78/edit}{blog post}.
 
 \noindent
 \textbf{\textit{Correlation penalty}} \\
@@ -128,6 +134,12 @@ For EIP-7521 the authors propose a function that preserves the requirement that 
 Moreover, the new correlation penalty function scales quadratically as opposed to the current function that scales linearly. With the proposed new function, the slashing penalties are substantially reduced for all validators, regardless of whether they have consolidated stake.
 
 Refer to the \href{https://notes.ethereum.org/@mikeneuder/slashings-eip-7251}{blogpost} to view graphs showing the comparative correlated slashing penalties for solo (32 ETH), partially consolidated (256 ETH), and fully consolidated (2,048 ETH) validators applying both the current and the proposed functions \cite{Neuder2023d}. \\
+
+Lion summarised some discussion around proposer and attester slashing, with the aim of decoupling correlated penalties from equivocating proposers and reducing a validator's time in exit status. (\href{https://hackmd.io/@dapplion/S1pGYKR_T}{blog post}). Independence is required for message replay protection. By reverting this \gls{pr} consolidated validators have a higher expected cost of proposer errors. However, the expected cost is negligible. If large stakers are convinced of this, then the additional complexity can be removed and Lion is in favour of dropping it.
+
+In other words, by setting the initial penalty to 0 and keeping the separation of proposer and attester slashing, the cost of proposer equivocation becomes very low. Agreement whether the additional complexity in the slashing flow is justified is still uncertain. It seems that the main benefit is when there are high correlation penalties (which will also affect staking pool validators), or very long exit queues, e.g. several months. At other times the cost is merely missed revenue plus penalties accrued over the 36 day withdrawal period, i.e. $\frac{1}{6}^{th}$ if the yield, like $0.5\%$ now.
+
+
 
 \noindent
 \textbf{\textit{Attestation penalty}} \\
@@ -184,6 +196,7 @@ Using the current method, the authors calculated the penalty for three different
 
 \noindent
 \textbf{\textit{Potential slashing during consolidation}} \\
+\label{consolidationslashing}
 % -------------------------------------------------------------------
 The points summarised here arose from discussions amongst several people, including Lion, Mikhail Kalinin, Francesco, Barnabé Monnot, Mike Neuder, Roberto Saltini.
 
@@ -226,7 +239,7 @@ Mikhail suggested three options to enable slashing across consolidations:
 \item pass the consolidating stake through the activation churn.\\
 \\
 Bypassing the exit churn would be the improvement for stakers and a consolidation to be reverted if the source is slashed before the \gls{eb} was fully activated, without the necessity to make the target liable for the source's slashings.\\
-Milhail feels that this option is more natural from the protocol perspective. Consolidating via churn when the queue is empty means it will be 4 epochs, instead of 2 epochs to wait for consolidation to be finalised. However, Francesco pointed out that a large amount of consolidations would require weeks or months of churn.  Nonetheless, Mikhail does not expect pools to consolidate much faster than allowed by the churn due to the inherent risks. The concern is that pools would be reluctant to consolidate via churn due to lost revenue. 
+Mikhail feels that this option is more natural from the protocol perspective. Consolidating via churn when the queue is empty means it will be 4 epochs, instead of 2 epochs to wait for consolidation to be finalised. However, Francesco pointed out that a large amount of consolidations would require weeks or months of churn.  Nonetheless, Mikhail does not expect pools to consolidate much faster than allowed by the churn due to the inherent risks. The concern is that pools would be reluctant to consolidate via churn due to lost revenue. 
 
 \item finalise consolidation on-chain before activating a consolidated balance. This is akin to waiting for \textit{activation\_eligibility\_epoch} to be finalised. \\
 \\
@@ -234,5 +247,10 @@ This is Mikhail's preferred option, with the addition of improving the slasher's
 \item accompanying the slashing message with the consolidation from another chain.
 \end{enumerate}
 
+Mikhail summarised the proposed slashing rule for a consolidation event is as follows: \\
+\noindent
+Resolve the final target validator and slash the whole consolidation chain: the source, interim targets and the final target.
+
+From the perspective of the slasher, the slashable offence occurs whenever \textit{consolidated\_to} is changed on any of the observable forks. 
 
 
