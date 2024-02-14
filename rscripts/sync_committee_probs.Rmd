@@ -315,13 +315,16 @@ expected_sync_mbrs <- expected_sync_mbrs %>%
 
 # Check total selected = 512 
 sync_committee_total <- sum(expected_sync_mbrs$expected)
+  
 
-# Showing that the expected number from each staker is the same
-# Is this correct? 
-# Need to think this through again ..........<<<<< START HERE TOMORROW!!!
-expected_sync_mbrs_staker <- expected_sync_mbrs %>%
-  group_by(staker) %>%
-  summarise(expected_staker = sum(expected))     
+```
+## Single validator dependence on active validator set 
+```{r}
+# Vary number of validators to see how it affects a single validator in the 
+# active validator set, wrt selection to sync committees and next block proposer
+
+# May code this as a Shiny app!
+
 
 ```
 
