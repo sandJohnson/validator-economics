@@ -61,3 +61,6 @@ rsconnect/
 *.cb
 *.cb2
 .*.lb
+
+# apple system directory files
+**/.DS_Store

@@ -1,0 +1,868 @@
+\glsdefs@newdocentry{apr}%
+{%
+name={APR},%
+sort={APR},%
+type={acronym},%
+first={annual percentage rate\glsspace (APR)},%
+firstplural={annual percentage rate\acrpluralsuffix \glsspace (APR\acrpluralsuffix )},%
+text={APR},%
+plural={APR\acrpluralsuffix },%
+description={annual percentage rate},%
+descriptionplural={annual percentage rate\acrpluralsuffix },%
+symbol={\relax },%
+symbolplural={\relax },%
+user1={},%
+user2={},%
+user3={},%
+user4={},%
+user5={},%
+user6={},%
+long={annual percentage rate},%
+longplural={annual percentage rates},%
+short={APR},%
+shortplural={APRs},%
+counter={page},%
+parent={},%
+%
+}%
+
+\glsdefs@newdocentry{bls}%
+{%
+name={BLS},%
+sort={BLS},%
+type={acronym},%
+first={Boneh–Lynn–Shacham\glsspace (BLS)},%
+firstplural={Boneh–Lynn–Shacham\acrpluralsuffix \glsspace (BLS\acrpluralsuffix )},%
+text={BLS},%
+plural={BLS\acrpluralsuffix },%
+description={Boneh–Lynn–Shacham},%
+descriptionplural={Boneh–Lynn–Shacham\acrpluralsuffix },%
+symbol={\relax },%
+symbolplural={\relax },%
+user1={},%
+user2={},%
+user3={},%
+user4={},%
+user5={},%
+user6={},%
+long={Boneh–Lynn–Shacham},%
+longplural={Boneh–Lynn–Shachams},%
+short={BLS},%
+shortplural={BLSs},%
+counter={page},%
+parent={},%
+%
+}%
+
+\glsdefs@newdocentry{bn}%
+{%
+name={BN},%
+sort={BN},%
+type={acronym},%
+first={Bayesian network\glsspace (BN)},%
+firstplural={Bayesian network\acrpluralsuffix \glsspace (BN\acrpluralsuffix )},%
+text={BN},%
+plural={BN\acrpluralsuffix },%
+description={Bayesian network},%
+descriptionplural={Bayesian network\acrpluralsuffix },%
+symbol={\relax },%
+symbolplural={\relax },%
+user1={},%
+user2={},%
+user3={},%
+user4={},%
+user5={},%
+user6={},%
+long={Bayesian network},%
+longplural={Bayesian networks},%
+short={BN},%
+shortplural={BNs},%
+counter={page},%
+parent={},%
+%
+}%
+
+\glsdefs@newdocentry{cbeth}%
+{%
+name={cbETH},%
+sort={cbETH},%
+type={acronym},%
+first={Coinbase wrapped staked ETH\glsspace (cbETH)},%
+firstplural={Coinbase wrapped staked ETH\acrpluralsuffix \glsspace (cbETH\acrpluralsuffix )},%
+text={cbETH},%
+plural={cbETH\acrpluralsuffix },%
+description={Coinbase wrapped staked ETH},%
+descriptionplural={Coinbase wrapped staked ETH\acrpluralsuffix },%
+symbol={\relax },%
+symbolplural={\relax },%
+user1={},%
+user2={},%
+user3={},%
+user4={},%
+user5={},%
+user6={},%
+long={Coinbase wrapped staked ETH},%
+longplural={Coinbase wrapped staked ETHs},%
+short={cbETH},%
+shortplural={cbETHs},%
+counter={page},%
+parent={},%
+%
+}%
+
+\glsdefs@newdocentry{cdf}%
+{%
+name={CDF},%
+sort={CDF},%
+type={acronym},%
+first={cumulative distribution function\glsspace (CDF)},%
+firstplural={cumulative distribution function\acrpluralsuffix \glsspace (CDF\acrpluralsuffix )},%
+text={CDF},%
+plural={CDF\acrpluralsuffix },%
+description={cumulative distribution function},%
+descriptionplural={cumulative distribution function\acrpluralsuffix },%
+symbol={\relax },%
+symbolplural={\relax },%
+user1={},%
+user2={},%
+user3={},%
+user4={},%
+user5={},%
+user6={},%
+long={cumulative distribution function},%
+longplural={cumulative distribution functions},%
+short={CDF},%
+shortplural={CDFs},%
+counter={page},%
+parent={},%
+%
+}%
+
+\glsdefs@newdocentry{cl}%
+{%
+name={CL},%
+sort={CL},%
+type={acronym},%
+first={consensus layer\glsspace (CL)},%
+firstplural={consensus layer\acrpluralsuffix \glsspace (CL\acrpluralsuffix )},%
+text={CL},%
+plural={CL\acrpluralsuffix },%
+description={consensus layer},%
+descriptionplural={consensus layer\acrpluralsuffix },%
+symbol={\relax },%
+symbolplural={\relax },%
+user1={},%
+user2={},%
+user3={},%
+user4={},%
+user5={},%
+user6={},%
+long={consensus layer},%
+longplural={consensus layers},%
+short={CL},%
+shortplural={CLs},%
+counter={page},%
+parent={},%
+%
+}%
+
+\glsdefs@newdocentry{dvt}%
+{%
+name={DVT},%
+sort={DVT},%
+type={acronym},%
+first={distributed validator technology\glsspace (DVT)},%
+firstplural={distributed validator technology\acrpluralsuffix \glsspace (DVT\acrpluralsuffix )},%
+text={DVT},%
+plural={DVT\acrpluralsuffix },%
+description={distributed validator technology},%
+descriptionplural={distributed validator technology\acrpluralsuffix },%
+symbol={\relax },%
+symbolplural={\relax },%
+user1={},%
+user2={},%
+user3={},%
+user4={},%
+user5={},%
+user6={},%
+long={distributed validator technology},%
+longplural={distributed validator technologys},%
+short={DVT},%
+shortplural={DVTs},%
+counter={page},%
+parent={},%
+%
+}%
+
+\glsdefs@newdocentry{eb}%
+{%
+name={EB},%
+sort={EB},%
+type={acronym},%
+first={effective balance\glsspace (EB)},%
+firstplural={effective balance\acrpluralsuffix \glsspace (EB\acrpluralsuffix )},%
+text={EB},%
+plural={EB\acrpluralsuffix },%
+description={effective balance},%
+descriptionplural={effective balance\acrpluralsuffix },%
+symbol={\relax },%
+symbolplural={\relax },%
+user1={},%
+user2={},%
+user3={},%
+user4={},%
+user5={},%
+user6={},%
+long={effective balance},%
+longplural={effective balances},%
+short={EB},%
+shortplural={EBs},%
+counter={page},%
+parent={},%
+%
+}%
+
+\glsdefs@newdocentry{ef}%
+{%
+name={EF},%
+sort={EF},%
+type={acronym},%
+first={Ethereum Foundation\glsspace (EF)},%
+firstplural={Ethereum Foundation\acrpluralsuffix \glsspace (EF\acrpluralsuffix )},%
+text={EF},%
+plural={EF\acrpluralsuffix },%
+description={Ethereum Foundation},%
+descriptionplural={Ethereum Foundation\acrpluralsuffix },%
+symbol={\relax },%
+symbolplural={\relax },%
+user1={},%
+user2={},%
+user3={},%
+user4={},%
+user5={},%
+user6={},%
+long={Ethereum Foundation},%
+longplural={Ethereum Foundations},%
+short={EF},%
+shortplural={EFs},%
+counter={page},%
+parent={},%
+%
+}%
+
+\glsdefs@newdocentry{eip}%
+{%
+name={EIP},%
+sort={EIP},%
+type={acronym},%
+first={Ethereum Improvement Proposal\glsspace (EIP)},%
+firstplural={Ethereum Improvement Proposal\acrpluralsuffix \glsspace (EIP\acrpluralsuffix )},%
+text={EIP},%
+plural={EIP\acrpluralsuffix },%
+description={Ethereum Improvement Proposal},%
+descriptionplural={Ethereum Improvement Proposal\acrpluralsuffix },%
+symbol={\relax },%
+symbolplural={\relax },%
+user1={},%
+user2={},%
+user3={},%
+user4={},%
+user5={},%
+user6={},%
+long={Ethereum Improvement Proposal},%
+longplural={Ethereum Improvement Proposals},%
+short={EIP},%
+shortplural={EIPs},%
+counter={page},%
+parent={},%
+%
+}%
+
+\glsdefs@newdocentry{el}%
+{%
+name={EL},%
+sort={EL},%
+type={acronym},%
+first={execution layer\glsspace (EL)},%
+firstplural={execution layer\acrpluralsuffix \glsspace (EL\acrpluralsuffix )},%
+text={EL},%
+plural={EL\acrpluralsuffix },%
+description={execution layer},%
+descriptionplural={execution layer\acrpluralsuffix },%
+symbol={\relax },%
+symbolplural={\relax },%
+user1={},%
+user2={},%
+user3={},%
+user4={},%
+user5={},%
+user6={},%
+long={execution layer},%
+longplural={execution layers},%
+short={EL},%
+shortplural={ELs},%
+counter={page},%
+parent={},%
+%
+}%
+
+\glsdefs@newdocentry{epbs}%
+{%
+name={ePBS},%
+sort={ePBS},%
+type={acronym},%
+first={enshrined PBS\glsspace (ePBS)},%
+firstplural={enshrined PBS\acrpluralsuffix \glsspace (ePBS\acrpluralsuffix )},%
+text={ePBS},%
+plural={ePBS\acrpluralsuffix },%
+description={enshrined PBS},%
+descriptionplural={enshrined PBS\acrpluralsuffix },%
+symbol={\relax },%
+symbolplural={\relax },%
+user1={},%
+user2={},%
+user3={},%
+user4={},%
+user5={},%
+user6={},%
+long={enshrined PBS},%
+longplural={enshrined PBSs},%
+short={ePBS},%
+shortplural={ePBSs},%
+counter={page},%
+parent={},%
+%
+}%
+
+\glsdefs@newdocentry{ffg}%
+{%
+name={FFG},%
+sort={FFG},%
+type={acronym},%
+first={Friendly finality gadget\glsspace (FFG)},%
+firstplural={Friendly finality gadget\acrpluralsuffix \glsspace (FFG\acrpluralsuffix )},%
+text={FFG},%
+plural={FFG\acrpluralsuffix },%
+description={Friendly finality gadget},%
+descriptionplural={Friendly finality gadget\acrpluralsuffix },%
+symbol={\relax },%
+symbolplural={\relax },%
+user1={},%
+user2={},%
+user3={},%
+user4={},%
+user5={},%
+user6={},%
+long={Friendly finality gadget},%
+longplural={Friendly finality gadgets},%
+short={FFG},%
+shortplural={FFGs},%
+counter={page},%
+parent={},%
+%
+}%
+
+\glsdefs@newdocentry{fxs}%
+{%
+name={FXS},%
+sort={FXS},%
+type={acronym},%
+first={Frax share\glsspace (FXS)},%
+firstplural={Frax share\acrpluralsuffix \glsspace (FXS\acrpluralsuffix )},%
+text={FXS},%
+plural={FXS\acrpluralsuffix },%
+description={Frax share},%
+descriptionplural={Frax share\acrpluralsuffix },%
+symbol={\relax },%
+symbolplural={\relax },%
+user1={},%
+user2={},%
+user3={},%
+user4={},%
+user5={},%
+user6={},%
+long={Frax share},%
+longplural={Frax shares},%
+short={FXS},%
+shortplural={FXSs},%
+counter={page},%
+parent={},%
+%
+}%
+
+\glsdefs@newdocentry{ghost}%
+{%
+name={GHOST},%
+sort={GHOST},%
+type={acronym},%
+first={Greedy Heaviest-Observed Sub-Tree\glsspace (GHOST)},%
+firstplural={Greedy Heaviest-Observed Sub-Tree\acrpluralsuffix \glsspace (GHOST\acrpluralsuffix )},%
+text={GHOST},%
+plural={GHOST\acrpluralsuffix },%
+description={Greedy Heaviest-Observed Sub-Tree},%
+descriptionplural={Greedy Heaviest-Observed Sub-Tree\acrpluralsuffix },%
+symbol={\relax },%
+symbolplural={\relax },%
+user1={},%
+user2={},%
+user3={},%
+user4={},%
+user5={},%
+user6={},%
+long={Greedy Heaviest-Observed Sub-Tree},%
+longplural={Greedy Heaviest-Observed Sub-Trees},%
+short={GHOST},%
+shortplural={GHOSTs},%
+counter={page},%
+parent={},%
+%
+}%
+
+\glsdefs@newdocentry{ldo}%
+{%
+name={LDO},%
+sort={LDO},%
+type={acronym},%
+first={Lido DAO\glsspace (LDO)},%
+firstplural={Lido DAO\acrpluralsuffix \glsspace (LDO\acrpluralsuffix )},%
+text={LDO},%
+plural={LDO\acrpluralsuffix },%
+description={Lido DAO},%
+descriptionplural={Lido DAO\acrpluralsuffix },%
+symbol={\relax },%
+symbolplural={\relax },%
+user1={},%
+user2={},%
+user3={},%
+user4={},%
+user5={},%
+user6={},%
+long={Lido DAO},%
+longplural={Lido DAOs},%
+short={LDO},%
+shortplural={LDOs},%
+counter={page},%
+parent={},%
+%
+}%
+
+\glsdefs@newdocentry{lmd}%
+{%
+name={LMD},%
+sort={LMD},%
+type={acronym},%
+first={Latest message driven\glsspace (LMD)},%
+firstplural={Latest message driven\acrpluralsuffix \glsspace (LMD\acrpluralsuffix )},%
+text={LMD},%
+plural={LMD\acrpluralsuffix },%
+description={Latest message driven},%
+descriptionplural={Latest message driven\acrpluralsuffix },%
+symbol={\relax },%
+symbolplural={\relax },%
+user1={},%
+user2={},%
+user3={},%
+user4={},%
+user5={},%
+user6={},%
+long={Latest message driven},%
+longplural={Latest message drivens},%
+short={LMD},%
+shortplural={LMDs},%
+counter={page},%
+parent={},%
+%
+}%
+
+\glsdefs@newdocentry{mev}%
+{%
+name={MEV},%
+sort={MEV},%
+type={acronym},%
+first={maximal extractable value\glsspace (MEV)},%
+firstplural={maximal extractable value\acrpluralsuffix \glsspace (MEV\acrpluralsuffix )},%
+text={MEV},%
+plural={MEV\acrpluralsuffix },%
+description={maximal extractable value},%
+descriptionplural={maximal extractable value\acrpluralsuffix },%
+symbol={\relax },%
+symbolplural={\relax },%
+user1={},%
+user2={},%
+user3={},%
+user4={},%
+user5={},%
+user6={},%
+long={maximal extractable value},%
+longplural={maximal extractable values},%
+short={MEV},%
+shortplural={MEVs},%
+counter={page},%
+parent={},%
+%
+}%
+
+\glsdefs@newdocentry{mm}%
+{%
+name={MM},%
+sort={MM},%
+type={acronym},%
+first={MetaMask\glsspace (MM)},%
+firstplural={MetaMask\acrpluralsuffix \glsspace (MM\acrpluralsuffix )},%
+text={MM},%
+plural={MM\acrpluralsuffix },%
+description={MetaMask},%
+descriptionplural={MetaMask\acrpluralsuffix },%
+symbol={\relax },%
+symbolplural={\relax },%
+user1={},%
+user2={},%
+user3={},%
+user4={},%
+user5={},%
+user6={},%
+long={MetaMask},%
+longplural={MetaMasks},%
+short={MM},%
+shortplural={MMs},%
+counter={page},%
+parent={},%
+%
+}%
+
+\glsdefs@newdocentry{p2p}%
+{%
+name={p2p},%
+sort={p2p},%
+type={acronym},%
+first={peer-to-peer\glsspace (p2p)},%
+firstplural={peer-to-peer\acrpluralsuffix \glsspace (p2p\acrpluralsuffix )},%
+text={p2p},%
+plural={p2p\acrpluralsuffix },%
+description={peer-to-peer},%
+descriptionplural={peer-to-peer\acrpluralsuffix },%
+symbol={\relax },%
+symbolplural={\relax },%
+user1={},%
+user2={},%
+user3={},%
+user4={},%
+user5={},%
+user6={},%
+long={peer-to-peer},%
+longplural={peer-to-peers},%
+short={p2p},%
+shortplural={p2ps},%
+counter={page},%
+parent={},%
+%
+}%
+
+\glsdefs@newdocentry{pbs}%
+{%
+name={PBS},%
+sort={PBS},%
+type={acronym},%
+first={proposer builder separation\glsspace (PBS)},%
+firstplural={proposer builder separation\acrpluralsuffix \glsspace (PBS\acrpluralsuffix )},%
+text={PBS},%
+plural={PBS\acrpluralsuffix },%
+description={proposer builder separation},%
+descriptionplural={proposer builder separation\acrpluralsuffix },%
+symbol={\relax },%
+symbolplural={\relax },%
+user1={},%
+user2={},%
+user3={},%
+user4={},%
+user5={},%
+user6={},%
+long={proposer builder separation},%
+longplural={proposer builder separations},%
+short={PBS},%
+shortplural={PBSs},%
+counter={page},%
+parent={},%
+%
+}%
+
+\glsdefs@newdocentry{pc}%
+{%
+name={PC},%
+sort={PC},%
+type={acronym},%
+first={personal computer\glsspace (PC)},%
+firstplural={personal computer\acrpluralsuffix \glsspace (PC\acrpluralsuffix )},%
+text={PC},%
+plural={PC\acrpluralsuffix },%
+description={personal computer},%
+descriptionplural={personal computer\acrpluralsuffix },%
+symbol={\relax },%
+symbolplural={\relax },%
+user1={},%
+user2={},%
+user3={},%
+user4={},%
+user5={},%
+user6={},%
+long={personal computer},%
+longplural={personal computers},%
+short={PC},%
+shortplural={PCs},%
+counter={page},%
+parent={},%
+%
+}%
+
+\glsdefs@newdocentry{pdf}%
+{%
+name={PDF},%
+sort={PDF},%
+type={acronym},%
+first={probability density function\glsspace (PDF)},%
+firstplural={probability density function\acrpluralsuffix \glsspace (PDF\acrpluralsuffix )},%
+text={PDF},%
+plural={PDF\acrpluralsuffix },%
+description={probability density function},%
+descriptionplural={probability density function\acrpluralsuffix },%
+symbol={\relax },%
+symbolplural={\relax },%
+user1={},%
+user2={},%
+user3={},%
+user4={},%
+user5={},%
+user6={},%
+long={probability density function},%
+longplural={probability density functions},%
+short={PDF},%
+shortplural={PDFs},%
+counter={page},%
+parent={},%
+%
+}%
+
+\glsdefs@newdocentry{pos}%
+{%
+name={PoS},%
+sort={PoS},%
+type={acronym},%
+first={proof of stake\glsspace (PoS)},%
+firstplural={proof of stake\acrpluralsuffix \glsspace (PoS\acrpluralsuffix )},%
+text={PoS},%
+plural={PoS\acrpluralsuffix },%
+description={proof of stake},%
+descriptionplural={proof of stake\acrpluralsuffix },%
+symbol={\relax },%
+symbolplural={\relax },%
+user1={},%
+user2={},%
+user3={},%
+user4={},%
+user5={},%
+user6={},%
+long={proof of stake},%
+longplural={proof of stakes},%
+short={PoS},%
+shortplural={PoSs},%
+counter={page},%
+parent={},%
+%
+}%
+
+\glsdefs@newdocentry{pr}%
+{%
+name={PR},%
+sort={PR},%
+type={acronym},%
+first={pull request\glsspace (PR)},%
+firstplural={pull request\acrpluralsuffix \glsspace (PR\acrpluralsuffix )},%
+text={PR},%
+plural={PR\acrpluralsuffix },%
+description={pull request},%
+descriptionplural={pull request\acrpluralsuffix },%
+symbol={\relax },%
+symbolplural={\relax },%
+user1={},%
+user2={},%
+user3={},%
+user4={},%
+user5={},%
+user6={},%
+long={pull request},%
+longplural={pull requests},%
+short={PR},%
+shortplural={PRs},%
+counter={page},%
+parent={},%
+%
+}%
+
+\glsdefs@newdocentry{rig}%
+{%
+name={RIG},%
+sort={RIG},%
+type={acronym},%
+first={Robust Incentives Group\glsspace (RIG)},%
+firstplural={Robust Incentives Group\acrpluralsuffix \glsspace (RIG\acrpluralsuffix )},%
+text={RIG},%
+plural={RIG\acrpluralsuffix },%
+description={Robust Incentives Group},%
+descriptionplural={Robust Incentives Group\acrpluralsuffix },%
+symbol={\relax },%
+symbolplural={\relax },%
+user1={},%
+user2={},%
+user3={},%
+user4={},%
+user5={},%
+user6={},%
+long={Robust Incentives Group},%
+longplural={Robust Incentives Groups},%
+short={RIG},%
+shortplural={RIGs},%
+counter={page},%
+parent={},%
+%
+}%
+
+\glsdefs@newdocentry{rpl}%
+{%
+name={RPL},%
+sort={RPL},%
+type={acronym},%
+first={Rocket Pool\glsspace (RPL)},%
+firstplural={Rocket Pool\acrpluralsuffix \glsspace (RPL\acrpluralsuffix )},%
+text={RPL},%
+plural={RPL\acrpluralsuffix },%
+description={Rocket Pool},%
+descriptionplural={Rocket Pool\acrpluralsuffix },%
+symbol={\relax },%
+symbolplural={\relax },%
+user1={},%
+user2={},%
+user3={},%
+user4={},%
+user5={},%
+user6={},%
+long={Rocket Pool},%
+longplural={Rocket Pools},%
+short={RPL},%
+shortplural={RPLs},%
+counter={page},%
+parent={},%
+%
+}%
+
+\glsdefs@newdocentry{ssf}%
+{%
+name={SSF},%
+sort={SSF},%
+type={acronym},%
+first={single-slot finality\glsspace (SSF)},%
+firstplural={single-slot finality\acrpluralsuffix \glsspace (SSF\acrpluralsuffix )},%
+text={SSF},%
+plural={SSF\acrpluralsuffix },%
+description={single-slot finality},%
+descriptionplural={single-slot finality\acrpluralsuffix },%
+symbol={\relax },%
+symbolplural={\relax },%
+user1={},%
+user2={},%
+user3={},%
+user4={},%
+user5={},%
+user6={},%
+long={single-slot finality},%
+longplural={single-slot finalitys},%
+short={SSF},%
+shortplural={SSFs},%
+counter={page},%
+parent={},%
+%
+}%
+
+\glsdefs@newdocentry{steth}%
+{%
+name={stETH},%
+sort={stETH},%
+type={acronym},%
+first={Lido staked Ether\glsspace (stETH)},%
+firstplural={Lido staked Ether\acrpluralsuffix \glsspace (stETH\acrpluralsuffix )},%
+text={stETH},%
+plural={stETH\acrpluralsuffix },%
+description={Lido staked Ether},%
+descriptionplural={Lido staked Ether\acrpluralsuffix },%
+symbol={\relax },%
+symbolplural={\relax },%
+user1={},%
+user2={},%
+user3={},%
+user4={},%
+user5={},%
+user6={},%
+long={Lido staked Ether},%
+longplural={Lido staked Ethers},%
+short={stETH},%
+shortplural={stETHs},%
+counter={page},%
+parent={},%
+%
+}%
+
+\glsdefs@newdocentry{ups}%
+{%
+name={UPS},%
+sort={UPS},%
+type={acronym},%
+first={uninterruptable power supply\glsspace (UPS)},%
+firstplural={uninterruptable power supply\acrpluralsuffix \glsspace (UPS\acrpluralsuffix )},%
+text={UPS},%
+plural={UPS\acrpluralsuffix },%
+description={uninterruptable power supply},%
+descriptionplural={uninterruptable power supply\acrpluralsuffix },%
+symbol={\relax },%
+symbolplural={\relax },%
+user1={},%
+user2={},%
+user3={},%
+user4={},%
+user5={},%
+user6={},%
+long={uninterruptable power supply},%
+longplural={uninterruptable power supplys},%
+short={UPS},%
+shortplural={UPSs},%
+counter={page},%
+parent={},%
+%
+}%
+
+\glsdefs@newdocentry{vrf}%
+{%
+name={VRF},%
+sort={VRF},%
+type={acronym},%
+first={verifiable random function\glsspace (VRF)},%
+firstplural={verifiable random function\acrpluralsuffix \glsspace (VRF\acrpluralsuffix )},%
+text={VRF},%
+plural={VRF\acrpluralsuffix },%
+description={verifiable random function},%
+descriptionplural={verifiable random function\acrpluralsuffix },%
+symbol={\relax },%
+symbolplural={\relax },%
+user1={},%
+user2={},%
+user3={},%
+user4={},%
+user5={},%
+user6={},%
+long={verifiable random function},%
+longplural={verifiable random functions},%
+short={VRF},%
+shortplural={VRFs},%
+counter={page},%
+parent={},%
+%
+}%
+
