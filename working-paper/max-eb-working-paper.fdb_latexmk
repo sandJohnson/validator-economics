@@ -1,12 +1,12 @@
 # Fdb version 3
-["bibtex max-eb-working-paper"] 1709556512 "max-eb-working-paper.aux" "max-eb-working-paper.bbl" "max-eb-working-paper" 1709556965
+["bibtex max-eb-working-paper"] 1709558179 "max-eb-working-paper.aux" "max-eb-working-paper.bbl" "max-eb-working-paper" 1709558198
   "eptcs.bst" 0 -1 0 ""
-  "max-eb-working-paper.aux" 1709556886 16223 f4fe900c6d4a246addcaec264ca344ea "pdflatex"
-  "references.bib" 1709554985 17491 ecfa2e890a2a23b31e8709af6e860518 ""
+  "max-eb-working-paper.aux" 1709558197 16189 f31dbcda7c837a37feafcf84f0ce2e99 "pdflatex"
+  "references.bib" 1709558049 17220 cbd2f2399943c5c573aaf700fb9cab23 ""
   (generated)
   "max-eb-working-paper.bbl"
   "max-eb-working-paper.blg"
-["pdflatex"] 1709556965 "max-eb-working-paper.tex" "max-eb-working-paper.pdf" "max-eb-working-paper" 1709556965
+["pdflatex"] 1709558195 "max-eb-working-paper.tex" "max-eb-working-paper.pdf" "max-eb-working-paper" 1709558198
   "/usr/local/texlive/2022/texmf-dist/fonts/enc/dvips/cm-super/cm-super-ts1.enc" 1136849721 2900 1537cc8184ad1792082cd229ecc269f4 ""
   "/usr/local/texlive/2022/texmf-dist/fonts/map/fontname/texfonts.map" 1577235249 3524 cb3e574dea2d1052e39280babc910dc8 ""
   "/usr/local/texlive/2022/texmf-dist/fonts/tfm/jknappen/ec/tcrm0600.tfm" 1136768653 1536 12e8c510d3e158fdd0e9a42e75118bd9 ""
@@ -57,7 +57,6 @@
   "/usr/local/texlive/2022/texmf-dist/fonts/type1/public/amsfonts/cm/cmr12.pfb" 1248133631 32722 d7379af29a190c3f453aba36302ff5a9 ""
   "/usr/local/texlive/2022/texmf-dist/fonts/type1/public/amsfonts/cm/cmr17.pfb" 1248133631 32362 179c33bbf43f19adbb3825bb4e36e57a ""
   "/usr/local/texlive/2022/texmf-dist/fonts/type1/public/amsfonts/cm/cmr5.pfb" 1248133631 31809 8670ca339bf94e56da1fc21c80635e2a ""
-  "/usr/local/texlive/2022/texmf-dist/fonts/type1/public/amsfonts/cm/cmr6.pfb" 1248133631 32734 69e00a6b65cedb993666e42eedb3d48f ""
   "/usr/local/texlive/2022/texmf-dist/fonts/type1/public/amsfonts/cm/cmr7.pfb" 1248133631 32762 224316ccc9ad3ca0423a14971cfa7fc1 ""
   "/usr/local/texlive/2022/texmf-dist/fonts/type1/public/amsfonts/cm/cmr8.pfb" 1248133631 32726 0a1aea6fcd6468ee2cf64d891f5c43c8 ""
   "/usr/local/texlive/2022/texmf-dist/fonts/type1/public/amsfonts/cm/cmr9.pfb" 1248133631 33993 9b89b85fd2d9df0482bd47194d1d3bf3 ""
@@ -247,11 +246,11 @@
   "/usr/local/texlive/2022/texmf-var/web2c/pdftex/pdflatex.fmt" 1650575205 2826435 89b148f502e787dce5b576eba0a4ab2e ""
   "/usr/local/texlive/2022/texmf.cnf" 1647878952 577 209b46be99c9075fd74d4c0369380e8c ""
   "compute-proposer-index.py" 1709548440 696 5ed5486bb9ae14264c0f5d7d12492e3c ""
-  "max-eb-working-paper.aux" 1709556886 16223 f4fe900c6d4a246addcaec264ca344ea "pdflatex"
+  "max-eb-working-paper.aux" 1709558197 16189 f31dbcda7c837a37feafcf84f0ce2e99 "pdflatex"
   "max-eb-working-paper.bbl" 0 -1 0 "bibtex max-eb-working-paper"
-  "max-eb-working-paper.glsdefs" 1709556886 18423 d5df3f8d53cd6b8225994a46b83d24eb "pdflatex"
-  "max-eb-working-paper.out" 1709556886 5964 dab08688445183a9c1f5efbc2dd926cf "pdflatex"
-  "max-eb-working-paper.tex" 1709556963 123569 b48f1dcd5d16ef1805ec84215c485329 ""
+  "max-eb-working-paper.glsdefs" 1709558197 18423 d5df3f8d53cd6b8225994a46b83d24eb "pdflatex"
+  "max-eb-working-paper.out" 1709558197 5964 dab08688445183a9c1f5efbc2dd926cf "pdflatex"
+  "max-eb-working-paper.tex" 1709558180 123738 9849582a5d998542d80b3718cd1fad19 ""
   (generated)
   "max-eb-working-paper.aux"
   "max-eb-working-paper.glsdefs"

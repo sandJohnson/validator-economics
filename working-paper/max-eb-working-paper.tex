@@ -807,11 +807,10 @@ proposer selection is a two-stage process:
 \end{enumerate}
 
 The \emph{swap-or-not-shuffle} technique is used to shuffle the validator
-indices in preparation for the selection of a block proposer
-\cite{compute-shuffled-index}.
-
-The computation to determine the proposer for the next block is the
-following:\footnote{\url{https://github.com/ethereum/consensus-specs/blob/9c35b7384e78da643f51f9936c578da7d04db698/specs/phase0/beacon-chain.md#compute_proposer_index}}
+indices in preparation for the selection of a block proposer.
+%\footnote{\href{https://github.com/ethereum/consensus-specs/blob/9c35b7384e78da643f51f9936c578da7d04db698/specs/phase0/beacon-chain.md#compute_shuffled_index}{link to function}}
+The computation to determine the proposer for the next block is the following:
+%\footnote{\href{https://github.com/ethereum/consensus-specs/blob/9c35b7384e78da643f51f9936c578da7d04db698/specs/phase0/beacon-chain.md#compute_proposer_index}{link to function}}
 \lstinputlisting[language=Python]{compute-proposer-index.py}
 
 Therefore, we iterate through the shuffled indices, starting with the first
