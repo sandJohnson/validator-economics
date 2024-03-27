@@ -18,6 +18,7 @@
 \usepackage[acronym]{glossaries}
 \usepackage[hang,footnotesize,bf]{caption}
 \DeclareGraphicsRule{.tif}{png}{.png}{`convert #1 `dirname #1`/`basename #1 .tif`.png}
+\usepackage{cleveref}
 
 % Copied from Stack Exchange for ToDo items
 % -----------------------------------------------------------
@@ -33,6 +34,12 @@
 \newcommandx{\thiswillnotshow}[2][1=]{\todo[disable,#1]{#2}}
 
 % from overleaf for code blocks (with linting)
+%------------------------------------------------------------------------------
+\newcommand{\rb}{\mathbf r}
+\newcommand{\eb}{x}
+\newcommand{\prob}{\mathbb P}
+\newcommand{\maxeb}{m}
+\newcommand{\teb}{\tilde{\eb}}
 %------------------------------------------------------------------------------
 \usepackage{listings} %usage \begin{lstlisting} ... \end{lstlisting}
 % or from external code file \lstinputlisting[language=Python]{filename.py}
@@ -63,6 +70,9 @@
 
 \lstset{style=mystyle}
 
+\newtheorem{theorem}{Theorem}
+\newtheorem{lemma}{Lemma}
+\newtheorem{example}{Example}
 %------------------------------------------------------------------------------
 
 \title{Expected utility under EIP-7521\footnote{We would like to acknowledge
@@ -315,13 +325,13 @@ those with an effective balance of 32 ETH \cite{Neuder2023a}.
     %We already weight the probability of becoming a proposer by the effective balance of that validator. See compute\_proposer\_index 17. Currently, if a validator’s effective balance (EB) is below the MaxEB, they are selected as the proposer given their validator index was randomly chosen only if,
 
     %\begin{equation*}
-    %EB * 255 \geqslant MaxEB*r, \texttt{ } where \texttt{ } r \sim U(0,255)
+    %EB \cdot  255 \geqslant MaxEB\cdot r, \texttt{ } where \texttt{ } r \sim U(0,255)
     %\end{equation*}
     %
     %Thus if EB = MaxEB, given the validator index was selected, the validator becomes the proposer with probability 1. Otherwise the probability is
     %
     %\begin{equation*}
-    %Pr(proposer | selected) = Pr \left( r \geqslant \frac{255*EB}{MaxEB} \right)
+    %Pr(proposer | selected) = Pr \left( r \geqslant \frac{255\cdot EB}{MaxEB} \right)
     %\end{equation*}
     Neuder states ``This works as intended even with a higher MaxEB, though it
     will slightly increase the time it takes to calculate the next proposer
@@ -817,22 +827,216 @@ Therefore, we iterate through the shuffled indices, starting with the first
 entry and then check whether it passes the selection criteria. If it doesn’t,
 then the next validator index in the array goes through the same check.
 
-As we can see from the code, the validator’s effective balance (EB) is
-multiplied by 255 (i.e.  $\text{MAX\_RANDOM\_BYTE} = 2^8 - 1 = 255$) and then
-compared to the product of the generated random\_byte, $r$ and 
-$\text{MAX\_EFFECTIVE\_BALANCE} = 2,048 \textsc{eth}$.
+As we can see from the code, the validator’s \emph{effective balance} is
+multiplied by 255 (i.e.  $\texttt{MAX\_RANDOM\_BYTE} = 2^8 - 1 = 255$) and then
+compared to the product of the generated random\_byte, $\rb: \Omega \rightarrow
+[255]$ and the $\text{MAX\_EFFECTIVE\_BALANCE} = 2,048
+\textsc{eth}$.\footnote{Here we are adopting the convention that $\Omega$ is
+  the implicit state space and $[n]$ is shorthand for the set of integers $0,
+\dots 254$.}
+  
 
-Figure 1 (a) is an exposition of random byte values generated for 716,800
+\Cref{fig-rb} (a) is an exposition of random byte values generated for 716,800
 validators from the \emph{random\_byte} assignment statement below.
 Superimposed on the histogram of these random byte integers is a uniform
 distribution. As expected, the random bytes appear to visually resemble values
-drawn from a uniform distribution: $r \sim U(0,255)$. We confirm this in the
-Q–Q plot in Figure 1 (b). Hence we can assume in subsequent calculations that
-the random bytes, $r$, have a uniform distribution, $r \sim U(0,255)$.
+drawn from a uniform distribution: $\rb \sim U(0,255)$. We confirm this in 
+the Q–Q plot of \cref{fig-rb} (b).
 
 \begin{lstlisting}
 random_byte = hash(seed + uint_to_bytes(uint64(i // 32)))[i % 32].
 \end{lstlisting}
+
+\feedback [inline] {figure 1 a and b here}
+\begin{figure}
+  ...
+  \caption{\label{fig-rb}}
+\end{figure}
+
+The probability of a validator being the proposer if their index was selected
+from the list is calculated as follows. Let $C_i$ be the event ``candidate $i$
+proposer check passed''. Then
+
+\begin{align} \label{eq-candidate}
+  C_i = \{\omega : 255 \cdot \eb_i \geq \rb(\omega) \cdot \maxeb \},
+  % = \{\eb : r \leq 255 \cdot \eb / \maxeb\},
+\end{align}
+$\eb_i = \texttt{candidate\_effective\_balance}$ and $\maxeb =
+\texttt{MAX\_EFFECTIVE\_BALANCE}$.
+Observe that the conditional probability $\prob(C \mid \eb_i = \maxeb) = 1$. In
+other words, if $i$'s effective balance of is equal to the maximum effective
+balance, then $i$ becomes the proposer with probability 1. Observe that the
+above holds, regardless of the value of $\maxeb$.
+
+
+In case where $\eb_i < \maxeb$, the probability of passing the proposer
+eligibility test will vary depending on the extent of validator consolidation.
+Let $\tilde \rb = \rb / 255$ be the normalized random byte function and, for
+each $\eb_i \in [32, 2048]$, let $\teb_i \in [1, 64]$, 
+$\teb_i = \eb_i / 32$ denote the normalized measure of $i$'s
+consolidated effective balance, so that $\tilde \eb_i = 1$ captures the
+status quo and $\teb_i = 64$ the maximally consolidated validator. 
+Via \cref{eq-candidate},
+\[C_i = \{\omega : \rb(\omega) / 255 \leq \eb_i / 2048\}
+= \{\omega : \tilde \rb(\omega) \leq \teb_i / 64\},\]
+so that, for every $\eb_i \in [32, 2048]$, 
+$\prob(C_i \mid \eb_i) = \teb_i /64$,
+and
+\begin{table}[htp]
+\begin{center}
+\caption{Probability candidate $i$ passes the proposer check conditional on
+effective balance}
+\renewcommand{\arraystretch}{1.3}
+\begin{tabular}{c|c|c|c|c|c|c}
+  \hline
+  $\eb_i$
+  & 32 & 64 & 128 & 256 & 512 & 1024\\
+  \hline
+  $\prob(C_i \mid \eb_i)$&
+  0.015625 & 0.03125 & 0.0625 & 0.125 & 0.25 & 0.5\\
+  \hline
+\end{tabular}
+\end{center}
+\end{table}
+
+%If the randomly selected candidate validator has $\eb_i = 32\textsc{eth}$, then
+%Therefore, $\prob(C_i) \approx 0.016$ (to three decimal places).
+%
+%$\therefore \prob(proposer \texttt{ } check \texttt{ }passed) \equiv
+%\left(\frac{32}{2048}\right) = 0.016$  **64 ETH (2 * 32 ETH)**
+%$\therefore \prob(proposer \texttt{ } check \texttt{ } passed) =
+%\left(\frac{64}{2048}\right) = 0.031$  **160 ETH (5 * 32 ETH)**
+%$\therefore \prob(proposer \texttt{ } check \texttt{ } passed) =
+%\left(\frac{160}{2048}\right) = 0.078$  **320 ETH (10 * 32 ETH)**
+%$\therefore \prob(proposer \texttt{ } check \texttt{ }passed) =
+%\left(\frac{320}{2048}\right) = 0.156$ **960 ETH (30 * 32 ETH)**
+%$\therefore \prob(proposer \texttt{ } check \texttt{ }passed) =
+%\left(\frac{960}{2048}\right) = 0.469$
+
+Figure 2 below depicts the increase in passing the proposer eligibility test as
+the validator's effective balance increases.
+
+Assuming a validator set size of 716,800, then the probability of any
+validator, regardless of their effective balance, being first in the list of
+shuffled validator indices (i.e. the candidate to be assessed as the next block
+proposer) is: 
+$\prob(candidate) = \frac{1}{(Active \texttt{ } validator \texttt{ } set \texttt{ }
+size)} = \frac{1}{ 716,800} = 1.395 \cdot 10^{-6}$.
+
+Currently (i.e. prior to EIP-7521), providing a validator maintains its
+effective balance at 32 ETH, once its index is selected as the next candidate
+to be checked, it would pass the proposer selection test with certainty (i.e.
+probability of $1$, or $100\%$).
+
+
+Putting it another way:
+Given EB=32 ETH, then the probability of being selected as the $1^{st}$
+candidate and becoming the next proposer is calculated as follows: $\prob(candidate
+\texttt{ }$ $\&$ $\texttt{ }proposer$ $check$ $passed)$  $= \prob(candidate) \cdot
+\prob(proposer$ $check$ $passed / candidate)$  $= \prob(candidate) \cdot \prob(proposer$
+$check$ $passed)$ (since these two events are independent)  $=
+\left(\frac{1}{716800}\right) \cdot 1 \approx 1.395 \cdot 10^{-6}$
+
+After MaxEB = 2,048 ETH, this changes to:
+$\prob(candidate$ $\&$ $proposer$ $check$ $passed) =$
+$\left(\frac{1}{716800}\right) \cdot \left(\frac{32}{2048}\right)$
+$\approx 2.18\cdot 10^{-8}$
+
+For the current MaxEB of 32 ETH, we know that if the validator is selected as
+the $1^{st}$ candidate in the shuffled index, then they will definitely be the
+proposer for the next block.
+
+When we consider the increased MaxEB proposal, then it may be quite likely that
+a validator is selected as the next candidate validator for the proposer
+eligibility test at subsequent rounds (e.g. $2^{nd}, 3^{rd}, ..., n^{th}$),
+because a selected candidate will be less likely to pass the proposer check.
+
+Therefore we calculate the probability that a 32 ETH validator, $v$, is
+selected at round $i$ given that all the previous rounds $(1,2, ... (i-1))$
+were unsuccessful, i.e. we sum over all the possible rounds that this validator
+may have been selected.
+
+For example, if validator $v$ is selected at round 3, there would have been a
+rejection of another validator at round 1 and round 2. Stating this more
+generally:  $\prob(validator \texttt{ } v \texttt{ } selected \texttt{ } as
+\texttt{ } next \texttt{ } proposer) = \sum_{i=1}^{716,800} p_i \cdot  \left(
+\prod_{j=1}^i (1-p_{j-1}) \right), \texttt{ } where$ 
+$p_i = \prob(round \texttt{ }i \texttt{ } proposer) = \prob(round \texttt{ } i \texttt{
+} candidate) \cdot  \prob(passing \texttt{ } proposer \texttt{ } eligibility)$, $and
+\texttt{ } p_0 = 0$
+This probability is also $1.395 \cdot  10^{-6}$.
+
+In summary, with an increased MaxEB, a solo staker would be selected as the
+next proposer with a probability of $2.18\cdot 10^{-8}$, from the current $1.395 \cdot 
+10^{-6}$ probability if they are the first candidate in the shuffled index.
+However, their probability over all the possible outcomes will be the same as
+is currently the case, if all the other validators have the same EB and hence
+the same probability of passing the proposer check.
+
+It gets a bit more complex when the minimal solo staker is competing against
+validators that are more likely to pass the proposer eligibility check, e.g.
+after implementation of EIP-7521.
+
+The probability calculations above assumes a validator set with no
+consolidation, i.e. the validator set size remained unchanged with the
+introduction of EIP-7521. In practice this is highly unlikely. Therefore, we
+consider an example scenario.
+
+\begin{example} Scenario: \emph{Active validator set has validators with
+    varying EBs (i.e. stakers may choose different strategies for validator
+    consolidation)} To the best of our knowledge, the analyses to date have
+    mainly been for a homogeneous validator set, i.e. all validators have the
+    same effective balance, either unconsolidated (32 ETH) or fully
+    consolidated (2,048 ETH). This includes the analysis we conducted above.
+  \end{example}
+
+Hence, a more interesting scenario would be an active validator set with a
+variety of effective balances.
+
+
+Therefore, let us assume that we have an active validator set with 716,800
+validators prior to EIP-7251. The stakers in this validator set choose to
+combine some of their validators to a greater or lesser extent, and may in fact
+leave several of their validators unconsolidated, i.e. at 32 ETH.
+
+We visualise this hypothetical consolidation of the validator set in Figure 3
+below.
+
+We group the stakers into five categories:
+\begin{enumerate}
+\item Small-scale solo stakers (32 - a few hundred ETH)
+\item Large-scale individual solo stakers (1000+ ETH)
+\item Large-scale institutional solo stakers (ie. companies staking their own ETH)
+\item Centralised staking pools
+\item Semi-decentralised staking pools (e.g. Rocketpool, Lido... )
+\end{enumerate}
+
+\feedback[inline]{figure (upload://lNZenxS8kjiAuO8A48qvOw8JoDg.png)
+caption\emph{Visual representation of the example scenario for validator
+consolidation}
+}
+
+We put a potential distribution over the various validator consolidations in our scenario for illustrative purposes. The distributions can be adjusted as required.
+
+The \emph{Validator numbers after consolidation} row (green) shows the reduced validator numbers for each category, using the consolidations shown in each column (yellow).
+
+Based on the chosen configuration, the total validator set size reduces to 329,810 (last value in the diagram).
+
+
+
+\begin{lemma}
+  The probability $\prob(P_i)$ of validator $i$ becoming the next proposer is
+  independent of the distribution of validator sizes.
+\end{lemma}
+
+\begin{theorem}
+  If external costs of running validators symmetric and any internal cost
+  component/penalty is nonlinear and decreasing in validator size, then, under
+  EIP-7251, the equilibrium distribution over validator sizes is the
+  Dirac-delta function: there exists a unique optimal size validator to which stakers will
+  either consolidate (or pool) towards. Moreover, that size will lie strictly
+  between the minimum and maximum effective balance.
+\end{theorem}
 
 % ------------------------------------------------
 \section{Slashing penalty analysis}
@@ -893,7 +1097,7 @@ The penalty for a \textit{slashed validator,} $ v_j$, is then calculated as
 follows by looking at the previous 36 days from this ``half-way'' epoch:
 \begin{equation*}
   \begin{split}
-& \textit{correlation penalty} = \frac{\left( \sum_{i=1}^n v_i  \right) * b * v_j}{T}, \texttt{ } where \\
+& \textit{correlation penalty} = \frac{\left( \sum_{i=1}^n v_i  \right) \cdot  b \cdot  v_j}{T}, \texttt{ } where \\
 & v_j = \textit{effective balance of validator j slashed 18 days ago} \\
 & v_i = \textit{effective balance of } i^{th} \textit{ validator slashed during previous 36 days} \\
 & n = \textit{number of validators that were slashed during last 36 days} \\
@@ -906,13 +1110,13 @@ For simplicity this is represented as:
 
 \begin{equation*}
 \begin{split}
-& \textit{correlation penalty (penalty)} = \frac{3*EB*SB}{TB}, \texttt{ } where \\
+& \textit{correlation penalty (penalty)} = \frac{3\cdot EB\cdot SB}{TB}, \texttt{ } where \\
 & 3 = \textit{Bellatrix multiplier} \\
 & EB = \textit{slashed validator's effective balance} \\
 & SB = \textit{total slashable balance} \\
 & TB = \textit{total effective balance of the beacon chain} \\
-& \therefore \textit{if SB} = \frac{1}{3} * TB \implies penalty = EB \\
-& \textit{Similarly, if } 3*EB*SB <  TB \implies penalty = 0 \textit{ due to integer division} \\
+& \therefore \textit{if SB} = \frac{1}{3} \cdot  TB \implies penalty = EB \\
+& \textit{Similarly, if } 3\cdot EB\cdot SB <  TB \implies penalty = 0 \textit{ due to integer division} \\
 \end{split}
 \end{equation*}
 
@@ -926,9 +1130,9 @@ which is 24 million ETH.
 \begin{equation*}
 \begin{split}
 & \textit{ SB = EB for an isolated slashing} \\
-& \therefore  3*EB*SB =  3*EB*EB \\
-& \textit{Assuming EB = 2,048 \& TB } = 2.4 * 10^7, \textit{ then} \\
-& 3*EB*EB = 1.2582912 * 10^7 < 2.4 * 10^7 \\
+& \therefore  3\cdot EB\cdot SB =  3\cdot EB\cdot EB \\
+& \textit{Assuming EB = 2,048 \& TB } = 2.4 \cdot  10^7, \textit{ then} \\
+& 3\cdot EB\cdot EB = 1.2582912 \cdot  10^7 < 2.4 \cdot  10^7 \\
 & \therefore penalty = 0
 \end{split}
 \end{equation*}
@@ -945,9 +1149,9 @@ proposal is implemented:
 
 \begin{equation*}
   \begin{split}
-& penalty' = \frac{3^2 * EB * SB^2}{TB^2} \\
+& penalty' = \frac{3^2 \cdot  EB \cdot  SB^2}{TB^2} \\
 & \therefore \textit{if SB } = \frac{TB}{3}, \textit{ then} \\
-& penalty' =   \frac{3^2 * EB * \left(  \frac{TB}{3}^2 \right) }{TB^2} \\
+& penalty' =   \frac{3^2 \cdot  EB \cdot  \left(  \frac{TB}{3}^2 \right) }{TB^2} \\
 & \therefore penalty' = EB
   \end{split}
 \end{equation*}
@@ -977,18 +1181,18 @@ the slashed validator will incur:
 & \textit{base reward} = \frac{64}{ \left\lfloor \sqrt{TB} \right\rfloor} \textit{, weight denominator} = 64, \\
 & \textit{source weight} = 14 \textit{  \& target weight} = 26\\
 & \\
-& \therefore \textit{epoch attestation penalty} = \frac{\textit{base reward} * EB * (14 + 26)}{64} \\
-& \therefore \textit{ if } TB \approx 24 \textit{million ETH} = 2.4 * 10^6 * 10^9 \textit{ Gwei}\\
-& \textit{the integer square root of } 2.4 * 10^6 \textit{ ETH} = 4,898 \textit{, and} \\
-& \textit{the integer square root of } 2.4 * 10^6 * 10^9 \textit{ Gwei} = 154,919,333 \\
-& \textit{base reward} = \frac{64 * 10^9}{154,919,333} = 413 \textit{ Gwei} \\
+& \therefore \textit{epoch attestation penalty} = \frac{\textit{base reward} \cdot  EB \cdot  (14 + 26)}{64} \\
+& \therefore \textit{ if } TB \approx 24 \textit{million ETH} = 2.4 \cdot  10^6 \cdot  10^9 \textit{ Gwei}\\
+& \textit{the integer square root of } 2.4 \cdot  10^6 \textit{ ETH} = 4,898 \textit{, and} \\
+& \textit{the integer square root of } 2.4 \cdot  10^6 \cdot  10^9 \textit{ Gwei} = 154,919,333 \\
+& \textit{base reward} = \frac{64 \cdot  10^9}{154,919,333} = 413 \textit{ Gwei} \\
 & \\
 & \therefore \textit{for a \textbf{solo staker} with 32 ETH:} \\
-& \textit{total attestation penalty for 8,092 epochs} = 8192 * \frac{413*32*40}{64}  \textit{ Gwei}\\
-& \therefore \textit{total attestation penality} \approx 6.767 * 10^7 \textit{ Gwei} \approx 0.06767 \texttt{ } ETH \\
+& \textit{total attestation penalty for 8,092 epochs} = 8192 \cdot  \frac{413\cdot 32\cdot 40}{64}  \textit{ Gwei}\\
+& \therefore \textit{total attestation penality} \approx 6.767 \cdot  10^7 \textit{ Gwei} \approx 0.06767 \texttt{ } ETH \\
 & \\
 & \textit{for a \textbf{fully consolidated} validator with 2,048 ETH:} \\
-& \textit{total attestation penalty for 8,092 epochs} = 8192 * \frac{413*2048*40}{64}\approx 4.331 \texttt{ } ETH \\
+& \textit{total attestation penalty for 8,092 epochs} = 8192 \cdot  \frac{413\cdot 2048\cdot 40}{64}\approx 4.331 \texttt{ } ETH \\
 \end{split}
 \end{equation*}
 
@@ -1031,6 +1235,7 @@ out the penalty for validators with three different effective balances: 32 ETH
 \end{center}
 \label{default}
 \end{table}%
+
 
 
 % -------------------------------------------------------------------------
