@@ -87,3 +87,5 @@ assign_total_sync_stakers_EB <- function(sync_committee) {
   
   sync_staker_totals
 }
+
+
