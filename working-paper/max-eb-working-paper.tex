@@ -1092,23 +1092,29 @@ proposer for $B'$''.
   where $\eb' \neq \eb$ since we are holding the balances of other stakers fixed.
   Observe that $\alpha'_s$ may define a new set $I'_s$ and as such an alternative
   expression for \eqref{eq-proposer-disjoint}.
-  Yet, recalling \eqref{eq-linearity} and the definition of the
-  normalised effective validator balances, $\teb_i$ we see that, since 
+  Recalling \eqref{eq-linearity} and the definition of the
+  normalised effective validator balances, $\teb_i$, we have the total
+  normalised effective balance of staker $s$.
   \[
     \teb_s = \langle \alpha_s, \teb\rangle
     = \langle \alpha'_s, \teb'\rangle. 
   \]
-    Then, via linearity (as shown in \eqref{eq-linearity}),
+  Let $t_s = \sum_{i \in I_s} \teb_i$ and $t'_s = \sum_{i \in I'_s} \teb_i$
+  Observe that, since $\alpha_s$ and $\teb$ take values in $[0, 1]$ and
+  $[16, 2048]$ respectively,
+  thus $\teb_s + (t_s - \teb_s) = \teb'_s + (t'_s - \teb'_s)$ if, and only if,
+  $t_s = t'_s$.  Then, via linearity (as shown in \eqref{eq-linearity}),
   \begin{equation}
     \sum_{i \in I_s} \prob(C_{i, N} \mid \eb_i)
-    = \sum_{i \in I_s} \teb_i / 64 = \teb_s / 64
+    = \sum_{i \in I_s} \teb_i / 64 = (\teb_s + (t_s - \teb_s) / 64
+    =  (\teb'_s + (t'_s - \teb'_s) / 64
     = \sum_{i \in I'_s} \teb'_i / 64
     = \sum_{i \in I'_s} \prob(C_{i, N} \mid \eb'_i).
   \end{equation}
 \end{proof}
-Thus, whilst $s$ can change the probability that a given validator
-$i$ is the next proposer by changing $\alpha_s$, $s$ cannot change the
-probability of $P_s$.
+Thus, whilst $s$ can change the probability that a given validator $i$ is the
+next proposer by changing $\alpha_s$, $s$ cannot change the probability of
+$P_s$.
 
 \begin{theorem}
   If external costs of running validators symmetric and any internal cost
