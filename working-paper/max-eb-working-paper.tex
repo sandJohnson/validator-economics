@@ -1053,10 +1053,40 @@ that all the above functions are fixed once $B$ is validated. For the
 subsequent block $B'$ let $P_s$ denote the event ``for some $i \in I_s$, $i$ is
 proposer for $B'$''.
 
+***--preliminary observation--**
+  Let us consider only the first order effects, which are valid if  $\teb:
+  \mathbf I \rightarrow [1, 64]$ takes values that are sufficiently high that
+  we may ignore the probability of a candidate failing to pass the proposer
+  check and if $\teb_s$ is relative small. The following preliminary
+  observation suggests that it is better for the staker to spread their stake
+  across as many validators as possible.
+ 
+  Consider $\alpha_s(i) = 1$ if $i = k$ and zero otherwise.
+  Then, for $n = \mathbf I$, the probability of being at the
+  front of the queue is $1 / n$. Finally suppose that $f: \mathbb R \rightarrow
+  \mathbb R$ is a linear function that represents the return to being a
+  proposer (as a function of stake). Then the expected return is 
+
+  \[ \frac{1}{n} \left(\frac{\teb_k}{64}\right) f(\eb_s) \]
+  
+  Now consider $\alpha'_s = \frac{1}{2}$ if $i = j, k$ and $0$ otherwise. In
+  particular, half of $s$'s stake in $k$ is now allocated to $j$ moreover, 
+  suppose that $\eb$ is otherwise unchanged. 
+
+  \[ \frac{1}{n} \left(
+      \frac{\teb_j + \teb_s/2}{64}
+      +\frac{\teb_k - \teb_s/2}{64}\right) f(\eb_s) 
+     = \frac{1}{n} \left(\frac{\teb_j + \teb_k}{64}\right) f(\eb_s).
+  \]
+
+  Observe that $s$ can increase their probability of participating as proposer
+  by choosing $\alpha_s$ to have full support, so that $I_s = \mathbf I$.
+
+***--end preliminary observation--***
 \begin{lemma}
   Under EIP-7251, for every staker $s$ with total stake $\eb_s$,  prior
-  probability  $\prob(P_s \mid \eb_s)$ is \emph{well-defined} (independent of
-  their choice of distribution $\alpha_s$ over validators).
+  probability  $\prob(P_s \mid \alpha_s)$ is increasing in the support of $I_s$
+  of $\alpha_s$.
 \end{lemma}
 \begin{proof}
   We first rewrite the event $P_s$. The \texttt{compute\_shuffled\_index}
@@ -1078,11 +1108,11 @@ proposer for $B'$''.
   disjoint union 
   \begin{equation}\label{eq-proposer-disjoint}
   P_s = \bigcup_{i \in I_s} P_i = \bigcup_{i \in I_s, N \in \mathbf N}
-  \left\{ C_{i, N} \cap \neg P_{j, N}) : j \prec_{N} i\}\right).
+   C_{i, N} \cap \left(\neg P_{j, N} : j \prec_{N} i\right).
   \end{equation}
   Observe, that, for every $N$, the set $\{j : j \preceq_N i\}$ is finite.
   Thus, via finitely many applications of \eqref{eq-proposer-disjoint}, we see
-  that $P_s$ can be written entirely in termsof the events $C_{j, N}$.
+  that $P_s$ can be written entirely in terms of the events $C_{j, N}$.
 
   Let $\alpha'_s \neq \alpha_s$ be any alternative ownership distribution for
   staker $s$. Observe that, since $\eb_s$ is fixed, we have 
@@ -1099,22 +1129,20 @@ proposer for $B'$''.
     \teb_s = \langle \alpha_s, \teb\rangle
     = \langle \alpha'_s, \teb'\rangle. 
   \]
-  Let $t_s = \sum_{i \in I_s} \teb_i$ and $t'_s = \sum_{i \in I'_s} \teb_i$
-  Observe that, since $\alpha_s$ and $\teb$ take values in $[0, 1]$ and
-  $[16, 2048]$ respectively,
-  thus $\teb_s + (t_s - \teb_s) = \teb'_s + (t'_s - \teb'_s)$ if, and only if,
-  $t_s = t'_s$.  Then, via linearity (as shown in \eqref{eq-linearity}),
-  \begin{equation}
-    \sum_{i \in I_s} \prob(C_{i, N} \mid \eb_i)
-    = \sum_{i \in I_s} \teb_i / 64 = (\teb_s + (t_s - \teb_s) / 64
-    =  (\teb'_s + (t'_s - \teb'_s) / 64
-    = \sum_{i \in I'_s} \teb'_i / 64
-    = \sum_{i \in I'_s} \prob(C_{i, N} \mid \eb'_i).
-  \end{equation}
+
+  %Let $t_s = \sum_{i \in I_s} \teb_i$ and $t'_s = \sum_{i \in I'_s} \teb_i$
+  %Thus $\teb_s + (t_s - \teb_s) = \teb'_s + (t'_s - \teb'_s)$ if, and only if,
+  %$t_s = t'_s$.  Then, via linearity (as shown in \eqref{eq-linearity}),
+  %\begin{equation}
+  %  \sum_{i \in I_s} \prob(C_{i, N} \mid \eb_i)
+  %  = \sum_{i \in I_s} \teb_i / 64
+  %  = t_s / 64
+  %  =  t'_s / 64
+  %  = \sum_{i \in I'_s} \teb'_i / 64
+  %  = \sum_{i \in I'_s} \prob(C_{i, N} \mid \eb'_i)
+  %\end{equation}
+  %if, and only if, $t_s = t'_s$.
 \end{proof}
-Thus, whilst $s$ can change the probability that a given validator $i$ is the
-next proposer by changing $\alpha_s$, $s$ cannot change the probability of
-$P_s$.
 
 \begin{theorem}
   If external costs of running validators symmetric and any internal cost
