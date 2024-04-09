@@ -1,12 +1,12 @@
 # Fdb version 3
-["bibtex max-eb-working-paper"] 1712665950 "max-eb-working-paper.aux" "max-eb-working-paper.bbl" "max-eb-working-paper" 1712666031
+["bibtex max-eb-working-paper"] 1712666550 "max-eb-working-paper.aux" "max-eb-working-paper.bbl" "max-eb-working-paper" 1712666550
   "eptcs.bst" 0 -1 0 ""
-  "max-eb-working-paper.aux" 1712666031 18163 f050a9a1a314a212412cccbf205efa33 "pdflatex"
+  "max-eb-working-paper.aux" 1712666550 18873 68ab59579927e8fe25a3c9d96624fd56 "pdflatex"
   "references.bib" 1709558049 17220 cbd2f2399943c5c573aaf700fb9cab23 ""
   (generated)
   "max-eb-working-paper.bbl"
   "max-eb-working-paper.blg"
-["pdflatex"] 1712666029 "max-eb-working-paper.tex" "max-eb-working-paper.pdf" "max-eb-working-paper" 1712666031
+["pdflatex"] 1712666548 "max-eb-working-paper.tex" "max-eb-working-paper.pdf" "max-eb-working-paper" 1712666548
   "/usr/local/texlive/2022/texmf-dist/fonts/enc/dvips/cm-super/cm-super-ts1.enc" 1136849721 2900 1537cc8184ad1792082cd229ecc269f4 ""
   "/usr/local/texlive/2022/texmf-dist/fonts/map/fontname/texfonts.map" 1577235249 3524 cb3e574dea2d1052e39280babc910dc8 ""
   "/usr/local/texlive/2022/texmf-dist/fonts/tfm/jknappen/ec/tcrm0600.tfm" 1136768653 1536 12e8c510d3e158fdd0e9a42e75118bd9 ""
@@ -259,7 +259,7 @@
   "max-eb-working-paper.bbl" 0 -1 0 "bibtex max-eb-working-paper"
   "max-eb-working-paper.glsdefs" 1712666031 18423 d5df3f8d53cd6b8225994a46b83d24eb "pdflatex"
   "max-eb-working-paper.out" 1712666031 5964 dab08688445183a9c1f5efbc2dd926cf "pdflatex"
-  "max-eb-working-paper.tex" 1712666027 139137 af6e4700197b2796409445612f692192 ""
+  "max-eb-working-paper.tex" 1712666548 139578 ac46d5ab50cd23bf58bca1606997f735 ""
   (generated)
   "max-eb-working-paper.aux"
   "max-eb-working-paper.glsdefs"

@@ -1088,6 +1088,12 @@ proposer for $B'$''.
   probability  $\prob(P_s \mid \alpha_s)$ is increasing in the support of $I_s$
   of $\alpha_s$.
 \end{lemma}
+\improvement{corrected lemma statement and added a preliminary observation
+  before the lemma; lemma proof needs to be fixed; also need the argument that
+  shows that, if given the choice, stakers ought to select the largest
+  validator; this leads to the result that near maximal validators are optimal;
+  Indeed, uniformly large with enough headroom to be able compound returns
+before pooling across stakers to form a new large validator}
 \begin{proof}
   We first rewrite the event $P_s$. The \texttt{compute\_shuffled\_index}
   function selects a well-ordering or enumeration $N = (\mathbf I, \preceq_N)$
