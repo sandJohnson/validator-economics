@@ -1,0 +1,435 @@
+\documentclass[UTF8]{article}
+%\usepackage{natbib}
+\usepackage{geometry}                % See geometry.pdf to learn the layout options. There are lots.
+\geometry{a4paper}                   % ... or a4paper or a5paper or ... 
+
+%\geometry{landscape}                % Activate for for rotated page geometry
+\usepackage{breakurl}     
+\usepackage{graphicx}
+\usepackage{graphbox}
+\usepackage{hyperref}
+\usepackage{amssymb}
+\usepackage{epstopdf}
+\usepackage{algorithm}
+\usepackage{amsmath}
+\usepackage[noend]{algpseudocode}
+\usepackage{enumitem}
+\usepackage{multirow}
+\usepackage{hhline}
+\usepackage[acronym]{glossaries}
+\usepackage[hang,footnotesize,bf]{caption}
+\DeclareGraphicsRule{.tif}{png}{.png}{`convert #1 `dirname #1`/`basename #1 .tif`.png}
+
+% Copied from StackOverflow for code snippets 
+% ------------------------------------------------------------
+\usepackage{listings}
+\usepackage{color}
+
+\definecolor{dkgreen}{rgb}{0,0.6,0}
+\definecolor{gray}{rgb}{0.5,0.5,0.5}
+\definecolor{mauve}{rgb}{0.58,0,0.82}
+
+\lstset{frame=tb,
+  language=Python,
+  aboveskip=3mm,
+  belowskip=3mm,
+  showstringspaces=false,
+  columns=flexible,
+  basicstyle={\small\ttfamily},
+  numbers=none,
+  numberstyle=\tiny\color{gray},
+  keywordstyle=\color{blue},
+  commentstyle=\color{dkgreen},
+  stringstyle=\color{mauve},
+  breaklines=true,
+  breakatwhitespace=true,
+  tabsize=3
+}
+
+
+% Copied from Stack Exchange for ToDo items
+% -----------------------------------------------------------
+\usepackage{xargs} 
+\usepackage[pdftex,dvipsnames]{xcolor}  % Coloured text etc.
+% 
+\usepackage[colorinlistoftodos,prependcaption,textsize=tiny]{todonotes}
+\newcommandx{\unsure}[2][1=]{\todo[linecolor=red,backgroundcolor=red!25,bordercolor=red,#1]{#2}}
+\newcommandx{\change}[2][1=]{\todo[linecolor=blue,backgroundcolor=blue!25,bordercolor=blue,#1]{#2}}
+\newcommandx{\info}[2][1=]{\todo[linecolor=OliveGreen,backgroundcolor=OliveGreen!25,bordercolor=OliveGreen,#1]{#2}}
+\newcommandx{\improvement}[2][1=]{\todo[linecolor=Plum,backgroundcolor=Plum!25,bordercolor=Plum,#1]{#2}}
+\newcommandx{\feedback}[2][1=]{\todo[linecolor=Goldenrod,backgroundcolor=Goldenrod!25,bordercolor=Coldenrod,#1]{#2}}
+\newcommandx{\thiswillnotshow}[2][1=]{\todo[disable,#1]{#2}}
+
+
+\title{Validator Economics: Variable min validator deposit size\\
+\vspace{4pt}
+\large EF Academic Grant ID: FY23-1030\\
+\vspace{16pt}
+SLASHING \& PENALTIES - MILESTONE 6 }
+\vspace{16pt}
+\author{Sandra Johnson\\
+Consensys Software R\&D}
+\date{\today}                                           % Activate to display a given date or no date
+
+\begin{document}
+\maketitle
+
+
+% Acronym definitions
+\newacronym{apr}{APR}{annual percentage rate}
+\newacronym{bls}{BLS}{Boneh–Lynn–Shacham}
+\newacronym{bn}{BN}{Bayesian network}
+\newacronym{cbeth}{cbETH}{Coinbase wrapped staked ETH}
+\newacronym{cdf}{CDF}{cumulative distribution function}
+\newacronym{cl}{CL}{consensus layer}
+\newacronym{cpt}{CPT}{conditional probability table}
+\newacronym{dos}{DoS}{denial of service}
+\newacronym{dvt}{DVT}{distributed validator technology}
+\newacronym{eb}{EB}{effective balance}
+\newacronym{ef}{EF}{Ethereum Foundation}
+\newacronym{eip}{EIP}{Ethereum Improvement Proposal}
+\newacronym{el}{EL}{execution layer}
+\newacronym{epbs}{ePBS}{enshrined PBS}
+\newacronym{ffg}{FFG}{Friendly finality gadget}
+\newacronym{fxs}{FXS}{Frax share}
+\newacronym{ghost}{GHOST}{Greedy Heaviest-Observed Sub-Tree}
+\newacronym{ldo}{LDO}{Lido DAO}
+\newacronym{lmd}{LMD}{Latest message driven}
+\newacronym{mev}{MEV}{maximal extractable value}
+\newacronym{mm}{MM}{MetaMask}
+\newacronym{npt}{NPT}{node probability table}
+\newacronym{p2p}{p2p}{peer-to-peer}
+\newacronym{pbs}{PBS}{proposer builder separation}
+\newacronym{pc}{PC}{personal computer}
+\newacronym{pdf}{PDF}{probability density function}
+\newacronym{pos}{PoS}{proof of stake}
+\newacronym{pr}{PR}{pull request}
+\newacronym{rig}{RIG}{Robust Incentives Group}
+\newacronym{rpl}{RPL}{Rocket Pool}
+\newacronym{ssf}{SSF}{single-slot finality}
+\newacronym{steth}{stETH}{Lido staked Ether}
+\newacronym{ups}{UPS}{uninterruptable power supply}
+\newacronym{vrf}{VRF}{verifiable random function}
+
+% ------------------------------------------------
+\section{Slashing penalty analysis}
+% ------------------------------------------------
+The main motivation for this
+\href{https://notes.ethereum.org/@mikeneuder/slashings-eip-7251}{post} is the
+concern of large stakers regarding slashing penalties for consolidated
+validators. The proposal consists of two parts:
+\begin{enumerate}
+  \item Changes to existing penalties:
+    \begin{itemize}
+      \item Changing the \textit{initial penalty} to be either fixed, or scaled
+        sublinearly
+      \item Changing the \textit{correlation penalty} to scale quadratically
+        rather than linearly.
+    \end{itemize}
+  \item Unchanged penalties:
+    \begin{itemize}
+      \item \textit{Attestation penalties}
+      \item \textit{Inactivity leak penalties}
+    \end{itemize}
+\end{enumerate}
+
+% ---------------------------------------------------------------
+\subsection{Validator slashing and penalties}
+% ---------------------------------------------------------------
+\label{slashing} \subsubsection*{Slashing} The situations that lead to a
+validator being slashed are few, but they are severe violations of protocol
+rules that may be considered as a potential solo or coordinated attack on the
+system. Regardless of the reason for the slashing event, they are all handled
+in the same way. There is an initial slashing penalty, which is currently set
+at 1 ETH (or $\frac{1}{32}$ of the stake) and this is followed 18 days after
+the slashing event by another penalty, known as the correlation penalty. The
+purpose of the latter is to penalise what may be a coordinated attack on the
+chain. Therefore the correlation penalty takes into account slashings 18 days
+before and after the slashing event. 
+
+A validator gets slashed when they are reported and evidence of the violation
+of the rules is included in a beacon block. For the valid reporting of a
+slashing event, the reporting validator receives a reward. The intention is
+that this will help incentivise the reporting of slashable events. Only one
+proposer slashing can be included in a report, whereas multiple attestation
+violations can be included in a report. When the slashing is included in a
+block, the proposer gets a reward which is a fraction of the effective balance
+of the validator being slashed (currently $\frac{1}{512}$). Up to 16 proposer
+slashings can be included in a block and up to 2 attester slashing reports. 
+Therefore, if several slashings have occurred, including these reports in a
+block can generate a generous reward for the proposer. 
+
+For more detailed information on slashing and calculations, please refer to the 
+latest version of Edgington's
+\href{https://eth2book.info/capella/part2/incentives/slashing/}{\textit{Upgrading Ethereum}}
+book \cite{Edgington2023}  which incorporates the updates included in the 
+Capella hard fork. In summary the events that lead to slashing are:
+
+\begin{enumerate}
+  \item ``making two differing attestations for the same target checkpoint''
+  \item ``making an attestation whose source and target votes `surround' those
+    in another attestation from the same validator.
+  \item ``proposing more than one distinct block at the same height''
+  \item ``attesting to different head blocks, with the same source and target
+    checkpoints''
+\end{enumerate}
+
+The first two relate to Casper \gls{ffg} consensus, and the latter two are
+related to \gls{lmd} \gls{ghost} consensus.
+
+Edgington points out that `slashable behaviours relate to ``equivocation'',
+which is when a validator contradicts something it previously advertised to the
+network'. Hence it is important for validators to ensure that they do not
+`accidentally' equivocate. This could theoretically happen as a result of bugs
+in client software, but the vast majority of slashings have been due to node
+operators running two different nodes using the same validator keys. The reason
+may have been to improve uptime, but the risk of slashing is too great compared
+to any potential benefit in uptime \cite{Edgington2023}. There was also an
+incident where a validator exploited a vulnerability in a relay operator
+running mev-boost, an open source proposer-builder separation protocol.
+Flashbots posted a 
+\href{https://collective.flashbots.net/t/post-mortem-april-3rd-2023-mev-boost-relay-incident-and-related-timing-issue/1540}{detailed post-mortem of the event}.
+
+Apart from the slashing penalties, a slashed validator accrues attestation
+penalties until such time as they exit, which is not until $2^{13} \texttt{
+}epochs = 8,192 \texttt{ }epochs \approx 36 \texttt{ } days$ after being
+slashed. Moreover,  if there is an inactivity leak at the time, the penalties
+imposed on slashed validators will be higher. Slashed validators cannot earn
+any attestation rewards while waiting to exit. It seems rather odd, but a
+slashed validator can still be elected to be the proposer for the next block.
+However, their block will be deemed to be invalid. The only duty for which they
+could receive a small reward is if they are selected to be in the sync
+committee, but the probability of this happening is very small. 
+
+\subsubsection*{Penalties} Slashing is the most severe penalty a validator is
+subjected to and as explained they can accrue several extra penalties while
+they wait to exit. However, there are a number of smaller, less serious
+`misdemeanours', or failure to perform their duties that can result in
+penalties for validators. The validator's stake is reduced by the penalty and
+the ETH is burnt, thereby reducing net issuance \cite{Edgington2023}. \\
+
+\textit{Attestation penalties}
+\begin{itemize}
+  \item Missed source and target votes (i.e. missed Casper FFG votes), but no
+    penalty for a missed head vote.
+  \item Incorrect source vote, then target vote is missed.
+  \item Incorrect source or target vote, then head vote is missed.
+\end{itemize}
+
+\textit{Sync committee penalties}
+\begin{itemize}
+  \item Non-participation of a member incurs a penalty equivalent to the reward
+    they would have received if it was correct
+\end{itemize}
+
+\subsection{Initial slashing penalty}
+% -------------------------------------------------
+Currently this penalty is proportional to the validator's effective balance,
+and this would result in a penalty of 1 ETH if the validator had 32 ETH.
+However, if a fully consolidated validator with 2,048 ETH effective balance
+would incur an initial penalty of 64 ETH.
+
+One proposal is to make this penalty a constant value of 1 ETH, but ``If we
+decide that a constant penalty is insufficient, ...'' it can be adjusted so
+that it monotonically increases with effective balance, e.g. by choosing from
+the family of polynomials.
+
+\info [inline] {How do the authors propose to check whether the initial penalty
+is sufficient?}
+
+The authors demonstrate the increase in initial penalty such that \\
+\textit{initial penalty =} $\frac{EB^x}{32}, \texttt{ } x \leqslant 1$ \\
+
+and generate graphs for $x=1, \frac{15}{16}, \frac{7}{8}, \frac{3}{4},
+\frac{1}{2}$ with respect to the graph of a constant initial penalty of 1 ETH
+\cite{Neuder2023d}.
+
+The authors conclude that visually it appears that $x = \frac{3}{4} \texttt{ }
+\frac{7}{8}$ are good choices in terms of balancing the size of the initial
+slashing penalty and the risk for a consolidated validator.
+
+\subsection{Correlation penalty}
+% --------------------------------------------
+This penalty is incurred roughly 18 days (4,096 epochs) after the slashing
+event, half way between its exit epoch and the slashing event. The correlation
+penalty is important in assessing whether there appears to have been a
+coordinated attack on the chain.
+
+The penalty for a \textit{slashed validator,} $ v_j$, is then calculated as
+follows by looking at the previous 36 days from this ``half-way'' epoch:
+\begin{equation*}
+  \begin{split}
+& \textit{correlation penalty} = \frac{\left( \sum_{i=1}^n v_i  \right) \cdot  b \cdot  v_j}{T}, \texttt{ } where \\
+& v_j = \textit{effective balance of validator j slashed 18 days ago} \\
+& v_i = \textit{effective balance of } i^{th} \textit{ validator slashed during previous 36 days} \\
+& n = \textit{number of validators that were slashed during last 36 days} \\
+& b =3 \textit{ (multiplier changed to 3 in Bellatrix, from 1  in Phase 0, and 2 in Altair)} \\
+& T = \textit{total effective balance of the beacon chain}
+  \end{split}
+\end{equation*}
+
+For simplicity this is represented as:
+
+\begin{equation*}
+\begin{split}
+& \textit{correlation penalty (penalty)} = \frac{3\cdot EB\cdot SB}{TB}, \texttt{ } where \\
+& 3 = \textit{Bellatrix multiplier} \\
+& EB = \textit{slashed validator's effective balance} \\
+& SB = \textit{total slashable balance} \\
+& TB = \textit{total effective balance of the beacon chain} \\
+& \therefore \textit{if SB} = \frac{1}{3} \cdot  TB \implies penalty = EB \\
+& \textit{Similarly, if } 3\cdot EB\cdot SB <  TB \implies penalty = 0 \textit{ due to integer division} \\
+\end{split}
+\end{equation*}
+
+As designed, there is no correlation penalty for isolated slashing events. The
+authors point out that this continues to be the case for a fully consolidated
+validator with 2,048 ETH effective balance.
+
+They based their calculation on the current staked ETH at the time of writing
+which is 24 million ETH.
+
+\begin{equation*}
+\begin{split}
+& \textit{ SB = EB for an isolated slashing} \\
+& \therefore  3\cdot EB\cdot SB =  3\cdot EB\cdot EB \\
+& \textit{Assuming EB = 2,048 \& TB } = 2.4 \cdot  10^7, \textit{ then} \\
+& 3\cdot EB\cdot EB = 1.2582912 \cdot  10^7 < 2.4 \cdot  10^7 \\
+& \therefore penalty = 0
+\end{split}
+\end{equation*}
+
+The authors include two graphs to demonstrate how the correlation penalty
+increases for solo (32 ETH), partially consolidated (256 ETH) and fully
+consolidated (2,048 ETH) validators. It is important to ensure that any
+modifications to the function for calculating the correlation penalty satisfies
+the requirement that when the total slashed balance is $\frac{1}{3}^{rd}$ of
+the total balance, the entire balance of the validator is slashed.
+
+The authors propose a function that preserves this requirement if the MaxEB
+proposal is implemented:
+
+\begin{equation*}
+  \begin{split}
+& penalty' = \frac{3^2 \cdot  EB \cdot  SB^2}{TB^2} \\
+& \therefore \textit{if SB } = \frac{TB}{3}, \textit{ then} \\
+& penalty' =   \frac{3^2 \cdot  EB \cdot  \left(  \frac{TB}{3}^2 \right) }{TB^2} \\
+& \therefore penalty' = EB
+  \end{split}
+\end{equation*}
+
+Moreover, the new correlation penalty function scales quadratically as opposed
+to the current function that scales linearly. Clearly with the proposed new
+function, the slashing penalties are substantially reduced, not only for fully
+consolidated validator, but also for partially consolidated and solo
+validators. The authors demonstrate the comparative correlated slashing
+penalties for these three types of validators using both the current and the
+proposed functions \cite{Neuder2023d}.
+
+% -----------------------------------------
+\subsection{Attestation penalty}
+% -----------------------------------------
+Once a validator is slashed, their attestations (source, target and head votes)
+are deemed to be invalid and hence they incur attestation penalties for the
+8,192 epochs until their exit epoch. 
+
+Different weights are attached to each vote, but only the source (weight = 14)
+and target (weight = 26) votes incur penalties. For each of the 8,192 epochs
+the slashed validator will incur:
+
+\begin{equation*}
+\begin{split}
+& Given:\\
+& \textit{base reward} = \frac{64}{ \left\lfloor \sqrt{TB} \right\rfloor} \textit{, weight denominator} = 64, \\
+& \textit{source weight} = 14 \textit{  \& target weight} = 26\\
+& \\
+& \therefore \textit{epoch attestation penalty} = \frac{\textit{base reward} \cdot  EB \cdot  (14 + 26)}{64} \\
+& \therefore \textit{ if } TB \approx 24 \textit{million ETH} = 2.4 \cdot  10^6 \cdot  10^9 \textit{ Gwei}\\
+& \textit{the integer square root of } 2.4 \cdot  10^6 \textit{ ETH} = 4,898 \textit{, and} \\
+& \textit{the integer square root of } 2.4 \cdot  10^6 \cdot  10^9 \textit{ Gwei} = 154,919,333 \\
+& \textit{base reward} = \frac{64 \cdot  10^9}{154,919,333} = 413 \textit{ Gwei} \\
+& \\
+& \therefore \textit{for a \textbf{solo staker} with 32 ETH:} \\
+& \textit{total attestation penalty for 8,092 epochs} = 8192 \cdot  \frac{413\cdot 32\cdot 40}{64}  \textit{ Gwei}\\
+& \therefore \textit{total attestation penality} \approx 6.767 \cdot  10^7 \textit{ Gwei} \approx 0.06767 \texttt{ } ETH \\
+& \\
+& \textit{for a \textbf{fully consolidated} validator with 2,048 ETH:} \\
+& \textit{total attestation penalty for 8,092 epochs} = 8192 \cdot  \frac{413\cdot 2048\cdot 40}{64}\approx 4.331 \texttt{ } ETH \\
+\end{split}
+\end{equation*}
+
+This attestation penalty for a large slashed staker seems acceptable, but could
+potentially be adjusted by changing the number of epochs that the validator is
+deemed as being ``offline''.The size of this penalty needs to be such that the
+security model is not compromised. In other words it should never be a better
+option to self-slash to avoid inactivity penalties. Therefore, it needs to be
+greater than the inactivity penalties for an unslashed validator that is
+exiting and offline \cite{Neuder2023d}.
+
+\subsection{Inactivity leak penalty}
+% -------------------------------------------------------------------
+An inactivity leak is currently defined as the situation when the chain has not
+been finalising for 4 epochs (this value is set by the protocol). Online
+validators are not penalised when this happens, i.e. no rewards are earned but
+the penalty is 0. On the other hand, offline validators, which includes slashed
+validators waiting to exit, start `leaking' state. The loss of stake means that
+the relative weight of the online validators will increase, which helps the
+chain to start finalising again. The inactivity penalty can be quite severe. 
+
+Using the current method of calculating inactivity leaks, the authors worked
+out the penalty for validators with three different effective balances: 32 ETH
+(solo validator), 256 ETH (partially consolidated validator),  and 2,048 ETH
+(fully consolidated validator).
+
+\begin{table}[htp]
+\caption{inactivity leak penalties}
+\begin{center}
+\renewcommand{\arraystretch}{1.3}
+\begin{tabular}{|l|l|l|l|}
+\hline
+\textbf{validator size} & \textbf{16 epoch leak} & \textbf{128 epoch leak} & \textbf{1024 epoch leak} \\
+\hline
+32 ETH & 0.000259 ETH & 0.0157 ETH & 1.00 ETH \\
+256 ETH & 0.00208 ETH & 0.126 ETH & 8.01 ETH \\
+2048 ETH & 0.0166 ETH & 1.01 ETH & 64.1 ETH \\
+\hline
+\end{tabular}
+\end{center}
+\label{default}
+\end{table}%
+
+% ---------------------------------------------------------------
+\subsection{Griefing/discouragement attacks}
+% ---------------------------------------------------------------
+According to Buterin a griefing attack is when a validator acts maliciously
+inside a consensus mechanism to reduce other validators' revenue even at some
+cost to themselves to encourage the victims to drop out of the mechanism
+\cite{buterin2018c}.
+
+The two main motivations for reducing the number of participants are most
+likely because fewer participants:
+\begin{itemize}
+  \item mean greater rewards for those remaining in the mechanism
+  \item helps to prepare an attack on the chain by reducing the cost of an
+    attack
+\end{itemize}
+
+Some strategies have already been put in place to avoid discouragement attacks
+\cite{Edgington2023}:
+\begin{itemize}
+  \item inverse square root scaling of validator rewards
+  \item scaling of rewards with participation (viz. for each ``source, target,
+    and head vote, the attester's reward is scaled by the proportion of the
+    total stake that made the same vote'')
+  \item zeroing attestation rewards during an inactivity leak
+  \item rate limiting of validator exists, which means that an attacker needs
+    to sustain an attack for longer and at greater cost in order to achieve the
+    same outcome.
+\end{itemize}
+\section{Bibliography}
+% -----------------------------
+\nocite{*}
+\bibliographystyle{eptcs}
+\bibliography{references}
+
+\end{document}
