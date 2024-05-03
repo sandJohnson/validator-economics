@@ -251,6 +251,14 @@ sync_staker_totals_df_maxeb_now <- assign_total_sync_stakers(sync_committee_df_m
 # Another interesting grouping would be the validator EB for each staker:
 sync_staker_totals_EB_df_maxeb_now <- assign_total_sync_stakers_EB(sync_committee_df_maxeb_now)
 
+# Total weight of sync committee (total staked ETH)
+# =================================================
+sync_committee_total_ETH_maxEB_now <- sum(sync_committee_df_maxeb_now$EB)
+sync_committee_total_ETH_now <- 32 * 512
+
+
+
+
 ## >>>>>>>>>>>>>>>>>>
 ## TODO!! VISUALISE OUTPUT (PROPORTIONAL SYNC COMMITTEE MEMBERSHIP VS VALIDATOR SET MEMBERSHIP)
 ## >>>>>>>>>>>>>>>>>>
@@ -272,6 +280,7 @@ scenario_post_EIP7521_prob_maxEB   <- 60/3020    # 64 x 32 ETH
 
 ```
 ## Probabilities and Expected values
+Using total active validator set of 900,000 (dataframes suffixed by _now)
 ```{r}
 # Totals for each type of validator
 active_validators_df_maxeb_now_EB_totals <- active_validators_df_maxeb_now %>%
@@ -315,7 +324,6 @@ expected_sync_mbrs <- expected_sync_mbrs %>%
 
 # Check total selected = 512 
 sync_committee_total <- sum(expected_sync_mbrs$expected)
-  
 
 ```
 ## Single validator dependence on active validator set 
